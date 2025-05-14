@@ -1,6 +1,7 @@
+/* src/app/styles/Contact.module.css */
 .contactPage {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--gray-50);
 }
 
 .container {
@@ -24,7 +25,7 @@
 
 /* Hero Section */
 .contactHero {
-  background-color: #3b82f6;
+  background-color: var(--primary-color);
   color: white;
   padding: 4rem 0;
   text-align: center;
@@ -34,6 +35,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  color: white;
 }
 
 .heroSubtitle {
@@ -68,8 +70,8 @@
 
 .formCard {
   background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   padding: 2rem;
   height: 100%;
 }
@@ -77,12 +79,12 @@
 .formTitle {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--gray-800);
   margin-bottom: 0.5rem;
 }
 
 .formSubtitle {
-  color: #6b7280;
+  color: var(--gray-600);
   margin-bottom: 2rem;
 }
 
@@ -112,7 +114,7 @@
 .formLabel {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--gray-700);
   margin-bottom: 0.5rem;
 }
 
@@ -121,10 +123,10 @@
 .formSelect {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--gray-300);
   border-radius: 0.375rem;
   background-color: white;
-  color: #1f2937;
+  color: var(--gray-800);
   font-size: 0.875rem;
   transition: all 0.2s;
 }
@@ -133,7 +135,7 @@
 .formTextarea:focus,
 .formSelect:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
@@ -143,17 +145,17 @@
 }
 
 .inputError {
-  border-color: #ef4444 !important;
+  border-color: var(--error-color) !important;
 }
 
 .errorText {
-  color: #ef4444;
+  color: var(--error-color);
   font-size: 0.75rem;
   margin-top: 0.25rem;
 }
 
 .submitButton {
-  background-color: #3b82f6;
+  background-color: var(--primary-color);
   color: white;
   padding: 0.75rem 1.5rem;
   border: none;
@@ -165,7 +167,7 @@
 }
 
 .submitButton:hover {
-  background-color: #2563eb;
+  background-color: var(--primary-dark);
 }
 
 .submitButton:disabled {
@@ -205,12 +207,12 @@
 }
 
 .successIcon {
-  background-color: #10b981;
+  background-color: var(--success-color);
   color: white;
 }
 
 .errorIcon {
-  background-color: #ef4444;
+  background-color: var(--error-color);
   color: white;
 }
 
@@ -247,15 +249,15 @@
 
 .infoCard {
   background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   padding: 2rem;
 }
 
 .infoTitle {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--gray-800);
   margin-bottom: 1.5rem;
 }
 
@@ -272,29 +274,29 @@
 .infoIcon {
   width: 2.5rem;
   height: 2.5rem;
-  background-color: #eff6ff;
+  background-color: var(--primary-light);
   border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #3b82f6;
+  color: var(--primary-color);
   margin-right: 1rem;
   flex-shrink: 0;
 }
 
 .infoLabel {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--gray-800);
   margin-bottom: 0.25rem;
 }
 
 .infoText {
-  color: #4b5563;
+  color: var(--gray-600);
   margin: 0;
 }
 
 .infoSubtext {
-  color: #6b7280;
+  color: var(--gray-500);
   font-size: 0.75rem;
   margin: 0.25rem 0 0 0;
 }
@@ -303,13 +305,13 @@
 .socialLinks {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--gray-200);
 }
 
 .socialTitle {
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--gray-800);
   margin-bottom: 1rem;
 }
 
@@ -321,32 +323,32 @@
 .socialIcon {
   width: 2.5rem;
   height: 2.5rem;
-  background-color: #eff6ff;
+  background-color: var(--primary-light);
   border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #3b82f6;
+  color: var(--primary-color);
   transition: all 0.2s;
 }
 
 .socialIcon:hover {
-  background-color: #3b82f6;
+  background-color: var(--primary-color);
   color: white;
 }
 
 /* Map Card */
 .mapCard {
   background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   padding: 2rem;
 }
 
 .mapTitle {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--gray-800);
   margin-bottom: 1rem;
 }
 
@@ -364,7 +366,7 @@
 .mapLink {
   display: inline-block;
   margin-top: 1rem;
-  color: #3b82f6;
+  color: var(--primary-color);
   font-size: 0.875rem;
   text-decoration: none;
 }
@@ -375,21 +377,21 @@
 
 /* FAQ Section */
 .faqSection {
-  background-color: #eff6ff;
+  background-color: var(--primary-light);
   padding: 4rem 0;
 }
 
 .faqTitle {
   font-size: 2rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--gray-800);
   text-align: center;
   margin-bottom: 0.5rem;
 }
 
 .faqSubtitle {
   text-align: center;
-  color: #6b7280;
+  color: var(--gray-600);
   margin-bottom: 3rem;
 }
 
@@ -401,26 +403,26 @@
 
 @media (min-width: 768px) {
   .faqGrid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 .faqItem {
   background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   padding: 1.5rem;
 }
 
 .faqQuestion {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--gray-800);
   margin-bottom: 0.75rem;
 }
 
 .faqAnswer {
-  color: #4b5563;
+  color: var(--gray-600);
   line-height: 1.5;
 }
 
@@ -432,7 +434,7 @@
 .faqLink {
   display: inline-flex;
   align-items: center;
-  color: #3b82f6;
+  color: var(--primary-color);
   font-weight: 500;
   text-decoration: none;
 }

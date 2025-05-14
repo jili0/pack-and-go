@@ -1,51 +1,11 @@
-
-/* General Page Styling */
-.container {
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-@media (min-width: 640px) {
-  .container {
-    padding: 0 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .container {
-    padding: 0 2rem;
-  }
-}
-
-.sectionHeader {
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
-
-.sectionHeader h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1e3a8a;
-  margin-bottom: 0.75rem;
-}
-
-.sectionHeader p {
-  font-size: 1.125rem;
-  color: #4b5563;
-  max-width: 48rem;
-  margin: 0 auto;
-}
-
-/* Pricing Page Specific Styles */
+/* src/app/styles/Pricing.module.css */
 .pricingPage {
   padding-bottom: 4rem;
 }
 
 /* Hero Section */
 .heroSection {
-  background: linear-gradient(to bottom, #1e40af, #3b82f6);
+  background: linear-gradient(to bottom, var(--dark-blue), var(--primary-color));
   color: white;
   padding: 5rem 0 4rem;
   text-align: center;
@@ -61,6 +21,7 @@
   font-size: 3rem;
   font-weight: 800;
   margin-bottom: 1.5rem;
+  color: white;
 }
 
 .heroText {
@@ -89,23 +50,23 @@
 
 .pricingCard {
   background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   padding: 2rem;
   text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: var(--transition);
 }
 
 .pricingCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow-hover);
 }
 
 .pricingCardIcon {
   width: 64px;
   height: 64px;
   margin: 0 auto 1.5rem;
-  background-color: #ebf5ff;
+  background-color: var(--primary-light);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -115,12 +76,12 @@
 .pricingCard h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--gray-800);
   margin-bottom: 1rem;
 }
 
 .pricingCard p {
-  color: #6b7280;
+  color: var(--gray-600);
   line-height: 1.6;
 }
 
@@ -129,8 +90,8 @@
 }
 
 .formulaBox {
-  background-color: #f9fafb;
-  border-radius: 0.5rem;
+  background-color: var(--gray-50);
+  border-radius: var(--border-radius);
   padding: 2rem;
   max-width: 48rem;
   margin: 0 auto;
@@ -140,7 +101,7 @@
 .formulaBox h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--gray-800);
   margin-bottom: 1.5rem;
 }
 
@@ -153,8 +114,8 @@
 }
 
 .formulaElement {
-  background-color: #e0f2fe;
-  color: #0369a1;
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
   font-weight: 500;
@@ -162,12 +123,12 @@
 
 .formulaOperator {
   font-size: 1.5rem;
-  color: #4b5563;
+  color: var(--gray-500);
   font-weight: 600;
 }
 
 .formulaResult {
-  background-color: #3b82f6;
+  background-color: var(--primary-color);
   color: white;
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
@@ -178,7 +139,7 @@
   display: flex;
   gap: 1rem;
   background-color: #fffbeb;
-  border-left: 4px solid #fbbf24;
+  border-left: 4px solid var(--warning-color);
   padding: 1.25rem;
   border-radius: 0.25rem;
   max-width: 48rem;
@@ -188,6 +149,7 @@
 .noteIcon {
   font-size: 1.5rem;
   flex-shrink: 0;
+  color: var(--warning-color);
 }
 
 .noteText p {
@@ -198,7 +160,7 @@
 
 /* Calculator Section */
 .calculatorSection {
-  background-color: #f3f4f6;
+  background-color: var(--gray-100);
   padding: 4rem 0;
 }
 
@@ -226,15 +188,15 @@
 
 .exampleCard {
   background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   overflow: hidden;
 }
 
 .exampleHeader {
-  background-color: #f9fafb;
+  background-color: var(--gray-50);
   padding: 1.25rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--gray-200);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -243,13 +205,13 @@
 .exampleHeader h3 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--gray-800);
   margin: 0;
 }
 
 .exampleBadge {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.25rem 0.75rem;
@@ -261,7 +223,7 @@
 }
 
 .exampleCalculation {
-  background-color: #f9fafb;
+  background-color: var(--gray-50);
   border-radius: 0.375rem;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -274,38 +236,38 @@
 }
 
 .calculationLabel {
-  color: #6b7280;
+  color: var(--gray-600);
 }
 
 .calculationValue {
   font-weight: 500;
-  color: #1f2937;
+  color: var(--gray-800);
 }
 
 .calculationTotal {
   display: flex;
   justify-content: space-between;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--gray-200);
   padding-top: 0.75rem;
   margin-top: 0.75rem;
 }
 
 .calculationTotalValue {
   font-weight: 700;
-  color: #3b82f6;
+  color: var(--primary-color);
   font-size: 1.25rem;
 }
 
 .exampleInfo p {
   margin: 0;
-  color: #6b7280;
+  color: var(--gray-600);
   line-height: 1.6;
   font-size: 0.875rem;
 }
 
 /* Additional Services Section */
 .additionalSection {
-  background-color: #f3f4f6;
+  background-color: var(--gray-100);
   padding: 4rem 0;
 }
 
@@ -324,8 +286,8 @@
 
 .serviceItem {
   background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   padding: 1.5rem;
   display: flex;
   gap: 1rem;
@@ -334,24 +296,25 @@
 .serviceIcon {
   font-size: 2rem;
   flex-shrink: 0;
+  color: var(--primary-color);
 }
 
 .serviceContent h3 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--gray-800);
   margin: 0 0 0.5rem;
 }
 
 .serviceContent p {
   margin: 0 0 0.5rem;
-  color: #6b7280;
+  color: var(--gray-600);
   line-height: 1.6;
 }
 
 .servicePrice {
   margin-top: 0.75rem !important;
-  background-color: #f3f4f6;
+  background-color: var(--gray-50);
   padding: 0.5rem 0.75rem;
   border-radius: 0.25rem;
   display: flex;
@@ -360,19 +323,19 @@
 }
 
 .priceLabel {
-  color: #6b7280;
+  color: var(--gray-600);
 }
 
 .priceValue {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--gray-800);
 }
 
 .servicesNote {
   text-align: center;
   max-width: 48rem;
   margin: 0 auto;
-  color: #6b7280;
+  color: var(--gray-600);
   font-size: 0.875rem;
 }
 
@@ -387,7 +350,7 @@
 }
 
 .faqItem {
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--gray-200);
   padding-bottom: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -400,13 +363,13 @@
 .faqItem h3 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--gray-800);
   margin: 0 0 1rem;
 }
 
 .faqAnswer p {
   margin: 0 0 1rem;
-  color: #6b7280;
+  color: var(--gray-600);
   line-height: 1.6;
 }
 
@@ -417,7 +380,7 @@
 .faqAnswer ul {
   margin: 0.5rem 0 1rem;
   padding-left: 1.5rem;
-  color: #6b7280;
+  color: var(--gray-600);
 }
 
 .faqAnswer li {
@@ -426,7 +389,7 @@
 
 /* CTA Section */
 .ctaSection {
-  background-color: #1e40af;
+  background-color: var(--dark-blue);
   color: white;
   padding: 4rem 0;
   text-align: center;
@@ -441,6 +404,7 @@
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  color: white;
 }
 
 .ctaContent p {
@@ -456,7 +420,7 @@
 .btnPrimary {
   display: inline-block;
   background-color: white;
-  color: #1e40af;
+  color: var(--dark-blue);
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   border-radius: 0.375rem;
@@ -465,5 +429,5 @@
 }
 
 .btnPrimary:hover {
-  background-color: #f9fafb;
+  background-color: var(--gray-50);
 }

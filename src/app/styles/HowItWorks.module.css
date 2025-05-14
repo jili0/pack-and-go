@@ -1,4 +1,412 @@
-/* src/app/styles/HowItWorks.module.css (continued) */
+/* src/app/styles/HowItWorks.module.css */
+.howItWorksPage {
+  min-height: 100vh;
+  background-color: var(--gray-50);
+}
+
+.hero {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 5rem 0;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+  max-width: 800px;
+  margin: 0 auto;
+  opacity: 0.9;
+}
+
+.sectionTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--dark-blue);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.sectionSubtitle {
+  font-size: 1.125rem;
+  color: var(--gray-600);
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  text-align: center;
+}
+
+/* Process Section */
+.processSection {
+  padding: 5rem 0;
+}
+
+.processSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.processStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .processStep {
+    flex-direction: row;
+    text-align: left;
+    gap: 2rem;
+  }
+  
+  .processStep:nth-child(even) {
+    flex-direction: row-reverse;
+  }
+}
+
+.stepImageContainer {
+  flex: 1;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .stepImageContainer {
+    margin-bottom: 0;
+  }
+}
+
+.stepImage {
+  width: 100%;
+  height: auto;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepNumber {
+  display: inline-block;
+  background-color: var(--primary-color);
+  color: white;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.stepTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 1rem;
+}
+
+.stepDescription {
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+
+/* Benefits Section */
+.benefitsSection {
+  padding: 5rem 0;
+  background-color: var(--light-blue);
+}
+
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 640px) {
+  .benefitsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .benefitsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.benefitCard {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 2rem;
+  transition: var(--transition);
+}
+
+.benefitCard:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+.benefitIcon {
+  width: 3rem;
+  height: 3rem;
+  background-color: var(--primary-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+}
+
+.benefitTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 1rem;
+}
+
+.benefitDescription {
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+
+/* Prices Section */
+.pricesSection {
+  padding: 5rem 0;
+}
+
+.priceCards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .priceCards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.priceCard {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.priceCard:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+.priceCardHeader {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.priceCardTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.priceAmount {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.priceUnit {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.priceCardBody {
+  padding: 1.5rem;
+}
+
+.priceFeatures {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.priceFeatureItem {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  color: var(--gray-600);
+}
+
+.priceFeatureIcon {
+  color: var(--success-color);
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.priceCardFooter {
+  padding: 0 1.5rem 1.5rem;
+  text-align: center;
+}
+
+/* Examples Section */
+.examplesSection {
+  padding: 5rem 0;
+  background-color: var(--light-blue);
+}
+
+.examplesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .examplesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.exampleCard {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+}
+
+.exampleCardHeader {
+  background-color: var(--primary-light);
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.exampleCardTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--dark-blue);
+  margin: 0;
+}
+
+.exampleCardBody {
+  padding: 1.5rem;
+}
+
+.exampleDetail {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.exampleDetail:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.exampleDetailLabel {
+  font-weight: 500;
+  color: var(--gray-700);
+}
+
+.exampleDetailValue {
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.totalValue {
+  color: var(--primary-color);
+  font-size: 1.125rem;
+}
+
+/* FAQ Section */
+.faqSection {
+  padding: 5rem 0;
+}
+
+.faqContainer {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--gray-200);
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.faqItem:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.faqQuestion {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 1rem;
+}
+
+.faqAnswer {
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+
+.faqAnswer p {
+  margin-bottom: 1rem;
+}
+
+.faqAnswer p:last-child {
+  margin-bottom: 0;
+}
+
+/* CTA Section */
+.ctaSection {
+  background-color: var(--dark-blue);
+  color: white;
+  padding: 5rem 0;
+  text-align: center;
+}
+
+.ctaContainer {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.ctaTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.ctaDescription {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
 .ctaButton {
   padding: 12px 20px;
   font-size: 16px;
