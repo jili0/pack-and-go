@@ -1,0 +1,22 @@
+/* src/app/styles/HowItWorks.module.css (continued) */
+.ctaButton {
+  padding: 12px 20px;
+  font-size: 16px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.featureIcon {
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+}
+
+.pricingItem,
+.featureItem {
+  align-items: flex-start;
+}
+
+.exampleCard {
+  padding: 16px;
+}
