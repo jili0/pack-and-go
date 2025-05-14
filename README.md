@@ -1,36 +1,184 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pack & Go - Umzugsplattform
 
-## Getting Started
+Pack & Go ist eine moderne Webplattform zur Vermittlung von Umzugsdiensten mit einem transparenten Preismodell und Qualitätszertifizierung.
 
-First, run the development server:
+## Hauptmerkmale
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Transparentes Preismodell basierend auf Stundensätzen und Helferanzahl
+- KisteKlar-Zertifizierung für Qualitätssicherung
+- Benutzerfreundlicher Prozess in 3 einfachen Schritten
+- Separate Dashboards für Kunden, Umzugsunternehmen und Administratoren
+- Vollständiges Bewertungssystem
+- Dokumenten-Upload und Verifizierung
+
+## Technologie-Stack
+
+### Frontend
+
+- **Next.js**: React-Framework mit App Router für Server-Side Rendering
+- **React Hook Form**: Formularvalidierung
+- **Context API**: State Management
+- **Socket.io-Client**: Echtzeit-Kommunikation
+
+### Backend
+
+- **Next.js API Routes**: Backend-Schnittstellen
+- **MongoDB + Mongoose**: Datenbank und ODM
+- **JWT**: Authentifizierung
+- **Socket.io**: Echtzeit-Nachrichten
+- **Resend**: E-Mail-Versand
+- **AWS S3**: Dateispeicherung (nur Produktionsumgebung)
+
+## Projektstruktur
+
+```
+pack-and-go/
+├── public/             # Statische Dateien
+│   ├── images/         # Bilder für die Website
+│   ├── favicon.ico     
+│   └── ...
+├── src/                
+│   ├── app/            # Next.js App Router
+│   │   ├── api/        # API-Routen
+│   │   ├── (auth)/     # Authentifizierungsseiten
+│   │   ├── (dashboard)/# Dashboard-Seiten (geschützt)
+│   │   ├── layout.js   # Root Layout
+│   │   └── page.js     # Homepage
+│   ├── components/     # React Komponenten
+│   ├── lib/            # Hilfsfunktionen
+│   ├── models/         # Mongoose-Modelle
+│   ├── context/        # React Context
+│   └── styles/         # CSS-Dateien
+├── middleware.js       # Next.js Middleware für Auth
+├── .env                # Umgebungsvariablen
+└── package.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Erste Schritte
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Voraussetzungen
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js 14.6.0 oder höher
+- NPM oder Yarn
+- MongoDB (lokal oder Remote)
 
-## Learn More
+### Installation
 
-To learn more about Next.js, take a look at the following resources:
+1. Klonen Sie das Repository:
+   ```bash
+   git clone https://github.com/yourusername/pack-and-go.git
+   cd pack-and-go
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Installieren Sie die Abhängigkeiten:
+   ```bash
+   npm install
+   # oder
+   yarn install
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Erstellen Sie eine .env.local-Datei im Hauptverzeichnis mit folgenden Umgebungsvariablen:
+   ```
+   # MongoDB
+   MONGODB_URI=mongodb://localhost:27017/pack-and-go
+   
+   # JWT
+   JWT_SECRET=your_jwt_secret_key
+   
+   # Resend (E-Mail)
+   RESEND_API_KEY=your_resend_api_key
+   FROM_EMAIL=no-reply@pack-and-go.de
+   SUPPORT_EMAIL=support@pack-and-go.de
+   ADMIN_EMAIL=admin@pack-and-go.de
+   
+   # S3 (Nur für Produktion, für Entwicklung optional)
+   AWS_ACCESS_KEY_ID=your_aws_access_key
+   AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+   AWS_REGION=eu-central-1
+   AWS_S3_BUCKET_NAME=your_bucket_name
+   AWS_S3_BASE_URL=https://your-bucket-url.s3.eu-central-1.amazonaws.com
+   
+   # App
+   NEXT_PUBLIC_BASE_URL=http://localhost:3000
+   ```
 
-## Deploy on Vercel
+4. Starten Sie den Entwicklungsserver:
+   ```bash
+   npm run dev
+   # oder
+   yarn dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Öffnen Sie [http://localhost:3000](http://localhost:3000) in Ihrem Browser.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Produktion
+
+Für die Bereitstellung in der Produktion:
+
+1. Bauen Sie die Anwendung:
+   ```bash
+   npm run build
+   # oder
+   yarn build
+   ```
+
+2. Starten Sie den Produktionsserver:
+   ```bash
+   npm start
+   # oder
+   yarn start
+   ```
+
+## Benutzertypen
+
+Die Plattform unterstützt drei Benutzertypen:
+
+1. **Kunden**
+   - Registrierung mit Name, E-Mail, Telefon
+   - Umzugsanfragen erstellen
+   - Umzugsfirmen vergleichen und auswählen
+   - Bewertungen abgeben
+
+2. **Umzugsfirmen**
+   - Registrierung mit Firmendetails und Dokumenten
+   - Nach Überprüfung durch Administratoren freigeschaltet
+   - Anfragen bestätigen oder ablehnen
+   - Eigene Preise und Servicegebiete festlegen
+
+3. **Administratoren**
+   - Umzugsfirmen verifizieren
+   - Benutzer und Firmen verwalten
+   - Plattform überwachen
+
+## Hauptfunktionen
+
+### Umzugssuche und -buchung
+
+1. Benutzer geben Start- und Zieladresse ein
+2. Benutzer wählen Anzahl der Helfer und geschätzte Dauer
+3. System zeigt verfügbare Umzugsfirmen für die Route
+4. Benutzer können Firmen nach Bewertung oder Zertifizierung sortieren
+5. Benutzer wählen eine Firma und bis zu drei Wunschtermine aus
+6. Umzugsfirma bestätigt einen Termin
+7. Benutzer erhält Bestätigung per E-Mail
+
+### Umzugsfirmen-Verifizierung
+
+1. Umzugsfirma registriert sich und lädt Dokumente hoch
+2. Administrator erhält Benachrichtigung und überprüft die Dokumente
+3. Bei erfolgreicher Überprüfung wird die Firma freigeschaltet
+4. Bei KisteKlar-Zertifizierung wird das Zertifikat ebenfalls überprüft
+
+### Bewertungssystem
+
+1. Nach Abschluss eines Umzugs kann der Kunde eine Bewertung abgeben
+2. Bewertungen fließen in das Gesamtrating der Umzugsfirma ein
+3. Kunden können Bewertungen als Entscheidungshilfe nutzen
+
+## Sicherheit
+
+- Alle Passwörter werden mit bcrypt gehasht
+- JWT-Authentifizierung für API-Zugriff
+- Rollenbasierte Zugriffskontrolle
+- Dokumente werden sicher in S3 gespeichert
+
