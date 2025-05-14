@@ -1,7 +1,8 @@
 // src/components/forms/AddressForm.jsx
-'use client';
+"use client";
 
 import { useState } from 'react';
+import styles from '@/app/styles/Components.module.css';
 
 const AddressForm = ({ 
   label, 
@@ -14,7 +15,7 @@ const AddressForm = ({
     street: initialValues.street || '',
     city: initialValues.city || '',
     postalCode: initialValues.postalCode || '',
-    country: initialValues.country || 'Deutschland',
+    country: initialValues.country || 'Germany',
     ...initialValues
   });
 
@@ -29,13 +30,13 @@ const AddressForm = ({
   };
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      {label && <h3 className="text-lg font-medium text-gray-700">{label}</h3>}
+    <div className={`${styles.addressForm} ${className}`}>
+      {label && <h3 className={styles.addressFormTitle}>{label}</h3>}
       
-      <div className="grid grid-cols-1 gap-4">
-        <div>
-          <label htmlFor={`street-${label}`} className="block text-sm font-medium text-gray-700">
-            Straße und Hausnummer
+      <div className={styles.addressFormFields}>
+        <div className={styles.formGroup}>
+          <label htmlFor={`street-${label}`} className={styles.label}>
+            Street and Number
           </label>
           <input
             type="text"
@@ -43,17 +44,15 @@ const AddressForm = ({
             name="street"
             value={address.street}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-              error ? 'border-red-500' : ''
-            }`}
-            placeholder="Musterstraße 123"
+            className={`${styles.input} ${error ? styles.inputError : ''}`}
+            placeholder="Example Street 123"
           />
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor={`postalCode-${label}`} className="block text-sm font-medium text-gray-700">
-              PLZ
+        <div className={styles.addressGrid}>
+          <div className={styles.formGroup}>
+            <label htmlFor={`postalCode-${label}`} className={styles.label}>
+              Postal Code
             </label>
             <input
               type="text"
@@ -61,16 +60,14 @@ const AddressForm = ({
               name="postalCode"
               value={address.postalCode}
               onChange={handleChange}
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                error ? 'border-red-500' : ''
-              }`}
+              className={`${styles.input} ${error ? styles.inputError : ''}`}
               placeholder="12345"
             />
           </div>
           
-          <div>
-            <label htmlFor={`city-${label}`} className="block text-sm font-medium text-gray-700">
-              Stadt
+          <div className={styles.formGroup}>
+            <label htmlFor={`city-${label}`} className={styles.label}>
+              City
             </label>
             <input
               type="text"
@@ -78,44 +75,42 @@ const AddressForm = ({
               name="city"
               value={address.city}
               onChange={handleChange}
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                error ? 'border-red-500' : ''
-              }`}
+              className={`${styles.input} ${error ? styles.inputError : ''}`}
               placeholder="Berlin"
             />
           </div>
         </div>
         
-        <div>
-          <label htmlFor={`country-${label}`} className="block text-sm font-medium text-gray-700">
-            Land
+        <div className={styles.formGroup}>
+          <label htmlFor={`country-${label}`} className={styles.label}>
+            Country
           </label>
           <select
             id={`country-${label}`}
             name="country"
             value={address.country}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className={styles.select}
           >
-            <option value="Deutschland">Deutschland</option>
-            <option value="Österreich">Österreich</option>
-            <option value="Schweiz">Schweiz</option>
-            <option value="Frankreich">Frankreich</option>
-            <option value="Italien">Italien</option>
-            <option value="Niederlande">Niederlande</option>
-            <option value="Belgien">Belgien</option>
-            <option value="Luxemburg">Luxemburg</option>
-            <option value="Dänemark">Dänemark</option>
-            <option value="Polen">Polen</option>
-            <option value="Tschechien">Tschechien</option>
-            <option value="Spanien">Spanien</option>
+            <option value="Germany">Germany</option>
+            <option value="Austria">Austria</option>
+            <option value="Switzerland">Switzerland</option>
+            <option value="France">France</option>
+            <option value="Italy">Italy</option>
+            <option value="Netherlands">Netherlands</option>
+            <option value="Belgium">Belgium</option>
+            <option value="Luxembourg">Luxembourg</option>
+            <option value="Denmark">Denmark</option>
+            <option value="Poland">Poland</option>
+            <option value="Czech Republic">Czech Republic</option>
+            <option value="Spain">Spain</option>
             <option value="Portugal">Portugal</option>
-            <option value="Vereinigtes Königreich">Vereinigtes Königreich</option>
+            <option value="United Kingdom">United Kingdom</option>
           </select>
         </div>
       </div>
       
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className={styles.errorMessage}>{error}</p>}
     </div>
   );
 };
