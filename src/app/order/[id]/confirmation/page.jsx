@@ -1,11 +1,12 @@
-// src/app/order/[id]/confirmation/page.jsx (continuing from previous part)
+// src/app/order/[id]/confirmation/page.jsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
-import StarRating from '@/components/ui/StarRating';
+import Image from '@/components/ui/Image';
+import styles from '@/app/styles/Components.module.css';
 
 export default function OrderConfirmation({ params }) {
   const { id } = params;
@@ -19,7 +20,7 @@ export default function OrderConfirmation({ params }) {
   
   useEffect(() => {
     if (!user) {
-      // Wenn nicht angemeldet, zur Login-Seite weiterleiten
+      // Redirect to login if not authenticated
       router.push('/login');
       return;
     }
@@ -33,11 +34,11 @@ export default function OrderConfirmation({ params }) {
           setOrder(data.order);
           setCompany(data.company);
         } else {
-          setError(data.message || 'Die Bestelldetails konnten nicht geladen werden.');
+          setError(data.message || 'The order details could not be loaded.');
         }
       } catch (error) {
-        console.error('Fehler beim Laden der Bestelldetails:', error);
-        setError('Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
+        console.error('Error fetching order details:', error);
+        setError('An error occurred. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -46,39 +47,32 @@ export default function OrderConfirmation({ params }) {
     fetchOrderDetails();
   }, [id, user, router]);
   
+  // Format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return 'No date specified';
+    
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+  
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center items-center min-h-[60vh]">
-            <div className="flex flex-col items-center">
-              <svg className="animate-spin h-12 w-12 text-blue-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <h2 className="text-lg font-medium text-gray-900">Bestelldetails werden geladen...</h2>
-              <p className="mt-1 text-sm text-gray-500">Bitte haben Sie einen Moment Geduld.</p>
-            </div>
-          </div>
-        </div>
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+        <p>Loading order details...</p>
       </div>
     );
   }
   
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-red-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Ein Fehler ist aufgetreten</h2>
-            <p className="text-gray-600 mb-6">{error}</p>
-            <Link href="/user" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              Zum Dashboard
-            </Link>
-          </div>
+      <div className={styles.container}>
+        <div className={`${styles.alert} ${styles.alertDanger}`}>
+          <h3>Error</h3>
+          <p>{error}</p>
+          <Link href="/user/orders" className={`${styles.btn} ${styles.btnPrimary}`}>
+            View My Orders
+          </Link>
         </div>
       </div>
     );
@@ -86,213 +80,215 @@ export default function OrderConfirmation({ params }) {
   
   if (!order || !company) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-red-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Bestellung nicht gefunden</h2>
-            <p className="text-gray-600 mb-6">Die angeforderte Bestellung konnte nicht gefunden werden.</p>
-            <Link href="/user" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              Zum Dashboard
-            </Link>
-          </div>
+      <div className={styles.container}>
+        <div className={`${styles.alert} ${styles.alertDanger}`}>
+          <h3>Order Not Found</h3>
+          <p>The requested order could not be found.</p>
+          <Link href="/user/orders" className={`${styles.btn} ${styles.btnPrimary}`}>
+            View My Orders
+          </Link>
         </div>
       </div>
     );
   }
   
-  // Formatiere das Datum für die Anzeige
-  const formatDate = (dateString) => {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('de-DE', options);
-  };
-  
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
-          {/* Erfolgsmeldung */}
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <div className={styles.container}>
+      <div className={styles.confirmationPage}>
+        {/* Success Message */}
+        <div className={styles.successBanner}>
+          <div className={styles.successIcon}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Vielen Dank für Ihre Bestellung!</h2>
-            <p className="text-gray-600 mb-2">
-              Ihre Buchung wurde erfolgreich übermittelt und wird derzeit von der Umzugsfirma geprüft.
-            </p>
-            <p className="text-gray-600">
-              Sie erhalten in Kürze eine Bestätigungs-E-Mail mit allen Details.
-            </p>
           </div>
-          
-          {/* Bestellübersicht */}
-          <div className="bg-white shadow overflow-hidden rounded-lg mb-6">
-            <div className="px-4 py-5 sm:px-6 bg-gray-50 flex justify-between items-center">
-              <h2 className="text-lg font-medium text-gray-900">Bestellübersicht</h2>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                {order.status === 'pending' && 'Anfrage gesendet'}
-                {order.status === 'confirmed' && 'Bestätigt'}
-                {order.status === 'declined' && 'Abgelehnt'}
-                {order.status === 'completed' && 'Abgeschlossen'}
-                {order.status === 'cancelled' && 'Storniert'}
-              </span>
-            </div>
-            <div className="border-t border-gray-200">
-              <dl>
-                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Bestellnummer</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{order._id}</dd>
-                </div>
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Datum der Bestellung</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {formatDate(order.createdAt)}
-                  </dd>
-                </div>
-                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Umzugsdatum</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {order.confirmedDate 
-                      ? formatDate(order.confirmedDate) 
-                      : (
-                        <>
-                          <span className="font-medium">Gewünscht:</span> {formatDate(order.preferredDates[0])}
-                          <p className="text-sm text-yellow-600 mt-1">
-                            (Wartet auf Bestätigung durch die Umzugsfirma)
-                          </p>
-                        </>
-                      )
-                    }
-                  </dd>
-                </div>
-              </dl>
-            </div>
+          <h1>Thank You for Your Order!</h1>
+          <p>Your booking has been submitted successfully and is currently being reviewed by the moving company.</p>
+        </div>
+        
+        {/* Order Overview */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h2>Order Overview</h2>
           </div>
-          
-          {/* Umzugsfirma */}
-          <div className="bg-white shadow overflow-hidden rounded-lg mb-6">
-            <div className="px-4 py-5 sm:px-6 bg-gray-50">
-              <h2 className="text-lg font-medium text-gray-900">Umzugsfirma</h2>
+          <div className={styles.cardBody}>
+            <div className={styles.orderInfo}>
+              <div className={styles.orderIdSection}>
+                <span className={styles.orderLabel}>Order ID:</span>
+                <span className={styles.orderId}>{order._id}</span>
+              </div>
+              
+              <div className={styles.orderStatusSection}>
+                <span className={styles.orderLabel}>Order Status:</span>
+                <span className={`${styles.badge} ${styles.badgeYellow}`}>
+                  Request Sent
+                </span>
+              </div>
             </div>
-            <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
-              <div className="flex items-start">
-                <div className="flex-shrink-0 bg-gray-100 rounded-full p-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
+            
+            {/* Moving Company */}
+            <div className={styles.companySection}>
+              <h3>Moving Company</h3>
+              <div className={styles.companyInfo}>
+                <div className={styles.companyLogo}>
+                  {company.logo ? (
+                    <Image 
+                      src={company.logo} 
+                      alt={company.companyName} 
+                      width={64} 
+                      height={64} 
+                      className={styles.logoImage} 
+                    />
+                  ) : (
+                    <div className={styles.logoPlaceholder}>
+                      <span>{company.companyName.charAt(0)}</span>
+                    </div>
+                  )}
                 </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900">{company.companyName}</h3>
-                  <div className="flex items-center mt-1">
-                    <StarRating rating={company.averageRating} />
-                    <span className="ml-2 text-sm text-gray-500">
-                      ({company.reviewsCount} {company.reviewsCount === 1 ? 'Bewertung' : 'Bewertungen'})
+                <div className={styles.companyDetails}>
+                  <h4>{company.companyName}</h4>
+                  <div className={styles.companyRating}>
+                    <div className={styles.stars}>
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className={i < Math.round(company.averageRating) ? styles.starFilled : styles.starEmpty}>★</span>
+                      ))}
+                    </div>
+                    <span className={styles.ratingCount}>
+                      ({company.reviewsCount} {company.reviewsCount === 1 ? 'review' : 'reviews'})
                     </span>
                   </div>
                   {company.isKisteKlarCertified && (
-                    <div className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-1.5 h-4 w-4 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      KisteKlar zertifiziert
+                    <div className={`${styles.badge} ${styles.badgeGreen}`}>
+                      KisteKlar Certified
                     </div>
                   )}
-                  <div className="mt-3">
-                    <p className="text-sm text-gray-600">
-                      <span className="font-medium">Telefon:</span> {company.phone || 'Nicht angegeben'}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-medium">E-Mail:</span> {company.email || 'Nicht angegeben'}
-                    </p>
-                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          
-          {/* Umzugsdetails */}
-          <div className="bg-white shadow overflow-hidden rounded-lg mb-6">
-            <div className="px-4 py-5 sm:px-6 bg-gray-50">
-              <h2 className="text-lg font-medium text-gray-900">Umzugsdetails</h2>
+            
+            {/* Moving Details */}
+            <div className={styles.movingDetails}>
+              <h3>Moving Details</h3>
+              <div className={styles.addressSection}>
+                <div className={styles.addressFrom}>
+                  <h4>From</h4>
+                  <p>{order.fromAddress.street}</p>
+                  <p>{order.fromAddress.postalCode} {order.fromAddress.city}</p>
+                  <p>{order.fromAddress.country}</p>
+                </div>
+                <div className={styles.addressArrow}>→</div>
+                <div className={styles.addressTo}>
+                  <h4>To</h4>
+                  <p>{order.toAddress.street}</p>
+                  <p>{order.toAddress.postalCode} {order.toAddress.city}</p>
+                  <p>{order.toAddress.country}</p>
+                </div>
+              </div>
+              
+              <div className={styles.detailsGrid}>
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>Preferred Date:</span>
+                  <span className={styles.detailValue}>
+                    {formatDate(order.preferredDates[0])}
+                  </span>
+                </div>
+                
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>Helpers:</span>
+                  <span className={styles.detailValue}>{order.helpersCount}</span>
+                </div>
+                
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>Estimated Hours:</span>
+                  <span className={styles.detailValue}>{order.estimatedHours}</span>
+                </div>
+                
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>Total Price:</span>
+                  <span className={`${styles.detailValue} ${styles.priceValue}`}>
+                    {order.totalPrice} €
+                  </span>
+                </div>
+              </div>
+              
+              {order.notes && (
+                <div className={styles.notesSection}>
+                  <h4>Additional Notes</h4>
+                  <p>{order.notes}</p>
+                </div>
+              )}
             </div>
-            <div className="border-t border-gray-200">
-              <dl>
-                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Von</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {order.fromAddress.street}, {order.fromAddress.postalCode} {order.fromAddress.city}, {order.fromAddress.country}
-                  </dd>
-                </div>
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Nach</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {order.toAddress.street}, {order.toAddress.postalCode} {order.toAddress.city}, {order.toAddress.country}
-                  </dd>
-                </div>
-                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Anzahl der Helfer</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{order.helpersCount}</dd>
-                </div>
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Geschätzte Stunden</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{order.estimatedHours}</dd>
-                </div>
-                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Gesamtpreis</dt>
-                  <dd className="mt-1 text-sm font-medium text-blue-700 sm:mt-0 sm:col-span-2">{order.totalPrice} €</dd>
-                </div>
-                {order.notes && (
-                  <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">Zusätzliche Hinweise</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{order.notes}</dd>
-                  </div>
-                )}
-              </dl>
+          </div>
+        </div>
+        
+        {/* What's Next */}
+        <div className={styles.whatsNextSection}>
+          <h2>What's Next?</h2>
+          <div className={styles.stepGrid}>
+            <div className={styles.stepCard}>
+              <div className={styles.stepNumber}>1</div>
+              <h3>Confirmation</h3>
+              <p>The moving company will review your request and confirm one of your preferred dates.</p>
+            </div>
+            
+            <div className={styles.stepCard}>
+              <div className={styles.stepNumber}>2</div>
+              <h3>Preparation</h3>
+              <p>Once confirmed, you can prepare for your move. Check out our <Link href="/moving-tips">moving tips</Link> for helpful advice.</p>
+            </div>
+            
+            <div className={styles.stepCard}>
+              <div className={styles.stepNumber}>3</div>
+              <h3>Moving Day</h3>
+              <p>On the agreed date, the moving team will arrive at your location to help with your move.</p>
+            </div>
+            
+            <div className={styles.stepCard}>
+              <div className={styles.stepNumber}>4</div>
+              <h3>Feedback</h3>
+              <p>After your move is complete, please share your experience by leaving a review.</p>
             </div>
           </div>
-          
-          {/* Wichtige Informationen */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Wichtige Informationen</h3>
-            <ul className="space-y-4 text-sm text-gray-600">
-              <li className="flex">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Die Umzugsfirma wird sich in Kürze mit Ihnen in Verbindung setzen, um die Details zu besprechen und das Datum zu bestätigen.</span>
-              </li>
-              <li className="flex">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Der endgültige Preis kann sich ändern, wenn die tatsächliche Dauer des Umzugs vom geschätzten Wert abweicht.</span>
-              </li>
-              <li className="flex">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Im Falle einer Stornierung oder Änderung kontaktieren Sie bitte die Umzugsfirma direkt oder unser Kundenserviceteam unter <a href="mailto:support@pack-and-go.de" className="text-blue-600 hover:text-blue-700">support@pack-and-go.de</a>.</span>
-              </li>
-            </ul>
+        </div>
+        
+        {/* Email Notification */}
+        <div className={styles.emailNotification}>
+          <div className={styles.emailIcon}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
           </div>
-          
-          {/* Aktionsbuttons */}
-          <div className="flex flex-col sm:flex-row sm:justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <Link 
-              href="/user/orders"
-              className="inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Meine Bestellungen anzeigen
-            </Link>
-            <Link 
-              href="/"
-              className="inline-flex justify-center items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Zurück zur Startseite
-            </Link>
+          <div className={styles.emailMessage}>
+            <h3>Check Your Email</h3>
+            <p>We've sent a confirmation email to <strong>{user.email}</strong> with all the details of your order.</p>
+            <p>If you don't see it, please check your spam folder.</p>
           </div>
+        </div>
+        
+        {/* Action Buttons */}
+        <div className={styles.actionButtons}>
+          <Link 
+            href={`/order/${order._id}`} 
+            className={`${styles.btn} ${styles.btnPrimary}`}
+          >
+            View Order Details
+          </Link>
+          
+          <Link 
+            href="/user/orders" 
+            className={`${styles.btn} ${styles.btnSecondary}`}
+          >
+            View All Orders
+          </Link>
+          
+          <Link 
+            href="/" 
+            className={`${styles.btn} ${styles.btnOutline}`}
+          >
+            Back to Home
+          </Link>
         </div>
       </div>
     </div>
