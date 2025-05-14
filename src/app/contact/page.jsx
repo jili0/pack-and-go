@@ -1,27 +1,67 @@
 // src/app/contact/page.jsx
-"use client";
+'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import styles from '@/app/styles/Contact.module.css';
-import Image from '@/components/ui/Image';
 
-export default function Contact() {
+const ContactPage = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  
+  const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState(null);
-  
-  const { 
-    register, 
-    handleSubmit, 
-    reset,
-    formState: { errors } 
-  } = useForm();
-  
-  const onSubmit = async (data) => {
+  const [submitResult, setSubmitResult] = useState(null);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+
+    // Fehler löschen beim Tippen
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: null
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name ist erforderlich';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'E-Mail-Adresse ist erforderlich';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'E-Mail-Adresse ist ungültig';
+    }
+    
+    if (!formData.message.trim()) {
+      newErrors.message = 'Bitte geben Sie eine Nachricht ein';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsSubmitting(true);
-    setSubmitSuccess(false);
-    setSubmitError(null);
+    setSubmitResult(null);
     
     try {
       const response = await fetch('/api/contact', {
@@ -29,199 +69,170 @@ export default function Contact() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formData),
       });
       
-      const result = await response.json();
+      const data = await response.json();
       
-      if (result.success) {
-        setSubmitSuccess(true);
-        reset(); // Reset form on success
+      if (data.success) {
+        setSubmitResult({
+          success: true,
+          message: 'Vielen Dank für Ihre Nachricht! Wir werden uns so schnell wie möglich bei Ihnen melden.'
+        });
+        // Form nur bei Erfolg zurücksetzen
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
       } else {
-        setSubmitError(result.message || 'Failed to send your message. Please try again later.');
+        setSubmitResult({
+          success: false,
+          message: data.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.'
+        });
       }
     } catch (error) {
-      console.error('Error sending contact form:', error);
-      setSubmitError('An unexpected error occurred. Please try again later.');
+      console.error('Fehler beim Senden des Kontaktformulars:', error);
+      setSubmitResult({
+        success: false,
+        message: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.'
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
     <div className={styles.contactPage}>
-      {/* Hero section */}
       <div className={styles.contactHero}>
-        <div className={styles.container}>
-          <h1 className={styles.heroTitle}>Contact Us</h1>
-          <p className={styles.heroSubtitle}>
-            Have questions about Pack & Go? We're here to help you with all your moving needs.
-          </p>
+        <div className="container">
+          <h1 className={styles.heroTitle}>Kontaktieren Sie uns</h1>
+          <p className={styles.heroSubtitle}>Haben Sie Fragen oder Anregungen? Unser Team steht Ihnen gerne zur Verfügung.</p>
         </div>
       </div>
       
-      <div className={styles.container}>
-        <div className={styles.contactContent}>
-          {/* Contact form and info columns */}
+      <div className={styles.contactContent}>
+        <div className="container">
           <div className={styles.contactGrid}>
-            {/* Contact form column */}
             <div className={styles.formColumn}>
               <div className={styles.formCard}>
-                <h2 className={styles.formTitle}>Send us a message</h2>
-                <p className={styles.formSubtitle}>
-                  Fill out the form below and we'll get back to you as soon as possible.
-                </p>
+                <h2 className={styles.formTitle}>Senden Sie uns eine Nachricht</h2>
+                <p className={styles.formSubtitle}>Wir freuen uns, von Ihnen zu hören und antworten innerhalb von 24 Stunden.</p>
                 
-                {submitSuccess && (
-                  <div className={styles.successAlert}>
-                    <div className={styles.successIcon}>✓</div>
-                    <div className={styles.successMessage}>
-                      <h3 className={styles.successTitle}>Message sent successfully!</h3>
-                      <p>Thank you for contacting us. We'll respond to your inquiry shortly.</p>
+                {submitResult && (
+                  submitResult.success ? (
+                    <div className={styles.successAlert}>
+                      <div className={styles.successIcon}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className={styles.successTitle}>Nachricht gesendet!</h3>
+                        <div className={styles.successMessage}>
+                          <p>{submitResult.message}</p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className={styles.errorAlert}>
+                      <div className={styles.errorIcon}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="8" x2="12" y2="12"></line>
+                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className={styles.errorTitle}>Fehler</h3>
+                        <div className={styles.errorMessage}>
+                          <p>{submitResult.message}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )
                 )}
                 
-                {submitError && (
-                  <div className={styles.errorAlert}>
-                    <div className={styles.errorIcon}>!</div>
-                    <div className={styles.errorMessage}>
-                      <h3 className={styles.errorTitle}>Error</h3>
-                      <p>{submitError}</p>
-                    </div>
-                  </div>
-                )}
-                
-                <form onSubmit={handleSubmit(onSubmit)} className={styles.contactForm}>
+                <form className={styles.contactForm} onSubmit={handleSubmit}>
                   <div className={styles.formRow}>
                     <div className={styles.formGroup}>
-                      <label htmlFor="name" className={styles.formLabel}>
-                        Name
-                      </label>
+                      <label htmlFor="name" className={styles.formLabel}>Name</label>
                       <input
-                        id="name"
-                        className={`${styles.formInput} ${errors.name ? styles.inputError : ''}`}
                         type="text"
-                        placeholder="Your name"
-                        {...register('name', { required: 'Name is required' })}
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className={`${styles.formInput} ${errors.name ? styles.inputError : ''}`}
+                        placeholder="Ihr Name"
+                        disabled={isSubmitting}
                       />
-                      {errors.name && (
-                        <span className={styles.errorText}>{errors.name.message}</span>
-                      )}
+                      {errors.name && <p className={styles.errorText}>{errors.name}</p>}
                     </div>
+                    
                     <div className={styles.formGroup}>
-                      <label htmlFor="email" className={styles.formLabel}>
-                        Email
-                      </label>
+                      <label htmlFor="email" className={styles.formLabel}>E-Mail</label>
                       <input
-                        id="email"
-                        className={`${styles.formInput} ${errors.email ? styles.inputError : ''}`}
                         type="email"
-                        placeholder="Your email address"
-                        {...register('email', {
-                          required: 'Email is required',
-                          pattern: {
-                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message: 'Invalid email address'
-                          }
-                        })}
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className={`${styles.formInput} ${errors.email ? styles.inputError : ''}`}
+                        placeholder="ihre-email@example.com"
+                        disabled={isSubmitting}
                       />
-                      {errors.email && (
-                        <span className={styles.errorText}>{errors.email.message}</span>
-                      )}
+                      {errors.email && <p className={styles.errorText}>{errors.email}</p>}
                     </div>
                   </div>
                   
                   <div className={styles.formGroup}>
-                    <label htmlFor="subject" className={styles.formLabel}>
-                      Subject
-                    </label>
+                    <label htmlFor="subject" className={styles.formLabel}>Betreff</label>
                     <input
-                      id="subject"
-                      className={`${styles.formInput} ${errors.subject ? styles.inputError : ''}`}
                       type="text"
-                      placeholder="What is your message about?"
-                      {...register('subject', { required: 'Subject is required' })}
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      className={styles.formInput}
+                      placeholder="Worum geht es?"
+                      disabled={isSubmitting}
                     />
-                    {errors.subject && (
-                      <span className={styles.errorText}>{errors.subject.message}</span>
-                    )}
                   </div>
                   
                   <div className={styles.formGroup}>
-                    <label htmlFor="message" className={styles.formLabel}>
-                      Message
-                    </label>
+                    <label htmlFor="message" className={styles.formLabel}>Nachricht</label>
                     <textarea
                       id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
                       className={`${styles.formTextarea} ${errors.message ? styles.inputError : ''}`}
-                      placeholder="Your message"
-                      rows="5"
-                      {...register('message', {
-                        required: 'Message is required',
-                        minLength: {
-                          value: 20,
-                          message: 'Message should be at least 20 characters'
-                        }
-                      })}
+                      placeholder="Wie können wir Ihnen helfen?"
+                      rows="6"
+                      disabled={isSubmitting}
                     ></textarea>
-                    {errors.message && (
-                      <span className={styles.errorText}>{errors.message.message}</span>
-                    )}
+                    {errors.message && <p className={styles.errorText}>{errors.message}</p>}
                   </div>
                   
-                  <div className={styles.formGroup}>
-                    <label htmlFor="reason" className={styles.formLabel}>
-                      Reason for contact
-                    </label>
-                    <select
-                      id="reason"
-                      className={`${styles.formSelect} ${errors.reason ? styles.inputError : ''}`}
-                      {...register('reason', { required: 'Please select a reason' })}
-                    >
-                      <option value="">Select a reason</option>
-                      <option value="quote">Request a quote</option>
-                      <option value="question">General question</option>
-                      <option value="support">Customer support</option>
-                      <option value="feedback">Feedback</option>
-                      <option value="partnership">Business partnership</option>
-                      <option value="other">Other</option>
-                    </select>
-                    {errors.reason && (
-                      <span className={styles.errorText}>{errors.reason.message}</span>
-                    )}
-                  </div>
-                  
-                  <button
-                    type="submit"
+                  <button 
+                    type="submit" 
                     className={styles.submitButton}
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? 'Sending...' : 'Send Message'}
+                    {isSubmitting ? 'Wird gesendet...' : 'Nachricht senden'}
                   </button>
                 </form>
               </div>
             </div>
             
-            {/* Contact information column */}
             <div className={styles.infoColumn}>
+              {/* Kontaktinformationen - du kannst diesen Teil nach Bedarf anpassen */}
               <div className={styles.infoCard}>
-                <h2 className={styles.infoTitle}>Contact Information</h2>
-                
+                <h3 className={styles.infoTitle}>Kontaktinformationen</h3>
                 <div className={styles.contactInfo}>
-                  <div className={styles.infoItem}>
-                    <div className={styles.infoIcon}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                      </svg>
-                    </div>
-                    <div className={styles.infoContent}>
-                      <h3 className={styles.infoLabel}>Phone</h3>
-                      <p className={styles.infoText}>+49 (0) 30 1234 5678</p>
-                      <p className={styles.infoSubtext}>Monday to Friday, 9am to 6pm</p>
-                    </div>
-                  </div>
-                  
                   <div className={styles.infoItem}>
                     <div className={styles.infoIcon}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -229,50 +240,63 @@ export default function Contact() {
                         <polyline points="22,6 12,13 2,6"></polyline>
                       </svg>
                     </div>
-                    <div className={styles.infoContent}>
-                      <h3 className={styles.infoLabel}>Email</h3>
-                      <p className={styles.infoText}>support@pack-and-go.de</p>
-                      <p className={styles.infoSubtext}>We'll respond as soon as possible</p>
+                    <div>
+                      <h4 className={styles.infoLabel}>E-Mail</h4>
+                      <p className={styles.infoText}>info@pack-and-go.de</p>
+                      <p className={styles.infoSubtext}>Wir antworten innerhalb von 24 Stunden</p>
                     </div>
                   </div>
                   
                   <div className={styles.infoItem}>
                     <div className={styles.infoIcon}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className={styles.infoLabel}>Telefon</h4>
+                      <p className={styles.infoText}>+49 (0) 30 1234567</p>
+                      <p className={styles.infoSubtext}>Mo-Fr von 9:00 bis 17:00 Uhr</p>
+                    </div>
+                  </div>
+                  
+                  <div className={styles.infoItem}>
+                    <div className={styles.infoIcon}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
                         <circle cx="12" cy="10" r="3"></circle>
                       </svg>
                     </div>
-                    <div className={styles.infoContent}>
-                      <h3 className={styles.infoLabel}>Office</h3>
-                      <p className={styles.infoText}>Friedrichstraße 123</p>
-                      <p className={styles.infoText}>10117 Berlin, Germany</p>
+                    <div>
+                      <h4 className={styles.infoLabel}>Adresse</h4>
+                      <p className={styles.infoText}>Musterstraße 123</p>
+                      <p className={styles.infoText}>10115 Berlin</p>
                     </div>
                   </div>
                 </div>
                 
                 <div className={styles.socialLinks}>
-                  <h3 className={styles.socialTitle}>Follow Us</h3>
+                  <h4 className={styles.socialTitle}>Folgen Sie uns</h4>
                   <div className={styles.socialIcons}>
-                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <a href="#" className={styles.socialIcon} aria-label="Facebook">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
                       </svg>
                     </a>
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                    <a href="#" className={styles.socialIcon} aria-label="Twitter">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
                       </svg>
                     </a>
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <a href="#" className={styles.socialIcon} aria-label="Instagram">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                         <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                         <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                       </svg>
                     </a>
-                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <a href="#" className={styles.socialIcon} aria-label="LinkedIn">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
                         <rect x="2" y="9" width="4" height="12"></rect>
                         <circle cx="4" cy="4" r="2"></circle>
@@ -283,77 +307,20 @@ export default function Contact() {
               </div>
               
               <div className={styles.mapCard}>
-                <h3 className={styles.mapTitle}>Find Us</h3>
+                <h3 className={styles.mapTitle}>Unsere Standorte</h3>
                 <div className={styles.mapContainer}>
-                  <Image
-                    src="/images/map.jpg"
-                    alt="Office location map"
-                    width={500}
-                    height={300}
-                    className={styles.mapImage}
-                  />
-                  <a 
-                    href="https://goo.gl/maps/123Friedrichstrasse"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.mapLink}
-                  >
-                    View on Google Maps
-                  </a>
+                  <img src="/images/placeholder.jpg" alt="Karte mit Standort von Pack & Go" className={styles.mapImage} />
                 </div>
+                <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" className={styles.mapLink}>
+                  Auf Google Maps anzeigen →
+                </a>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
-      {/* FAQ section */}
-      <div className={styles.faqSection}>
-        <div className={styles.container}>
-          <h2 className={styles.faqTitle}>Frequently Asked Questions</h2>
-          <p className={styles.faqSubtitle}>Find quick answers to common questions about our services.</p>
-          
-          <div className={styles.faqGrid}>
-            <div className={styles.faqItem}>
-              <h3 className={styles.faqQuestion}>How does Pack & Go pricing work?</h3>
-              <p className={styles.faqAnswer}>
-                Our pricing is transparent and based on three factors: the hourly rate of the moving company (per helper), the number of helpers needed, and the estimated duration of the move. These three values are multiplied to determine the total price.
-              </p>
-            </div>
-            
-            <div className={styles.faqItem}>
-              <h3 className={styles.faqQuestion}>How are my belongings insured during the move?</h3>
-              <p className={styles.faqAnswer}>
-                All moving companies on our platform have basic insurance for transport damage. Companies with the KisteKlar certification offer additional insurance coverage. The exact insurance conditions may vary by company and will be transparently presented to you before booking.
-              </p>
-            </div>
-            
-            <div className={styles.faqItem}>
-              <h3 className={styles.faqQuestion}>Can I cancel or reschedule my booking?</h3>
-              <p className={styles.faqAnswer}>
-                Yes, you can cancel or reschedule your booking. Cancellation up to 7 days before the move is free. For later cancellations, fees may apply depending on how close to the moving date you cancel. A date change is usually free if notified at least 48 hours before the scheduled move.
-              </p>
-            </div>
-            
-            <div className={styles.faqItem}>
-              <h3 className={styles.faqQuestion}>What is the KisteKlar certification?</h3>
-              <p className={styles.faqAnswer}>
-                The KisteKlar certification is our quality standard for moving companies. Certified companies have been thoroughly verified and meet high quality standards. They offer additional insurance protection and employ professionally trained staff with experience in handling valuable items.
-              </p>
-            </div>
-          </div>
-          
-          <div className={styles.moreFaqLink}>
-            <a href="/faq" className={styles.faqLink}>
-              View all FAQs
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.faqLinkIcon}>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </a>
-          </div>
-        </div>
-      </div>
     </div>
   );
-}
+};
+
+export default ContactPage;

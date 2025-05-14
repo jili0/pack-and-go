@@ -20,6 +20,18 @@ export const AuthProvider = ({ children }) => {
   const checkUserLoggedIn = async () => {
     try {
       const res = await fetch('/api/auth/me');
+      
+      if (res.status === 401) {
+        // Nicht authentifiziert
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+      
+      if (!res.ok) {
+        throw new Error('Fehler beim Abrufen des Benutzers');
+      }
+
       const data = await res.json();
 
       if (data.success) {
@@ -120,6 +132,9 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Logout error:', error);
+      // Selbst wenn der Server-Logout fehlschlägt, wollen wir den Client-Zustand zurücksetzen
+      setUser(null);
+      router.push('/');
     }
   };
 

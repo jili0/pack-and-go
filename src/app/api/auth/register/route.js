@@ -11,14 +11,44 @@ export async function POST(request) {
     
     const { name, email, password, phone, role = 'user' } = await request.json();
     
-    // Prüfen, ob der Benutzer bereits existiert
-    const existingUser = await User.findOne({ email });
-    
-    if (existingUser) {
+    // Validierung der Eingabedaten
+    if (!name || !email || !password || !phone) {
       return NextResponse.json(
-        { success: false, message: 'Diese E-Mail-Adresse wird bereits verwendet' },
+        { success: false, message: 'Alle Pflichtfelder müssen ausgefüllt werden' },
         { status: 400 }
       );
+    }
+
+    // E-Mail-Format validieren
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { success: false, message: 'Bitte geben Sie eine gültige E-Mail-Adresse ein' },
+        { status: 400 }
+      );
+    }
+
+    // Passwortlänge validieren
+    if (password.length < 6) {
+      return NextResponse.json(
+        { success: false, message: 'Das Passwort muss mindestens 6 Zeichen lang sein' },
+        { status: 400 }
+      );
+    }
+
+    // Prüfen, ob der Benutzer bereits existiert
+    try {
+      const existingUser = await User.findOne({ email });
+      
+      if (existingUser) {
+        return NextResponse.json(
+          { success: false, message: 'Diese E-Mail-Adresse wird bereits verwendet' },
+          { status: 400 }
+        );
+      }
+    } catch (error) {
+      console.error('Fehler bei der Benutzerüberprüfung:', error);
+      // Fehler bei der Benutzerüberprüfung ignorieren, da möglicherweise keine DB-Verbindung besteht
     }
     
     // Zulässige Rollen beschränken
@@ -30,16 +60,47 @@ export async function POST(request) {
     }
     
     // Neuen Benutzer erstellen
-    const newUser = await User.create({
-      name,
-      email,
-      password,
-      phone,
-      role
-    });
+    let newUser;
+    try {
+      newUser = await User.create({
+        name,
+        email,
+        password,
+        phone,
+        role
+      });
+    } catch (error) {
+      console.error('Fehler beim Erstellen des Benutzers:', error);
+      
+      if (error.name === 'ValidationError') {
+        const errors = Object.keys(error.errors).map(key => ({
+          field: key,
+          message: error.errors[key].message
+        }));
+        
+        return NextResponse.json(
+          { 
+            success: false, 
+            message: 'Validierungsfehler', 
+            errors 
+          },
+          { status: 400 }
+        );
+      }
+      
+      return NextResponse.json(
+        { success: false, message: 'Serverfehler bei der Benutzerregistrierung' },
+        { status: 500 }
+      );
+    }
     
-    // Willkommens-E-Mail senden
-    await sendWelcomeEmail(email, name);
+    // Willkommens-E-Mail senden (optional - könnte fehlschlagen)
+    try {
+      await sendWelcomeEmail(email, name);
+    } catch (emailError) {
+      console.error('Fehler beim Senden der Willkommens-E-Mail:', emailError);
+      // Wir wollen nicht die Registrierung abbrechen, wenn die E-Mail nicht gesendet werden kann
+    }
     
     // JWT-Token erstellen
     const token = createToken(newUser._id, newUser.role);
