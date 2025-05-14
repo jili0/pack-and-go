@@ -19,6 +19,7 @@
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  color: white;
 }
 
 .heroContent p {
@@ -43,7 +44,7 @@
 
 .introText h2 {
   font-size: 2rem;
-  color: #1e3a8a;
+  color: var(--dark-blue);
   margin-bottom: 1rem;
 }
 
@@ -51,27 +52,29 @@
   font-size: 1.1rem;
   line-height: 1.6;
   margin-bottom: 1.5rem;
-  color: #4b5563;
+  color: var(--gray-600);
 }
 
 .downloadBox {
-  background-color: #f3f4f6;
-  border-radius: 8px;
+  background-color: var(--gray-100);
+  border-radius: var(--border-radius);
   padding: 1.5rem;
   margin-top: 2rem;
+  box-shadow: var(--box-shadow);
 }
 
 .downloadBox h3 {
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
+  color: var(--gray-800);
 }
 
 .downloadBtn {
   display: inline-block;
-  background-color: #2563eb;
+  background-color: var(--primary-color);
   color: white;
   padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  border-radius: var(--border-radius);
   margin-top: 1rem;
   font-weight: 500;
   text-decoration: none;
@@ -79,14 +82,14 @@
 }
 
 .downloadBtn:hover {
-  background-color: #1d4ed8;
+  background-color: var(--primary-dark);
 }
 
 .featureImage {
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   max-width: 100%;
   height: auto;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow);
 }
 
 @media (min-width: 768px) {
@@ -121,7 +124,7 @@
   content: '';
   position: absolute;
   width: 4px;
-  background-color: #e5e7eb;
+  background-color: var(--gray-200);
   top: 0;
   bottom: 0;
   left: 30px;
@@ -143,7 +146,7 @@
   width: 60px;
   height: 60px;
   left: 0;
-  background-color: #2563eb;
+  background-color: var(--primary-color);
   color: white;
   border-radius: 50%;
   text-align: center;
@@ -155,14 +158,20 @@
 
 .timelineContent {
   background-color: white;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e5e7eb;
+  box-shadow: var(--box-shadow);
+  border: 1px solid var(--gray-200);
+  transition: var(--transition);
+}
+
+.timelineContent:hover {
+  box-shadow: var(--box-shadow-hover);
+  transform: translateY(-5px);
 }
 
 .timelineContent h3 {
-  color: #1e3a8a;
+  color: var(--dark-blue);
   margin-bottom: 1rem;
   font-size: 1.25rem;
 }
@@ -197,11 +206,12 @@
 .checkboxLabel {
   cursor: pointer;
   line-height: 1.5;
+  color: var(--gray-700);
 }
 
 .checkboxInput:checked + .checkboxLabel {
   text-decoration: line-through;
-  color: #9ca3af;
+  color: var(--gray-400);
 }
 
 @media (min-width: 768px) {
@@ -238,7 +248,7 @@
 }
 
 .tipsSection {
-  background-color: #f3f4f6;
+  background-color: var(--gray-100);
   padding: 4rem 0;
   margin-bottom: 4rem;
 }
@@ -246,7 +256,7 @@
 .tipsSection h2 {
   text-align: center;
   font-size: 2rem;
-  color: #1e3a8a;
+  color: var(--dark-blue);
   margin-bottom: 2.5rem;
 }
 
@@ -264,26 +274,27 @@
 
 .tipCard {
   background-color: white;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e5e7eb;
+  box-shadow: var(--box-shadow);
+  border: 1px solid var(--gray-200);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .tipCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow-hover);
 }
 
 .tipIcon {
   font-size: 2.5rem;
   margin-bottom: 1rem;
   text-align: center;
+  color: var(--primary-color);
 }
 
 .tipCard h3 {
-  color: #1e3a8a;
+  color: var(--dark-blue);
   text-align: center;
   margin-bottom: 1rem;
   font-size: 1.25rem;
@@ -291,6 +302,7 @@
 
 .tipCard ul {
   padding-left: 1.5rem;
+  color: var(--gray-600);
 }
 
 .tipCard li {
@@ -303,7 +315,7 @@
 }
 
 .ctaSection {
-  background-color: #2563eb;
+  background-color: var(--primary-color);
   color: white;
   padding: 4rem 0;
   text-align: center;
@@ -312,6 +324,7 @@
 .ctaContent h2 {
   font-size: 2rem;
   margin-bottom: 1rem;
+  color: white;
 }
 
 .ctaContent p {
@@ -323,15 +336,15 @@
 .ctaButton {
   display: inline-block;
   background-color: white;
-  color: #2563eb;
+  color: var(--primary-color);
   padding: 0.75rem 2rem;
-  border-radius: 6px;
+  border-radius: var(--border-radius);
   font-weight: 600;
   text-decoration: none;
   transition: background-color 0.2s, transform 0.2s;
 }
 
 .ctaButton:hover {
-  background-color: #f3f4f6;
+  background-color: var(--gray-100);
   transform: translateY(-2px);
 }
