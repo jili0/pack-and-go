@@ -1,7 +1,7 @@
 // src/app/page.js (completing the remaining part)
 import Image from 'next/image';
 import Link from 'next/link';
-import MovingCalculator from '@/components/forms/MovingCalculator';
+import MovingCalculator from '@/components/forms/PriceCalculator';
 
 export default function Home() {
   return (
