@@ -1,0 +1,337 @@
+/* src/app/styles/Checklist.module.css */
+.checklistContainer {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.heroSection {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/checklist-hero.jpg');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  text-align: center;
+  padding: 8rem 1rem;
+  margin-bottom: 3rem;
+}
+
+.heroContent h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.heroContent p {
+  font-size: 1.25rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.introSection {
+  margin-bottom: 4rem;
+}
+
+.introText {
+  margin-bottom: 2rem;
+}
+
+.introText h2 {
+  font-size: 2rem;
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+}
+
+.introText p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: #4b5563;
+}
+
+.downloadBox {
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.downloadBox h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.downloadBtn {
+  display: inline-block;
+  background-color: #2563eb;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.downloadBtn:hover {
+  background-color: #1d4ed8;
+}
+
+.featureImage {
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+  .introSection .container {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+  }
+  
+  .introText {
+    flex: 1;
+    margin-bottom: 0;
+  }
+  
+  .introImage {
+    flex: 1;
+  }
+}
+
+.checklistSection {
+  margin-bottom: 4rem;
+}
+
+.timeline {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  background-color: #e5e7eb;
+  top: 0;
+  bottom: 0;
+  left: 30px;
+  margin-left: -2px;
+}
+
+.timelineItem {
+  position: relative;
+  margin-bottom: 3rem;
+  padding-left: 70px;
+}
+
+.timelineItem:last-child {
+  margin-bottom: 0;
+}
+
+.timelineBadge {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  left: 0;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 60px;
+  font-weight: 600;
+  z-index: 1;
+  font-size: 0.9rem;
+}
+
+.timelineContent {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.timelineContent h3 {
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.checkItems {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.checkItems li {
+  position: relative;
+  padding-left: 40px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.checkItems li:last-child {
+  margin-bottom: 0;
+}
+
+.checkboxInput {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.checkboxLabel {
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.checkboxInput:checked + .checkboxLabel {
+  text-decoration: line-through;
+  color: #9ca3af;
+}
+
+@media (min-width: 768px) {
+  .timeline::before {
+    left: 50%;
+  }
+  
+  .timelineItem {
+    padding-left: 0;
+  }
+  
+  .timelineItem:nth-child(odd) .timelineContent {
+    margin-left: auto;
+    margin-right: 70px;
+  }
+  
+  .timelineItem:nth-child(even) .timelineContent {
+    margin-right: auto;
+    margin-left: 70px;
+  }
+  
+  .timelineItem:nth-child(odd) .timelineBadge {
+    left: auto;
+    right: 10px;
+  }
+  
+  .timelineItem:nth-child(even) .timelineBadge {
+    left: 10px;
+  }
+  
+  .timelineContent {
+    width: calc(50% - 50px);
+  }
+}
+
+.tipsSection {
+  background-color: #f3f4f6;
+  padding: 4rem 0;
+  margin-bottom: 4rem;
+}
+
+.tipsSection h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #1e3a8a;
+  margin-bottom: 2.5rem;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .tipsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.tipCard {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.tipCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.tipIcon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.tipCard h3 {
+  color: #1e3a8a;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.tipCard ul {
+  padding-left: 1.5rem;
+}
+
+.tipCard li {
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.tipCard li:last-child {
+  margin-bottom: 0;
+}
+
+.ctaSection {
+  background-color: #2563eb;
+  color: white;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.ctaContent h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.ctaContent p {
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto 2rem auto;
+}
+
+.ctaButton {
+  display: inline-block;
+  background-color: white;
+  color: #2563eb;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.ctaButton:hover {
+  background-color: #f3f4f6;
+  transform: translateY(-2px);
+}
