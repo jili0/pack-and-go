@@ -52,22 +52,22 @@ const Footer = () => {
             <h3 className={styles.footerHeading}>Service</h3>
             <ul className={styles.footerLinks}>
               <li className={styles.footerLink}>
-                <Link href="/umzug">
+                <Link href="/moving">
                   Umzug Deutschland
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="/auslandsumzug">
+                <Link href="/international-moving">
                   Auslandsumzug
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="/preise">
+                <Link href="/pricing">
                   Preise
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="/bewertungen">
+                <Link href="/reviews">
                   Bewertungen
                 </Link>
               </li>
@@ -79,27 +79,27 @@ const Footer = () => {
             <h3 className={styles.footerHeading}>Unternehmen</h3>
             <ul className={styles.footerLinks}>
               <li className={styles.footerLink}>
-                <Link href="/ueber-uns">
+                <Link href="/about-us">
                   Über uns
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="/kontakt">
+                <Link href="/contact">
                   Kontakt
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="/datenschutz">
+                <Link href="/privacy">
                   Datenschutz
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="/impressum">
+                <Link href="/imprint">
                   Impressum
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="/agb">
+                <Link href="/terms">
                   AGB
                 </Link>
               </li>

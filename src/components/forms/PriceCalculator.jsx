@@ -27,6 +27,7 @@ const PriceCalculator = () => {
               type="button" 
               className={styles.decrementBtn}
               onClick={() => helpersCount > 1 && setHelpersCount(helpersCount - 1)}
+              aria-label="Decrease helpers count"
             >
               -
             </button>
@@ -37,11 +38,13 @@ const PriceCalculator = () => {
               className={styles.numberInput}
               min="1"
               max="10"
+              aria-label="Number of helpers"
             />
             <button 
               type="button" 
               className={styles.incrementBtn}
               onClick={() => setHelpersCount(helpersCount + 1)}
+              aria-label="Increase helpers count"
             >
               +
             </button>
@@ -55,6 +58,7 @@ const PriceCalculator = () => {
               type="button" 
               className={styles.decrementBtn}
               onClick={() => hours > 1 && setHours(hours - 1)}
+              aria-label="Decrease hours"
             >
               -
             </button>
@@ -65,11 +69,13 @@ const PriceCalculator = () => {
               className={styles.numberInput}
               min="1"
               max="24"
+              aria-label="Estimated hours"
             />
             <button 
               type="button" 
               className={styles.incrementBtn}
               onClick={() => setHours(hours + 1)}
+              aria-label="Increase hours"
             >
               +
             </button>

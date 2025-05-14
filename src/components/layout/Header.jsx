@@ -19,7 +19,7 @@ const Header = () => {
     <header className={styles.header}>
       <div className={styles.headerContent}>
         {/* Logo und Markenname */}
-        <div className={styles.logo}>
+        <div>
           <Link href="/" className={styles.logo}>
             <div className={styles.logoImage}>
               <Image 
@@ -38,13 +38,13 @@ const Header = () => {
           <Link href="/" className={styles.navLink}>
             Startseite
           </Link>
-          <Link href="/wie-es-funktioniert" className={styles.navLink}>
+          <Link href="/how-it-works" className={styles.navLink}>
             Wie es funktioniert
           </Link>
-          <Link href="/preise" className={styles.navLink}>
+          <Link href="/pricing" className={styles.navLink}>
             Preise
           </Link>
-          <Link href="/kontakt" className={styles.navLink}>
+          <Link href="/contact" className={styles.navLink}>
             Kontakt
           </Link>
         </nav>
@@ -79,7 +79,7 @@ const Header = () => {
               <Link href="/login" className={styles.navLink}>
                 Anmelden
               </Link>
-              <Link href="/register" className={`${styles.btn} ${styles.btnPrimary}`}>
+              <Link href="/register" className={styles.btnPrimary}>
                 Registrieren
               </Link>
             </>
@@ -94,7 +94,7 @@ const Header = () => {
             aria-label={mobileMenuOpen ? "Menü schließen" : "Menü öffnen"}
           >
             <svg
-              className={mobileMenuOpen ? styles.iconHidden : styles.iconVisible}
+              className={mobileMenuOpen ? "iconHidden" : "iconVisible"}
               xmlns="http://www.w3.org/2000/svg"
               width="24" 
               height="24"
@@ -106,7 +106,7 @@ const Header = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
             <svg
-              className={mobileMenuOpen ? styles.iconVisible : styles.iconHidden}
+              className={mobileMenuOpen ? "iconVisible" : "iconHidden"}
               xmlns="http://www.w3.org/2000/svg"
               width="24" 
               height="24" 
@@ -127,13 +127,13 @@ const Header = () => {
           <Link href="/" className={styles.mobileMenuItem}>
             Startseite
           </Link>
-          <Link href="/wie-es-funktioniert" className={styles.mobileMenuItem}>
+          <Link href="/how-it-works" className={styles.mobileMenuItem}>
             Wie es funktioniert
           </Link>
-          <Link href="/preise" className={styles.mobileMenuItem}>
+          <Link href="/pricing" className={styles.mobileMenuItem}>
             Preise
           </Link>
-          <Link href="/kontakt" className={styles.mobileMenuItem}>
+          <Link href="/contact" className={styles.mobileMenuItem}>
             Kontakt
           </Link>
         </div>

@@ -1,4 +1,4 @@
-// middleware.js
+// src/middleware.js
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
@@ -9,8 +9,29 @@ const publicPaths = [
   '/register',
   '/api/auth/login',
   '/api/auth/register',
-  '/api/companies/search'
+  '/api/companies/search',
+  '/pricing',
+  '/how-it-works',
+  '/contact',
+  '/about-us',
+  '/privacy',
+  '/imprint',
+  '/terms',
+  '/moving',
+  '/international-moving',
+  '/reviews',
+  '/moving-tips',
+  '/checklist',
+  '/staedte',
+  '/stadt'
 ];
+
+// Prüfen, ob ein Pfad öffentlich ist
+const isPublicPath = (path) => {
+  return publicPaths.some(publicPath => {
+    return path === publicPath || path.startsWith(`${publicPath}/`);
+  });
+};
 
 // Pfade, die spezifische Rollen erfordern
 const roleBasedPaths = {
@@ -26,7 +47,7 @@ export async function middleware(request) {
   const { pathname } = request.nextUrl;
   
   // Öffentliche Pfade überspringen
-  if (publicPaths.some(path => pathname.startsWith(path))) {
+  if (isPublicPath(pathname)) {
     return NextResponse.next();
   }
   
