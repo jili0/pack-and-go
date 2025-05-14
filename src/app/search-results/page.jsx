@@ -1,10 +1,10 @@
-// src/app/search-results/page.jsx (continuing from previous part)
-'use client';
+// src/app/search-results/page.jsx
+"use client";
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import CompanyCard from '@/components/ui/CompanyCard';
-import Link from 'next/link';
+import Image from '@/components/ui/Image';
+import styles from '@/app/styles/SearchResults.module.css';
 
 export default function SearchResults() {
   const router = useRouter();
@@ -12,19 +12,19 @@ export default function SearchResults() {
   const [formData, setFormData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [sortBy, setSortBy] = useState('rating'); // 'rating' oder 'certified'
+  const [sortBy, setSortBy] = useState('rating'); // 'rating' or 'certified'
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    // Lade die gespeicherten Formulardaten und Suchergebnisse aus dem Session Storage
+    // Load the saved form data and search results from Session Storage
     const loadSessionData = () => {
       try {
         const savedFormData = sessionStorage.getItem('movingFormData');
         const savedResults = sessionStorage.getItem('searchResults');
         
         if (!savedFormData || !savedResults) {
-          // Wenn keine Daten gefunden werden, zurück zur Startseite
+          // If no data is found, redirect back to home page
           router.push('/');
           return;
         }
@@ -33,8 +33,8 @@ export default function SearchResults() {
         setCompanies(JSON.parse(savedResults));
         setLoading(false);
       } catch (error) {
-        console.error('Fehler beim Laden der Suchergebnisse:', error);
-        setError('Die Suchergebnisse konnten nicht geladen werden. Bitte versuchen Sie es erneut.');
+        console.error('Error loading search results:', error);
+        setError('The search results could not be loaded. Please try again.');
         setLoading(false);
       }
     };
@@ -42,16 +42,16 @@ export default function SearchResults() {
     loadSessionData();
   }, [router]);
 
-  // Sortiere die Unternehmen nach ausgewähltem Kriterium
+  // Sort companies by selected criterion
   const sortedCompanies = [...companies].sort((a, b) => {
     if (sortBy === 'rating') {
-      // Sortiere nach Bewertung (höchste zuerst)
+      // Sort by rating (highest first)
       return b.averageRating - a.averageRating;
     } else if (sortBy === 'certified') {
-      // Sortiere nach Zertifizierung (zertifizierte zuerst)
+      // Sort by certification (certified first)
       if (a.isKisteKlarCertified && !b.isKisteKlarCertified) return -1;
       if (!a.isKisteKlarCertified && b.isKisteKlarCertified) return 1;
-      // Bei gleicher Zertifizierung nach Bewertung sortieren
+      // If certification is the same, sort by rating
       return b.averageRating - a.averageRating;
     }
     return 0;
@@ -67,191 +67,279 @@ export default function SearchResults() {
   };
 
   const handleConfirmSelection = () => {
-    // Speichere die ausgewählte Firma und Formulardaten für den Bestellprozess
+    // Save the selected company and form data for the order process
     sessionStorage.setItem('selectedCompany', JSON.stringify(selectedCompany));
     
-    // Weiterleitung zur Bestellseite
+    // Redirect to the order creation page
     router.push('/order/create');
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center items-center min-h-[60vh]">
-            <div className="flex flex-col items-center">
-              <svg className="animate-spin h-12 w-12 text-blue-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <h2 className="text-lg font-medium text-gray-900">Umzugsfirmen werden geladen...</h2>
-              <p className="mt-1 text-sm text-gray-500">Bitte haben Sie einen Moment Geduld.</p>
-            </div>
-          </div>
-        </div>
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+        <h2 className={styles.loadingText}>Loading moving companies...</h2>
+        <p className={styles.loadingSubtext}>Please wait a moment.</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-red-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Ein Fehler ist aufgetreten</h2>
-            <p className="text-gray-600 mb-6">{error}</p>
-            <Link href="/" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              Zurück zur Startseite
-            </Link>
-          </div>
+      <div className={styles.container}>
+        <div className={styles.errorContainer}>
+          <div className={styles.errorIcon}>⚠️</div>
+          <h2 className={styles.errorTitle}>An error occurred</h2>
+          <p className={styles.errorText}>{error}</p>
+          <button 
+            className={styles.primaryButton}
+            onClick={() => router.push('/')}
+          >
+            Back to Home
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Kopfbereich */}
-        <div className="pb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Gefundene Umzugsfirmen</h1>
-          <p className="mt-2 text-lg text-gray-600">
-            Von {formData?.fromAddress?.city || 'Startort'} nach {formData?.toAddress?.city || 'Zielort'}
+    <div className={styles.container}>
+      {/* Header Section */}
+      <div className={styles.header}>
+        <h1 className={styles.title}>Moving Companies Found</h1>
+        <p className={styles.subtitle}>
+          From {formData?.fromAddress?.city || 'Start location'} to {formData?.toAddress?.city || 'Destination'}
+        </p>
+      </div>
+
+      {/* Filter Bar */}
+      <div className={styles.filterBar}>
+        <div className={styles.resultsCount}>
+          <h2 className={styles.resultsText}>
+            {companies.length} moving companies found
+          </h2>
+          <p className={styles.resultsSubtext}>
+            For {formData?.estimatedHours || 0} hours with {formData?.helpersCount || 0} helpers
           </p>
         </div>
-
-        {/* Filterleiste */}
-        <div className="bg-white shadow-sm rounded-lg p-4 mb-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-medium text-gray-900">
-                {companies.length} Umzugsfirmen gefunden
-              </h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Für {formData?.estimatedHours || 0} Stunden mit {formData?.helpersCount || 0} Helfern
-              </p>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-700">Sortieren nach:</span>
-              <div className="relative">
-                <select
-                  value={sortBy}
-                  onChange={(e) => handleSortChange(e.target.value)}
-                  className="block w-full bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="rating">Beste Bewertung</option>
-                  <option value="certified">KisteKlar zertifiziert</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Umzugsfirmen-Liste */}
-        {sortedCompanies.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6">
-            {sortedCompanies.map((company) => (
-              <CompanyCard
-                key={company._id}
-                company={company}
-                onSelect={handleSelectCompany}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Keine Umzugsfirmen gefunden</h3>
-            <p className="text-gray-600 mb-6">
-              Leider wurden keine passenden Umzugsfirmen für Ihre Anfrage gefunden.
-              Versuchen Sie es mit anderen Start- oder Zielorten.
-            </p>
-            <Link href="/" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
-              Neue Suche starten
-            </Link>
-          </div>
-        )}
         
-        {/* Zurück-Button */}
-        <div className="mt-8 text-center">
-          <Link 
-            href="/"
-            className="inline-flex items-center text-blue-600 hover:text-blue-700"
+        <div className={styles.sortContainer}>
+          <span className={styles.sortLabel}>Sort by:</span>
+          <select
+            value={sortBy}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className={styles.sortSelect}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
-            </svg>
-            Zurück zur Startseite
-          </Link>
+            <option value="rating">Best Rating</option>
+            <option value="certified">KisteKlar Certified</option>
+          </select>
         </div>
       </div>
 
-      {/* Bestätigungsmodal */}
-      {showModal && selectedCompany && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="fixed inset-0 bg-black opacity-50"></div>
-          <div className="relative bg-white rounded-lg max-w-lg w-full mx-4 shadow-xl overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">
-                Umzugsfirma auswählen
-              </h3>
-            </div>
-            <div className="p-6">
-              <p className="text-gray-600 mb-4">
-                Möchten Sie die folgende Umzugsfirma auswählen?
-              </p>
-              <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                <h4 className="font-medium text-gray-900">{selectedCompany.companyName}</h4>
-                <div className="flex items-center mt-1 text-sm text-gray-500">
-                  <span className="font-medium text-blue-600">{selectedCompany.averageRating.toFixed(1)}</span>
-                  <span className="mx-1">•</span>
-                  <span>{selectedCompany.reviewsCount} Bewertungen</span>
-                  {selectedCompany.isKisteKlarCertified && (
-                    <>
-                      <span className="mx-1">•</span>
-                      <span className="text-green-600 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        KisteKlar zertifiziert
+      {/* Companies List */}
+      <div className={styles.companiesList}>
+        {sortedCompanies.length > 0 ? (
+          sortedCompanies.map((company) => (
+            <div key={company._id} className={styles.companyCard}>
+              <div className={styles.companyHeader}>
+                <div className={styles.companyInfo}>
+                  <div className={styles.companyLogo}>
+                    {company.logo ? (
+                      <Image 
+                        src={company.logo} 
+                        alt={`${company.companyName} Logo`}
+                        width={64}
+                        height={64}
+                        className={styles.logoImage} 
+                      />
+                    ) : (
+                      <div className={styles.logoPlaceholder}>
+                        <span>{company.companyName.charAt(0)}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className={styles.companyDetails}>
+                    <h3 className={styles.companyName}>{company.companyName}</h3>
+                    <div className={styles.ratingContainer}>
+                      <div className={styles.stars}>
+                        {[...Array(5)].map((_, i) => (
+                          <span 
+                            key={i} 
+                            className={i < Math.round(company.averageRating) ? styles.starFilled : styles.starEmpty}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                      <span className={styles.reviewCount}>
+                        ({company.reviewsCount} {company.reviewsCount === 1 ? 'review' : 'reviews'})
                       </span>
-                    </>
-                  )}
+                    </div>
+                  </div>
+                </div>
+                
+                {company.isKisteKlarCertified && (
+                  <div className={styles.certificationBadge}>
+                    <svg className={styles.certIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    KisteKlar Certified
+                  </div>
+                )}
+              </div>
+              
+              {/* Price */}
+              <div className={styles.priceContainer}>
+                <div className={styles.priceHeader}>
+                  <span className={styles.priceLabel}>Hourly Rate:</span>
+                  <span className={styles.priceValue}>
+                    {company.hourlyRate * (formData?.helpersCount || 2)} €/hr
+                  </span>
+                </div>
+                <p className={styles.priceNote}>
+                  for {formData?.helpersCount || 2} helpers ({company.hourlyRate} € per helper/hr)
+                </p>
+              </div>
+              
+              {/* Expandable Section */}
+              <div className={styles.expandableSection}>
+                {company.description && (
+                  <div className={styles.descriptionSection}>
+                    <h4 className={styles.sectionTitle}>Description</h4>
+                    <p className={styles.companyDescription}>{company.description}</p>
+                  </div>
+                )}
+                
+                {company.serviceAreas && company.serviceAreas.length > 0 && (
+                  <div className={styles.serviceAreasSection}>
+                    <h4 className={styles.sectionTitle}>Service Areas</h4>
+                    <div className={styles.serviceAreasList}>
+                      {company.serviceAreas.map((area, index) => (
+                        <span key={index} className={styles.serviceAreaTag}>
+                          {area.from} → {area.to}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Action Buttons */}
+              <div className={styles.actionButtons}>
+                <button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={() => {
+                    const element = document.getElementById(`company-details-${company._id}`);
+                    if (element) {
+                      element.classList.toggle(styles.expanded);
+                    }
+                  }}
+                >
+                  Show More
+                </button>
+                
+                <button
+                  type="button"
+                  className={styles.primaryButton}
+                  onClick={() => handleSelectCompany(company)}
+                >
+                  Select
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className={styles.noResults}>
+            <div className={styles.noResultsIcon}>🔍</div>
+            <h3 className={styles.noResultsTitle}>No Moving Companies Found</h3>
+            <p className={styles.noResultsText}>
+              Unfortunately, no matching moving companies were found for your request.
+              Try different start or destination locations.
+            </p>
+            <button
+              className={styles.primaryButton}
+              onClick={() => router.push('/')}
+            >
+              Start New Search
+            </button>
+          </div>
+        )}
+      </div>
+      
+      {/* Back Button */}
+      <div className={styles.backButtonContainer}>
+        <button 
+          onClick={() => router.push('/')}
+          className={styles.backButton}
+        >
+          <svg className={styles.backIcon} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.70711 14.7071C7.31658 15.0976 6.68342 15.0976 6.29289 14.7071L2.29289 10.7071C1.90237 10.3166 1.90237 9.68342 2.29289 9.29289L6.29289 5.29289C6.68342 4.90237 7.31658 4.90237 7.70711 5.29289C8.09763 5.68342 8.09763 6.31658 7.70711 6.70711L5.41421 9H17C17.5523 9 18 9.44772 18 10C18 10.5523 17.5523 11 17 11H5.41421L7.70711 13.2929C8.09763 13.6834 8.09763 14.3166 7.70711 14.7071Z" fill="currentColor"/>
+          </svg>
+          Back to Home
+        </button>
+      </div>
+
+      {/* Confirmation Modal */}
+      {showModal && selectedCompany && (
+        <div className={styles.modalBackdrop}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>Select Moving Company</h3>
+            </div>
+            <div className={styles.modalBody}>
+              <p className={styles.modalText}>
+                Would you like to select the following moving company?
+              </p>
+              <div className={styles.modalCompanyCard}>
+                <h4 className={styles.modalCompanyName}>{selectedCompany.companyName}</h4>
+                <div className={styles.modalCompanyDetails}>
+                  <div className={styles.modalRating}>
+                    <span className={styles.modalRatingValue}>{selectedCompany.averageRating.toFixed(1)}</span>
+                    <span className={styles.modalRatingSeparator}>•</span>
+                    <span className={styles.modalReviewCount}>{selectedCompany.reviewsCount} reviews</span>
+                    {selectedCompany.isKisteKlarCertified && (
+                      <>
+                        <span className={styles.modalRatingSeparator}>•</span>
+                        <span className={styles.modalCertified}>
+                          <svg className={styles.modalCertIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          KisteKlar certified
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-              <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-700">Geschätzter Preis:</span>
-                  <span className="text-xl font-bold text-blue-700">
+              <div className={styles.modalPriceCard}>
+                <div className={styles.modalPriceHeader}>
+                  <span className={styles.modalPriceLabel}>Estimated Price:</span>
+                  <span className={styles.modalPriceValue}>
                     {formData ? (selectedCompany.hourlyRate * formData.helpersCount * formData.estimatedHours) : 0} €
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Basierend auf {formData?.helpersCount || 2} Helfern für {formData?.estimatedHours || 4} Stunden
+                <p className={styles.modalPriceNote}>
+                  Based on {formData?.helpersCount || 2} helpers for {formData?.estimatedHours || 4} hours
                 </p>
               </div>
-              <div className="flex space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Abbrechen
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmSelection}
-                  className="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Auswählen und fortfahren
-                </button>
-              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className={styles.modalSecondaryButton}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSelection}
+                className={styles.modalPrimaryButton}
+              >
+                Select and Continue
+              </button>
             </div>
           </div>
         </div>
