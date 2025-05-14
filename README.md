@@ -33,25 +33,145 @@ Pack & Go ist eine moderne Webplattform zur Vermittlung von Umzugsdiensten mit e
 
 ```
 pack-and-go/
-├── public/             # Statische Dateien
-│   ├── images/         # Bilder für die Website
+├── public/                       # Static files
+│   ├── images/                   # Images 
+│   │   ├── logo.png
+│   │   ├── logo-white.png
+│   │   ├── hero-image.jpg
+│   │   ├── step1.jpg
+│   │   ├── step2.jpg
+│   │   ├── step3.jpg
+│   │   ├── certification.jpg
+│   │   ├── placeholder.jpg       # Placeholder image
+│   │   └── cities/               # City images for homepage
+│   │       ├── berlin.jpg
+│   │       ├── hamburg.jpg
+│   │       ├── munich.jpg
+│   │       └── cologne.jpg
 │   ├── favicon.ico     
-│   └── ...
+│   └── robots.txt
 ├── src/                
-│   ├── app/            # Next.js App Router
-│   │   ├── api/        # API-Routen
-│   │   ├── (auth)/     # Authentifizierungsseiten
-│   │   ├── (dashboard)/# Dashboard-Seiten (geschützt)
-│   │   ├── layout.js   # Root Layout
-│   │   └── page.js     # Homepage
-│   ├── components/     # React Komponenten
-│   ├── lib/            # Hilfsfunktionen
-│   ├── models/         # Mongoose-Modelle
-│   ├── context/        # React Context
-│   └── styles/         # CSS-Dateien
-├── middleware.js       # Next.js Middleware für Auth
-├── .env                # Umgebungsvariablen
-└── package.json
+│   ├── app/                      # Next.js App Router
+│   │   ├── api/                  # API routes
+│   │   │   ├── auth/             # Authentication APIs
+│   │   │   │   ├── login/
+│   │   │   │   │   └── route.js
+│   │   │   │   ├── logout/
+│   │   │   │   │   └── route.js
+│   │   │   │   ├── me/
+│   │   │   │   │   └── route.js
+│   │   │   │   ├── register/
+│   │   │   │   │   └── route.js
+│   │   │   │   └── delete/
+│   │   │   │       └── route.js
+│   │   │   ├── companies/        # Company APIs
+│   │   │   │   ├── route.js
+│   │   │   │   └── search/
+│   │   │   │       └── route.js
+│   │   │   ├── orders/           # Order APIs
+│   │   │   │   ├── route.js
+│   │   │   │   └── [id]/
+│   │   │   │       └── route.js
+│   │   │   ├── user/             # User APIs
+│   │   │   │   └── orders/
+│   │   │   │       └── route.js
+│   │   │   └── company/          # Company-specific APIs
+│   │   │       └── setup/
+│   │   │           └── route.js
+│   │   ├── (auth)/               # Authentication pages
+│   │   │   ├── login/
+│   │   │   │   └── page.jsx
+│   │   │   └── register/
+│   │   │       └── page.jsx
+│   │   ├── (dashboard)/          # Dashboard pages (protected)
+│   │   │   ├── user/             # Customer dashboard
+│   │   │   │   ├── page.jsx
+│   │   │   │   ├── orders/
+│   │   │   │   │   ├── page.jsx
+│   │   │   │   │   └── [id]/
+│   │   │   │   │       └── page.jsx
+│   │   │   │   └── profile/
+│   │   │   │       └── page.jsx
+│   │   │   ├── company/          # Moving company dashboard
+│   │   │   │   ├── page.jsx
+│   │   │   │   ├── orders/
+│   │   │   │   │   └── page.jsx
+│   │   │   │   ├── profile/
+│   │   │   │   │   └── page.jsx
+│   │   │   │   └── setup/
+│   │   │   │       └── page.jsx
+│   │   │   └── admin/            # Admin dashboard
+│   │   │       ├── page.jsx
+│   │   │       └── companies/
+│   │   │           └── page.jsx
+│   │   ├── order/                # Order pages
+│   │   │   ├── [id]/
+│   │   │   │   └── confirmation/
+│   │   │   │       └── page.jsx
+│   │   │   └── create/
+│   │   │       └── page.jsx
+│   │   ├── search-results/       # Search results page
+│   │   │   └── page.jsx
+│   │   ├── how-it-works/         # Information pages
+│   │   │   └── page.jsx
+│   │   ├── pricing/
+│   │   │   └── page.jsx
+│   │   ├── contact/
+│   │   │   └── page.jsx
+│   │   ├── moving-tips/
+│   │   │   └── page.jsx
+│   │   ├── checklist/
+│   │   │   └── page.jsx
+│   │   ├── styles/               # CSS styles (modules)
+│   │   │   ├── global.css        # Global CSS
+│   │   │   ├── Home.module.css
+│   │   │   ├── Layout.module.css
+│   │   │   └── Components.module.css
+│   │   ├── layout.js             # Root Layout
+│   │   └── page.js               # Homepage
+│   ├── components/               # React components
+│   │   ├── layout/               # Layout components
+│   │   │   ├── Header.jsx
+│   │   │   └── Footer.jsx
+│   │   ├── ui/                   # UI components
+│   │   │   ├── CompanyCard.jsx
+│   │   │   ├── StarRating.jsx
+│   │   │   ├── Badge.jsx
+│   │   │   ├── Button.jsx
+│   │   │   ├── Alert.jsx
+│   │   │   └── Modal.jsx
+│   │   ├── forms/                # Form components
+│   │   │   ├── AddressForm.jsx
+│   │   │   ├── PriceCalculator.jsx  # Simple price calculator (instead of MovingCalculator)
+│   │   │   ├── LoginForm.jsx
+│   │   │   ├── RegisterForm.jsx
+│   │   │   └── FileUpload.jsx
+│   │   └── dashboard/            # Dashboard components
+│   │       ├── OrderList.jsx
+│   │       ├── OrderDetails.jsx
+│   │       └── ProfileForm.jsx
+│   ├── lib/                      # Helper functions
+│   │   ├── auth.js               # Authentication functions
+│   │   ├── db.js                 # Database configuration
+│   │   ├── email.js              # Email functions
+│   │   ├── fileUpload.js         # File upload functions
+│   │   ├── validation.js         # Validation functions
+│   │   ├── imageHandler.js       # Image handling with placeholders
+│   │   └── helpers.js            # General helper functions
+│   ├── models/                   # Mongoose models
+│   │   ├── User.js
+│   │   ├── Company.js
+│   │   ├── Order.js
+│   │   └── Review.js
+│   └── context/                  # React Context
+│       ├── AuthContext.js
+│       └── OrderContext.js
+├── middleware.js                 # Next.js Middleware for Auth
+├── .env.local                    # Local environment variables
+├── .env                          # Production environment variables
+├── .gitignore
+├── package.json
+└── README.md
 ```
 
 ## Erste Schritte
