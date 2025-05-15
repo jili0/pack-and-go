@@ -1,0 +1,25 @@
+/* src/app/styles/SearchResults.module.css */
+.searchResultsContainer {
+  padding: 2rem 0;
+}
+
+.searchResultsHeader {
+  margin-bottom: 2rem;
+}
+
+.resultsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .resultsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.noResults {
+  text-align: center;
+  padding: 3rem 0;
+}
