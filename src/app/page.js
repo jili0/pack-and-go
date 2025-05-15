@@ -35,7 +35,7 @@ export default function Home() {
       <section className={styles.stepsSection}>
         <div className={styles.stepsContainer}>
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>So einfach funktioniert's</h2>
+            <h2 className={styles.sectionTitle}>So einfach funktioniert&apos;s</h2>
             <p className={styles.sectionSubtitle}>
               Pack & Go macht Ihren Umzug zum Kinderspiel. Folgen Sie einfach diesen drei Schritten:
             </p>
