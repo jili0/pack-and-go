@@ -33,14 +33,17 @@ const Header = () => {
           <Link href="/" className={styles.navLink}>
             Home
           </Link>
-          <Link href="/how-it-works" className={styles.navLink}>
-            How it works
+          <Link href="/guide" className={styles.navLink}>
+            Guide
           </Link>
           <Link href="/pricing" className={styles.navLink}>
             Pricing
           </Link>
           <Link href="/contact" className={styles.navLink}>
             Contact
+          </Link>
+          <Link href="/tips" className={styles.navLink}>
+            Tips
           </Link>
         </nav>
 
@@ -85,7 +88,7 @@ const Header = () => {
               <Link href="/login" className={styles.navLink}>
                 Login
               </Link>
-              <Link href="/register" className={styles.btnPrimary}>
+              <Link href="/register" className={styles.navLink}>
                 Register
               </Link>
             </>
@@ -100,7 +103,8 @@ const Header = () => {
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
             <svg
-              className={mobileMenuOpen ? "iconHidden" : "iconVisible"}
+              className={styles.menuIcon}
+              style={{ display: mobileMenuOpen ? "none" : "block" }}
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
@@ -116,7 +120,8 @@ const Header = () => {
               />
             </svg>
             <svg
-              className={mobileMenuOpen ? "iconVisible" : "iconHidden"}
+              className={styles.closeIcon}
+              style={{ display: mobileMenuOpen ? "block" : "none" }}
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
@@ -143,8 +148,8 @@ const Header = () => {
           <Link href="/" className={styles.mobileMenuItem}>
             Home
           </Link>
-          <Link href="/how-it-works" className={styles.mobileMenuItem}>
-            How it works
+          <Link href="/guide" className={styles.mobileMenuItem}>
+            Guide
           </Link>
           <Link href="/pricing" className={styles.mobileMenuItem}>
             Pricing

@@ -1,7 +1,7 @@
 // src/app/moving-tips/page.jsx
 import Image from '@/components/ui/Image';
 import Link from 'next/link';
-import styles from '@/app/styles/MovingTips.module.css';
+import styles from '@/app/styles/Tips.module.css';
 export const metadata = {
   title: 'Moving Tips | Pack & Go',
   description: 'Helpful tips and tricks for a stress-free and efficient move with Pack & Go'
@@ -308,7 +308,7 @@ export default function MovingTips() {
                 <span className={styles.resourceIcon}>💰</span>
                 <span className={styles.resourceText}>Understanding Moving Costs</span>
               </Link>
-              <Link href="/how-it-works" className={styles.resourceLink}>
+              <Link href="/guide" className={styles.resourceLink}>
                 <span className={styles.resourceIcon}>ℹ️</span>
                 <span className={styles.resourceText}>How Pack & Go Works</span>
               </Link>

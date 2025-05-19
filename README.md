@@ -112,13 +112,13 @@ pack-and-go/
 │   │   │       └── page.jsx
 │   │   ├── search-results/       # Search results page
 │   │   │   └── page.jsx
-│   │   ├── how-it-works/         # Information pages
+│   │   ├── guide/         # Information pages
 │   │   │   └── page.jsx
 │   │   ├── pricing/
 │   │   │   └── page.jsx
 │   │   ├── contact/
 │   │   │   └── page.jsx
-│   │   ├── moving-tips/
+│   │   ├── tips/
 │   │   │   └── page.jsx
 │   │   ├── checklist/
 │   │   │   └── page.jsx

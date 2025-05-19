@@ -2,10 +2,10 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from '@/components/ui/Image';
-import styles from '@/app/styles/HowItWorks.module.css';
+import styles from '@/app/styles/Guide.module.css';
 
 export const metadata = {
-  title: 'How It Works | Pack & Go',
+  title: 'Guide | Pack & Go',
   description: 'Learn how Pack & Go works in 3 simple steps. Find, compare, and book moving companies with transparent pricing.',
 };
 

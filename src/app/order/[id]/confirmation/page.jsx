@@ -235,7 +235,7 @@ export default function OrderConfirmation({ params }) {
             <div className={styles.stepCard}>
               <div className={styles.stepNumber}>2</div>
               <h3>Preparation</h3>
-              <p>Once confirmed, you can prepare for your move. Check out our <Link href="/moving-tips">moving tips</Link> for helpful advice.</p>
+              <p>Once confirmed, you can prepare for your move. Check out our <Link href="/tips">Tips</Link> for helpful advice.</p>
             </div>
             
             <div className={styles.stepCard}>
