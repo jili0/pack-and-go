@@ -9,6 +9,7 @@
   justify-content: space-between;
   align-items: flex-end;
   padding-inline: 3vw;
+  font-size: min(18px, calc(1vw + 10px));
 }
 
 .logoImage {
@@ -45,7 +46,6 @@
 .navLink {
   color: var(--gray-600);
   padding-inline: min(.5rem, .8vw);
-  font-size: min(18px, calc(1vw + 10px));
   font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
@@ -111,12 +111,26 @@
 }
 /* Ende: hier oben braucht man noch styling nach dem login */
 
+ 
+.mobileMenu {
+  display: none;
+  position: absolute;
+  top: 100%; 
+  left: 0;
+  right: 0;
+  background-color: white;
+  padding: 1rem;
+  border-top: 1px solid var(--gray-200);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 90; 
+}
+
 .mobileMenuButton {
   display: block;
   background: none;
   border: none;
   color: var(--gray-400);
-  padding: 0.5rem;
+  padding-inline: min(.5rem, .8vw);
 }
 
 .mobileMenuButton:hover {
@@ -131,12 +145,6 @@
   }
 }
 
-.mobileMenu {
-  display: none;
-  background-color: white;
-  padding: 1rem;
-  border-top: 1px solid var(--gray-200);
-}
 
 .mobileMenuOpen {
   display: block;
@@ -145,7 +153,6 @@
 .mobileMenuItem {
   display: block;
   padding: 0.75rem 0;
-  font-size: 1rem;
   color: var(--gray-700);
   border-bottom: 1px solid var(--gray-200);
   text-decoration: none;
