@@ -1,4 +1,3 @@
-// src/components/layout/Header.jsx
 'use client';
 
 import { useState } from 'react';
@@ -18,7 +17,7 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.headerContent}>
-        {/* Logo und Markenname */}
+        {/* Logo and brand name */}
         <div>
           <Link href="/" className={styles.logo}>
             <div className={styles.logoImage}>
@@ -33,23 +32,23 @@ const Header = () => {
           </Link>
         </div>
 
-        {/* Desktop-Navigation */}
+        {/* Desktop navigation */}
         <nav className={styles.navigation}>
           <Link href="/" className={styles.navLink}>
-            Startseite
+            Home
           </Link>
           <Link href="/how-it-works" className={styles.navLink}>
-            Wie es funktioniert
+            How it works
           </Link>
           <Link href="/pricing" className={styles.navLink}>
-            Preise
+            Pricing
           </Link>
           <Link href="/contact" className={styles.navLink}>
-            Kontakt
+            Contact
           </Link>
         </nav>
 
-        {/* Desktop-Benutzer-Menü */}
+        {/* Desktop user menu */}
         <div className={styles.userMenu}>
           {user ? (
             <div className={styles.userMenuContainer}>
@@ -64,34 +63,34 @@ const Header = () => {
                   Dashboard
                 </Link>
                 <Link href={`/${user.role}/profile`} className={styles.userMenuItem}>
-                  Profil
+                  Profile
                 </Link>
                 <button
                   onClick={logout}
                   className={styles.userMenuItem}
                 >
-                  Abmelden
+                  Logout
                 </button>
               </div>
             </div>
           ) : (
             <>
               <Link href="/login" className={styles.navLink}>
-                Anmelden
+                Login
               </Link>
               <Link href="/register" className={styles.btnPrimary}>
-                Registrieren
+                Register
               </Link>
             </>
           )}
         </div>
 
-        {/* Mobile-Menü-Button */}
+        {/* Mobile menu button */}
         <div>
           <button
             onClick={toggleMobileMenu}
             className={styles.mobileMenuButton}
-            aria-label={mobileMenuOpen ? "Menü schließen" : "Menü öffnen"}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
             <svg
               className={mobileMenuOpen ? "iconHidden" : "iconVisible"}
@@ -121,20 +120,20 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile-Menü */}
+      {/* Mobile menu */}
       <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.mobileMenuOpen : ''}`}>
         <div>
           <Link href="/" className={styles.mobileMenuItem}>
-            Startseite
+            Home
           </Link>
           <Link href="/how-it-works" className={styles.mobileMenuItem}>
-            Wie es funktioniert
+            How it works
           </Link>
           <Link href="/pricing" className={styles.mobileMenuItem}>
-            Preise
+            Pricing
           </Link>
           <Link href="/contact" className={styles.mobileMenuItem}>
-            Kontakt
+            Contact
           </Link>
         </div>
         <div className={styles.mobileMenuDivider}>
@@ -147,22 +146,22 @@ const Header = () => {
                 Dashboard
               </Link>
               <Link href={`/${user.role}/profile`} className={styles.mobileMenuItem}>
-                Profil
+                Profile
               </Link>
               <button
                 onClick={logout}
                 className={styles.mobileMenuItem}
               >
-                Abmelden
+                Logout
               </button>
             </div>
           ) : (
             <div>
               <Link href="/login" className={styles.mobileMenuItem}>
-                Anmelden
+                Login
               </Link>
               <Link href="/register" className={styles.mobileMenuItem}>
-                Registrieren
+                Register
               </Link>
             </div>
           )}
