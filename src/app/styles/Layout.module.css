@@ -9,7 +9,6 @@
   justify-content: space-between;
   align-items: flex-end;
   padding-inline: 3vw;
-  font-size: min(18px, calc(1vw + 10px));
 }
 
 .logoImage {
