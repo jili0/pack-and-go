@@ -74,10 +74,20 @@
   color: var(--dark-blue);
 }
 
-/* Steps Section */
+/* Steps Section (how it works) */
 .stepsSection {
-  padding: 5rem 0;
+  padding: 4rem 0;
   background-color: var(--gray-50);
+}
+
+.stepsContainer {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.sectionHeader {
+  margin-bottom: 3rem;
 }
 
 .sectionTitle {
@@ -90,7 +100,6 @@
 
 .sectionSubtitle {
   text-align: center;
-  margin-bottom: 3rem;
   font-size: 1.125rem;
   color: var(--gray-600);
   max-width: 600px;
@@ -98,24 +107,24 @@
   margin-right: auto;
 }
 
-.stepsContainer {
+.stepsList {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 1rem;
+  gap: 2.5rem;
 }
 
 .step {
-  flex: 1;
   text-align: center;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .stepNumber {
   width: 3rem;
   height: 3rem;
+  font-size: 1.25rem;
   background-color: var(--primary-color);
   color: white;
   font-weight: 700;
@@ -123,21 +132,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: var(--transition);
+}
+
+.step:hover .stepNumber {
+  transform: scale(1.1);
+  box-shadow: var(--box-shadow-hover);
 }
 
 .stepTitle {
   font-size: 1.25rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   color: var(--gray-800);
 }
 
 .stepDescription {
   color: var(--gray-600);
-  font-size: 0.875rem;
-  max-width: 80%;
-  margin: 0 auto;
+  font-size: 1rem;
+  max-width: 90%;
 }
 
 /* Features Section */
@@ -347,28 +361,77 @@
   .heroContainer {
     padding: 0 1.5rem;
   }
+  
+  .stepsList {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  
+  .step {
+    flex: 1;
+    padding: 1rem;
+  }
+  
+  .stepDescription {
+    max-width: 100%;
+  }
+  
   .stepsContainer {
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
   }
-
+  
   .featuresGrid {
     grid-template-columns: repeat(3, 1fr);
   }
-
+  
   .citiesGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 /* Large devices (min-width: 1024px) */
-
 @media (min-width: 1024px) {
   .heroContainer {
     padding: 0 2rem;
   }
-
+  
+  .stepsSection {
+    padding: 5rem 0;
+  }
+  
+  .stepsContainer {
+    padding: 0 2rem;
+  }
+  
+  .sectionTitle {
+    font-size: 2.5rem;
+  }
+  
+  .sectionSubtitle {
+    font-size: 1.25rem;
+  }
+  
+  .stepsList {
+    gap: 2rem;
+  }
+  
+  .stepNumber {
+    width: 4rem;
+    height: 4rem;
+    font-size: 1.5rem;
+  }
+  
+  .stepTitle {
+    font-size: 1.5rem;
+  }
+  
+  .stepDescription {
+    font-size: 1.125rem;
+  }
+  
   .citiesGrid {
     grid-template-columns: repeat(4, 1fr);
   }

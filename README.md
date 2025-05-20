@@ -36,7 +36,6 @@ pack-and-go/
 ├── public/                       # Static files
 │   ├── images/                   # Images 
 │   │   ├── logo.png
-│   │   ├── logo-white.png
 │   │   ├── hero-image.jpg
 │   │   ├── step1.jpg
 │   │   ├── step2.jpg
