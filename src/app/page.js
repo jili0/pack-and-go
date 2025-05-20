@@ -12,7 +12,7 @@ export default function Home() {
           <div className={styles.heroContent}>
             <h1 className={styles.heroTitle}>Easy moving with transparent prices</h1>
             <p className={styles.heroText}>
-              At Pack & Go, you'll find certified moving helpers at fair prices.
+              At Pack & Go, you&apos;ll find certified moving helpers at fair prices.
               Compare offers and book your move in just a few clicks.
             </p>
             <Link href="#calculator" className={styles.heroBtn}>
