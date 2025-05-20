@@ -1,19 +1,17 @@
-// src/components/forms/PriceCalculator.jsx
 "use client";
 
 import { useState, useEffect } from 'react';
-import styles from '@/app/styles/Components.module.css';
+import styles from '@/app/styles/PriceCalculator.module.css';
 
 const PriceCalculator = () => {
   const [helpersCount, setHelpersCount] = useState(2);
   const [hours, setHours] = useState(4);
-  const [hourlyRate, setHourlyRate] = useState(50); // Price per helper per hour
   const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
     // Calculate total price
-    setTotalPrice(helpersCount * hours * hourlyRate);
-  }, [helpersCount, hours, hourlyRate]);
+    setTotalPrice(helpersCount * hours * 50);
+  }, [helpersCount, hours, 50]);
 
   return (
     <div className={styles.calculator}>
@@ -85,7 +83,7 @@ const PriceCalculator = () => {
       
       <div className={styles.result}>
         <div className={styles.calculation}>
-          <p>{helpersCount} helpers × {hours} hours × {hourlyRate}€ per helper</p>
+          <p>{helpersCount} helpers × {hours} hours × 50€ per helper</p>
         </div>
         <div className={styles.totalPrice}>
           <span className={styles.priceLabel}>Total Price:</span>
