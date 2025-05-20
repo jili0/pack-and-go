@@ -1,4 +1,3 @@
-// src/app/(auth)/login/page.jsx
 'use client';
 
 import { useState, Suspense } from 'react';
@@ -68,9 +67,9 @@ const LoginContent = () => {
       const result = await login(formData.email, formData.password);
       
       if (result.success) {
-        // Redirect to previous page or dashboard
+        // Redirect to dashboard after login
         const fromUrl = searchParams.get('from');
-        router.push(fromUrl || '/user');
+        router.push(fromUrl || '/dashboard');
       } else {
         setLoginError(result.message || 'Login failed');
       }
@@ -156,9 +155,9 @@ const LoginSkeleton = () => (
 const LoginPage = () => {
   return (
     <div className="container py-8">
-      <Suspense fallback={<LoginSkeleton />}>
+      {/* <Suspense fallback={<LoginSkeleton />}> */}
         <LoginContent />
-      </Suspense>
+      {/* </Suspense> */}
     </div>
   );
 };

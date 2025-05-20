@@ -19,7 +19,7 @@ export default function UserDashboard() {
   // Leite zur Login-Seite weiter, wenn der Benutzer nicht angemeldet ist
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login?redirect=user');
+      router.push('/login?redirect=/user');
     }
   }, [user, loading, router]);
   

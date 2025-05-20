@@ -36,6 +36,7 @@ export const AuthProvider = ({ children }) => {
 
       if (data.success) {
         setUser(data.user);
+        return {success: true, user: data.user}
       } else {
         setUser(null);
       }
