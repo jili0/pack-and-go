@@ -123,7 +123,7 @@ export default function Home() {
         <div className={styles.citiesContainer}>
           <h2 className={styles.sectionTitle}>Top moving companies in major cities</h2>
           <p className={styles.sectionSubtitle}>
-            Find verified moving companies in Germany's largest cities
+            Find verified moving companies in Germany&apos;s largest cities
           </p>
           
           <div className={styles.citiesGrid}>
