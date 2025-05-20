@@ -1,11 +1,10 @@
-// src/components/layout/Header.jsx
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useAuth } from '@/context/AuthContext';
-import styles from '@/app/styles/Layout.module.css';
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useAuth } from "@/context/AuthContext";
+import styles from "@/app/styles/Layout.module.css";
 
 const Header = () => {
   const { user, logout } = useAuth();
@@ -17,152 +16,172 @@ const Header = () => {
 
   return (
     <header className={styles.header}>
-      <div className={styles.headerContent}>
-        {/* Logo und Markenname */}
-        <div>
-          <Link href="/" className={styles.logo}>
-            <div className={styles.logoImage}>
-              <Image 
-                src="/images/logo.png" 
-                alt="Pack & Go Logo" 
-                fill 
-                className="object-contain" 
-              />
-            </div>
-            <span className={styles.logoText}>Pack & Go</span>
-          </Link>
-        </div>
+      {/* Logo */}
+      <Link href="/">
+        <Image
+          className={styles.logoImage}
+          src="/images/logo.png"
+          alt="Pack & Go Logo"
+          width="225"
+          height="100"
+        />
+      </Link>
 
-        {/* Desktop-Navigation */}
+      {/* Desktop navigation */}
+      <div className={styles.headerContent}>
         <nav className={styles.navigation}>
           <Link href="/" className={styles.navLink}>
-            Startseite
+            Home
           </Link>
-          <Link href="/how-it-works" className={styles.navLink}>
-            Wie es funktioniert
+          <Link href="/guide" className={styles.navLink}>
+            Guide
           </Link>
           <Link href="/pricing" className={styles.navLink}>
-            Preise
+            Pricing
           </Link>
           <Link href="/contact" className={styles.navLink}>
-            Kontakt
+            Contact
+          </Link>
+          <Link href="/tips" className={styles.navLink}>
+            Tips
           </Link>
         </nav>
 
-        {/* Desktop-Benutzer-Menü */}
+        {/* Desktop user menu */}
         <div className={styles.userMenu}>
           {user ? (
             <div className={styles.userMenuContainer}>
               <button className={styles.userMenuButton}>
                 <span className={styles.userMenuText}>{user.name}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className={styles.userMenuIcon} width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={styles.userMenuIcon}
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </button>
               <div className={styles.userMenuDropdown}>
                 <Link href={`/${user.role}`} className={styles.userMenuItem}>
                   Dashboard
                 </Link>
-                <Link href={`/${user.role}/profile`} className={styles.userMenuItem}>
-                  Profil
-                </Link>
-                <button
-                  onClick={logout}
+                <Link
+                  href={`/${user.role}/profile`}
                   className={styles.userMenuItem}
                 >
-                  Abmelden
+                  Profile
+                </Link>
+                <button onClick={logout} className={styles.userMenuItem}>
+                  Logout
                 </button>
               </div>
             </div>
           ) : (
             <>
               <Link href="/login" className={styles.navLink}>
-                Anmelden
+                Login
               </Link>
-              <Link href="/register" className={styles.btnPrimary}>
-                Registrieren
+              <Link href="/register" className={styles.navLink}>
+                Register
               </Link>
             </>
           )}
         </div>
 
-        {/* Mobile-Menü-Button */}
+        {/* Mobile menu button */}
         <div>
           <button
             onClick={toggleMobileMenu}
             className={styles.mobileMenuButton}
-            aria-label={mobileMenuOpen ? "Menü schließen" : "Menü öffnen"}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
             <svg
-              className={mobileMenuOpen ? "iconHidden" : "iconVisible"}
+              className={styles.menuIcon}
+              style={{ display: mobileMenuOpen ? "none" : "block" }}
               xmlns="http://www.w3.org/2000/svg"
-              width="24" 
+              width="24"
               height="24"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
             <svg
-              className={mobileMenuOpen ? "iconVisible" : "iconHidden"}
+              className={styles.closeIcon}
+              style={{ display: mobileMenuOpen ? "block" : "none" }}
               xmlns="http://www.w3.org/2000/svg"
-              width="24" 
-              height="24" 
+              width="24"
+              height="24"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
       </div>
 
-      {/* Mobile-Menü */}
-      <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.mobileMenuOpen : ''}`}>
+      {/* Mobile menu */}
+      <div
+        className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.mobileMenuOpen : ""}`}
+      >
         <div>
           <Link href="/" className={styles.mobileMenuItem}>
-            Startseite
+            Home
           </Link>
-          <Link href="/how-it-works" className={styles.mobileMenuItem}>
-            Wie es funktioniert
+          <Link href="/guide" className={styles.mobileMenuItem}>
+            Guide
           </Link>
           <Link href="/pricing" className={styles.mobileMenuItem}>
-            Preise
+            Pricing
           </Link>
           <Link href="/contact" className={styles.mobileMenuItem}>
-            Kontakt
+            Contact
           </Link>
         </div>
         <div className={styles.mobileMenuDivider}>
           {user ? (
             <div>
-              <div className={styles.mobileMenuUser}>
-                {user.name}
-              </div>
+              <div className={styles.mobileMenuUser}>{user.name}</div>
               <Link href={`/${user.role}`} className={styles.mobileMenuItem}>
                 Dashboard
               </Link>
-              <Link href={`/${user.role}/profile`} className={styles.mobileMenuItem}>
-                Profil
-              </Link>
-              <button
-                onClick={logout}
+              <Link
+                href={`/${user.role}/profile`}
                 className={styles.mobileMenuItem}
               >
-                Abmelden
+                Profile
+              </Link>
+              <button onClick={logout} className={styles.mobileMenuItem}>
+                Logout
               </button>
             </div>
           ) : (
             <div>
               <Link href="/login" className={styles.mobileMenuItem}>
-                Anmelden
+                Login
               </Link>
               <Link href="/register" className={styles.mobileMenuItem}>
-                Registrieren
+                Register
               </Link>
             </div>
           )}

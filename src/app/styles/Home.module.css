@@ -1,6 +1,9 @@
-/* src/app/styles/Home.module.css */
 .hero {
-  background: linear-gradient(to bottom, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(
+    to bottom,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   color: white;
   padding: 5rem 0;
   text-align: center;
@@ -12,18 +15,6 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 1rem;
-}
-
-@media (min-width: 640px) {
-  .heroContainer {
-    padding: 0 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .heroContainer {
-    padding: 0 2rem;
-  }
 }
 
 .heroContent {
@@ -116,14 +107,6 @@
   padding: 0 1rem;
 }
 
-@media (min-width: 768px) {
-  .stepsContainer {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-}
-
 .step {
   flex: 1;
   text-align: center;
@@ -175,18 +158,14 @@
   gap: 2rem;
 }
 
-@media (min-width: 768px) {
-  .featuresGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
 .featureCard {
   background-color: white;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
   padding: 2rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .featureCard:hover {
@@ -237,25 +216,15 @@
   margin-top: 3rem;
 }
 
-@media (min-width: 768px) {
-  .citiesGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .citiesGrid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
 .cityCard {
   position: relative;
   height: 200px;
   border-radius: var(--border-radius);
   overflow: hidden;
   box-shadow: var(--box-shadow);
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
 }
 
 .cityCard:hover {
@@ -369,4 +338,38 @@
 
 .allCitiesLinkIcon {
   margin-left: 0.5rem;
+}
+
+/* =========== Media Queries =========== */
+
+/* Medium devices (min-width: 768px) */
+@media (min-width: 768px) {
+  .heroContainer {
+    padding: 0 1.5rem;
+  }
+  .stepsContainer {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .featuresGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .citiesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Large devices (min-width: 1024px) */
+
+@media (min-width: 1024px) {
+  .heroContainer {
+    padding: 0 2rem;
+  }
+
+  .citiesGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }

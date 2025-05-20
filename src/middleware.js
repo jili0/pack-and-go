@@ -11,7 +11,7 @@ const publicPaths = [
   '/api/auth/register',
   '/api/companies/search',
   '/pricing',
-  '/how-it-works',
+  '/guide',
   '/contact',
   '/about-us',
   '/privacy',
@@ -20,7 +20,7 @@ const publicPaths = [
   '/moving',
   '/international-moving',
   '/reviews',
-  '/moving-tips',
+  '/tips',
   '/checklist',
   '/staedte',
   '/stadt'

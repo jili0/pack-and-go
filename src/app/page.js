@@ -1,4 +1,3 @@
-// src/app/page.js
 import Link from 'next/link';
 import Image from 'next/image';
 import MovingCalculator from '@/components/forms/PriceCalculator';
@@ -7,74 +6,74 @@ import styles from '@/app/styles/Home.module.css';
 export default function Home() {
   return (
     <div>
-      {/* Hero-Bereich */}
+      {/* Hero Section */}
       <section className={styles.hero}>
         <div className={styles.heroContainer}>
           <div className={styles.heroContent}>
-            <h1 className={styles.heroTitle}>Einfach umziehen mit transparenten Preisen</h1>
+            <h1 className={styles.heroTitle}>Easy moving with transparent prices</h1>
             <p className={styles.heroText}>
-              Bei Pack & Go finden Sie zertifizierte Umzugshelfer zu fairen Preisen.
-              Vergleichen Sie Angebote und buchen Sie Ihren Umzug in wenigen Klicks.
+              At Pack & Go, you'll find certified moving helpers at fair prices.
+              Compare offers and book your move in just a few clicks.
             </p>
             <Link href="#calculator" className={styles.heroBtn}>
-              Jetzt Umzug planen
+              Plan your move now
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Umzugsrechner */}
+      {/* Moving Calculator */}
       <section id="calculator" className={styles.calculator}>
         <div className={styles.calculatorContainer}>
-          <h2 className={styles.calculatorTitle}>Berechnen Sie Ihren Umzugspreis</h2>
+          <h2 className={styles.calculatorTitle}>Calculate your moving price</h2>
           <MovingCalculator />
         </div>
       </section>
 
-      {/* Wie es funktioniert */}
+      {/* How it works */}
       <section className={styles.stepsSection}>
         <div className={styles.stepsContainer}>
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>So einfach funktioniert&apos;s</h2>
+            <h2 className={styles.sectionTitle}>How it works</h2>
             <p className={styles.sectionSubtitle}>
-              Pack & Go macht Ihren Umzug zum Kinderspiel. Folgen Sie einfach diesen drei Schritten:
+              Pack & Go makes your move a breeze. Just follow these three steps:
             </p>
           </div>
           
           <div className={styles.stepsList}>
             <div className={styles.step}>
               <div className={styles.stepNumber}>1</div>
-              <h3 className={styles.stepTitle}>Anfrage stellen</h3>
+              <h3 className={styles.stepTitle}>Submit request</h3>
               <p className={styles.stepDescription}>
-                Geben Sie Ihre Umzugsdetails ein und erhalten Sie sofort einen Preisüberblick.
+                Enter your moving details and get an immediate price overview.
               </p>
             </div>
             
             <div className={styles.step}>
               <div className={styles.stepNumber}>2</div>
-              <h3 className={styles.stepTitle}>Firma auswählen</h3>
+              <h3 className={styles.stepTitle}>Select company</h3>
               <p className={styles.stepDescription}>
-                Vergleichen Sie Bewertungen und wählen Sie die passende Umzugsfirma für Ihre Bedürfnisse.
+                Compare reviews and choose the right moving company for your needs.
               </p>
             </div>
             
             <div className={styles.step}>
               <div className={styles.stepNumber}>3</div>
-              <h3 className={styles.stepTitle}>Umzug genießen</h3>
+              <h3 className={styles.stepTitle}>Enjoy your move</h3>
               <p className={styles.stepDescription}>
-                Lehnen Sie sich zurück und lassen Sie die Profis Ihre Sachen sicher transportieren.
+                Sit back and let the professionals safely transport your belongings.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Vorteile */}
+      {/* Advantages */}
       <section className={styles.featuresSection}>
         <div className={styles.featuresContainer}>
-          <h2 className={styles.sectionTitle}>Unsere Vorteile</h2>
+          <h2 className={styles.sectionTitle}>Our advantages</h2>
           <p className={styles.sectionSubtitle}>
-            Warum immer mehr Menschen Pack & Go für ihren Umzug wählen
+            Why more and more people choose Pack & Go for their move
           </p>
           
           <div className={styles.featuresGrid}>
@@ -85,9 +84,9 @@ export default function Home() {
                   <circle cx="12" cy="10" r="3" />
                 </svg>
               </div>
-              <h3 className={styles.featureTitle}>Transparente Preise</h3>
+              <h3 className={styles.featureTitle}>Transparent prices</h3>
               <p className={styles.featureDescription}>
-                Keine versteckten Kosten. Sie zahlen nur für die tatsächlich benötigte Zeit und die Anzahl der Helfer.
+                No hidden costs. You only pay for the time actually needed and the number of helpers.
               </p>
             </div>
             
@@ -98,9 +97,9 @@ export default function Home() {
                   <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
               </div>
-              <h3 className={styles.featureTitle}>Geprüfte Qualität</h3>
+              <h3 className={styles.featureTitle}>Verified quality</h3>
               <p className={styles.featureDescription}>
-                Alle Umzugsfirmen werden sorgfältig überprüft. KisteKlar-zertifizierte Anbieter garantieren höchste Standards.
+                All moving companies are thoroughly checked. KisteKlar-certified providers guarantee the highest standards.
               </p>
             </div>
             
@@ -110,21 +109,21 @@ export default function Home() {
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
               </div>
-              <h3 className={styles.featureTitle}>Echte Bewertungen</h3>
+              <h3 className={styles.featureTitle}>Genuine reviews</h3>
               <p className={styles.featureDescription}>
-                Lesen Sie Erfahrungen anderer Kunden und treffen Sie eine informierte Entscheidung für Ihren Umzug.
+                Read experiences from other customers and make an informed decision for your move.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Städte-Sektion */}
+      {/* Cities Section */}
       <section className={styles.citiesSection}>
         <div className={styles.citiesContainer}>
-          <h2 className={styles.sectionTitle}>Top Umzugsunternehmen in großen Städten</h2>
+          <h2 className={styles.sectionTitle}>Top moving companies in major cities</h2>
           <p className={styles.sectionSubtitle}>
-            Finden Sie verifizierte Umzugsunternehmen in den größten Städten Deutschlands
+            Find verified moving companies in Germany&apos;s largest cities
           </p>
           
           <div className={styles.citiesGrid}>
@@ -139,7 +138,7 @@ export default function Home() {
                 <div className={styles.cityOverlay}></div>
                 <div className={styles.cityContent}>
                   <h3 className={styles.cityTitle}>Berlin</h3>
-                  <p className={styles.citySubtitle}>Top 10 Umzugsunternehmen</p>
+                  <p className={styles.citySubtitle}>Top 10 moving companies</p>
                 </div>
               </div>
             </Link>
@@ -155,7 +154,7 @@ export default function Home() {
                 <div className={styles.cityOverlay}></div>
                 <div className={styles.cityContent}>
                   <h3 className={styles.cityTitle}>Hamburg</h3>
-                  <p className={styles.citySubtitle}>Top 10 Umzugsunternehmen</p>
+                  <p className={styles.citySubtitle}>Top 10 moving companies</p>
                 </div>
               </div>
             </Link>
@@ -171,7 +170,7 @@ export default function Home() {
                 <div className={styles.cityOverlay}></div>
                 <div className={styles.cityContent}>
                   <h3 className={styles.cityTitle}>München</h3>
-                  <p className={styles.citySubtitle}>Top 10 Umzugsunternehmen</p>
+                  <p className={styles.citySubtitle}>Top 10 moving companies</p>
                 </div>
               </div>
             </Link>
@@ -187,7 +186,7 @@ export default function Home() {
                 <div className={styles.cityOverlay}></div>
                 <div className={styles.cityContent}>
                   <h3 className={styles.cityTitle}>Köln</h3>
-                  <p className={styles.citySubtitle}>Top 10 Umzugsunternehmen</p>
+                  <p className={styles.citySubtitle}>Top 10 moving companies</p>
                 </div>
               </div>
             </Link>
@@ -195,10 +194,10 @@ export default function Home() {
           
           <div className={styles.allCitiesLinkContainer}>
             <Link 
-              href="/staedte" 
+              href="/cities" 
               className={styles.allCitiesLink}
             >
-              Alle Städte ansehen
+              View all cities
               <svg xmlns="http://www.w3.org/2000/svg" className={styles.allCitiesLinkIcon} width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
@@ -210,15 +209,15 @@ export default function Home() {
       {/* Call-to-Action */}
       <section className={styles.ctaSection}>
         <div className={styles.ctaContainer}>
-          <h2 className={styles.ctaTitle}>Bereit für Ihren stressfreien Umzug?</h2>
+          <h2 className={styles.ctaTitle}>Ready for your stress-free move?</h2>
           <p className={styles.ctaText}>
-            Holen Sie sich jetzt kostenlos und unverbindlich Angebote von verifizierten Umzugsfirmen in Ihrer Region.
+            Get free and non-binding offers from verified moving companies in your region now.
           </p>
           <Link 
             href="#calculator" 
             className={styles.ctaBtn}
           >
-            Jetzt Umzug planen
+            Plan your move now
             <svg xmlns="http://www.w3.org/2000/svg" className={styles.ctaBtnIcon} width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>

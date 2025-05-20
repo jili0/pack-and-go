@@ -1,6 +1,6 @@
 /* src/app/styles/globals.css */
 :root {
-  --primary-color: #2563eb;
+  --primary-color: #258beb;
   --primary-dark: #1d4ed8;
   --primary-light: #dbeafe;
   --secondary-color: #10b981;
@@ -21,7 +21,8 @@
   --warning-color: #f59e0b;
   --border-radius: 0.5rem;
   --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --box-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --box-shadow-hover:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --transition: all 0.2s ease-in-out;
 }
 
@@ -38,8 +39,11 @@ html {
 body {
   color: var(--gray-800);
   background-color: var(--gray-50);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
   line-height: 1.5;
+  font-size: min(18px, calc(1vw + 10px));
 }
 
 a {
@@ -52,13 +56,18 @@ a:hover {
   color: var(--primary-dark);
 }
 
-button, input, select, textarea {
+button,
+input,
+select,
+textarea {
   font-family: inherit;
   font-size: 100%;
   transition: var(--transition);
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   display: block;
   width: 100%;
   padding: 0.5rem;
@@ -67,7 +76,9 @@ input, select, textarea {
   border-radius: 0.25rem;
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
@@ -96,20 +107,39 @@ button {
   }
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin-bottom: 0.5rem;
   font-weight: 600;
   line-height: 1.2;
 }
 
-h1 { font-size: 2.5rem; }
-h2 { font-size: 2rem; }
-h3 { font-size: 1.75rem; }
-h4 { font-size: 1.5rem; }
-h5 { font-size: 1.25rem; }
-h6 { font-size: 1rem; }
+h1 {
+  font-size: 2.5rem;
+}
+h2 {
+  font-size: 2rem;
+}
+h3 {
+  font-size: 1.75rem;
+}
+h4 {
+  font-size: 1.5rem;
+}
+h5 {
+  font-size: 1.25rem;
+}
+h6 {
+  font-size: 1rem;
+}
 
-p { margin-bottom: 1rem; }
+p {
+  margin-bottom: 1rem;
+}
 
 /* Standardbuttons */
 .btn {
@@ -206,18 +236,42 @@ p { margin-bottom: 1rem; }
 }
 
 /* Flexbox helpers */
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
 
 /* Spacing helpers */
-.mt-1 { margin-top: 0.25rem; }
-.mt-2 { margin-top: 0.5rem; }
-.mt-4 { margin-top: 1rem; }
-.mt-6 { margin-top: 1.5rem; }
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mb-6 { margin-bottom: 1.5rem; }
-.mb-8 { margin-bottom: 2rem; }
-.mb-12 { margin-bottom: 3rem; }
+.mt-1 {
+  margin-top: 0.25rem;
+}
+.mt-2 {
+  margin-top: 0.5rem;
+}
+.mt-4 {
+  margin-top: 1rem;
+}
+.mt-6 {
+  margin-top: 1.5rem;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+.mb-4 {
+  margin-bottom: 1rem;
+}
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+.mb-8 {
+  margin-bottom: 2rem;
+}
+.mb-12 {
+  margin-bottom: 3rem;
+}
 
-.text-center { text-align: center; }
+.text-center {
+  text-align: center;
+}
