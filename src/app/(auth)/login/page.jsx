@@ -155,9 +155,9 @@ const LoginSkeleton = () => (
 const LoginPage = () => {
   return (
     <div className="container py-8">
-      {/* <Suspense fallback={<LoginSkeleton />}> */}
+      <Suspense fallback={<LoginSkeleton />}>
         <LoginContent />
-      {/* </Suspense> */}
+      </Suspense>
     </div>
   );
 };
