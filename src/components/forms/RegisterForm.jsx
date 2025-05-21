@@ -226,7 +226,7 @@ const RegisterForm = () => {
             disabled={isSubmitting}
           />
           <label htmlFor="terms" className={styles.checkboxLabel}>
-            Ich stimme den <Link href="/terms" target="_blank" className={styles.formFooterLink}>Nutzungsbedingungen</Link> und der <Link href="/privacy" target="_blank" className={styles.formFooterLink}>Datenschutzerklärung</Link> zu.
+            Ich stimme den <Link href="/placeholder" target="_blank" className={styles.formFooterLink}>Nutzungsbedingungen</Link> und der <Link href="/placeholder" target="_blank" className={styles.formFooterLink}>Datenschutzerklärung</Link> zu.
           </label>
         </div>
         {errors.terms && <p className={styles.formError}>{errors.terms}</p>}
