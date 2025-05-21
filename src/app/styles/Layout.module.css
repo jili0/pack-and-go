@@ -98,7 +98,6 @@
 
 /* Mobile Menu */
 .mobileMenu {
-  display: none;
   position: absolute;
   top: 100%;
   left: 0;
@@ -124,9 +123,6 @@
   border-radius: 0.375rem;
 }
 
-.mobileMenuOpen {
-  display: block;
-}
 
 .mobileMenuItem {
   display: block;
