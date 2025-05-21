@@ -147,51 +147,48 @@
   padding: 5rem 0 2rem;
 }
 
+
+
+/* Simplest approach - direct styling */
 .footerContent {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 1rem;
-}
-
-.footerGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
+  text-align: center;
   margin-bottom: 3rem;
 }
 
 .footerBrand {
   margin-bottom: 1.5rem;
-}
-
-.footerLogo {
   display: flex;
-  align-items: center;
-  color: white;
-  text-decoration: none;
+  justify-content: center;
 }
 
 .footerLogoImage {
-  width: 40px;
-  height: 40px;
+  width: 225px;
+  height: 100px;
   position: relative;
+  object-fit: contain;
+  margin: 0 auto;
 }
 
 .footerLogoText {
-  margin-left: 0.5rem;
-  font-size: 1.5rem;
-  font-weight: 700;
+  display: none;
 }
 
 .footerDescription {
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 1.5rem;
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .footerSocial {
   display: flex;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
+  justify-content: center;
 }
 
 .socialIcon {
@@ -239,19 +236,31 @@
 
 /* =========== Media Queries =========== */
 
+/* Small devices (min-width: 500px) */
+@media (min-width: 500px) {
+  .footerContent > div:nth-child(2),
+  .footerContent > div:nth-child(3) {
+    display: inline-block !important;
+    width: 45% !important;
+    vertical-align: top !important;
+    text-align: center !important;
+  }
+  
+  .footerContent > div:first-child {
+    margin-bottom: 3rem;
+    width: 100%;
+  }
+}
+
 /* Medium devices (min-width: 768px) */
 @media (min-width: 768px) {
   .navigation {
     display: flex;
     align-items: center;
   }
-  
+
   .mobileMenuButton {
     display: none;
-  }
-  
-  .footerGrid {
-    grid-template-columns: 2fr 1fr 1fr;
   }
 
   .footerContent {
@@ -263,5 +272,37 @@
 @media (min-width: 1024px) {
   .footerContent {
     padding: 0 2rem;
+    text-align: left;
+  }
+  
+  .footerContent {
+    display: flex;
+    justify-content: space-evenly;
+    text-align: left;
+  }
+  
+  .footerContent > div:first-child {
+    width: 50% !important;
+    margin-bottom: 0;
+    margin-left: 3rem;
+  }
+  
+  .footerContent > div:nth-child(2),
+  .footerContent > div:nth-child(3) {
+    width: 22% !important;
+    text-align: left !important;
+  }
+  
+  .footerSocial {
+    justify-content: flex-start;
+  }
+  
+  .footerBrand {
+    justify-content: flex-start;
+  }
+  
+  .footerDescription {
+    margin-left: 0;
+    margin-right: 0;
   }
 }
