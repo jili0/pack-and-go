@@ -1,4 +1,3 @@
-// src/components/layout/Footer.jsx
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from '@/app/styles/Layout.module.css';
@@ -8,25 +7,23 @@ const Footer = () => {
 
   return (
     <footer className={styles.footer}>
-      <div className={styles.footerContent}>
-        <div className={styles.footerGrid}>
-          {/* Logo und Kurzbeschreibung */}
+        <div className={styles.footerContent}>
+          {/* Logo and short description */}
           <div>
             <div className={styles.footerBrand}>
               <Link href="/" className={styles.footerLogo}>
                 <div className={styles.footerLogoImage}>
                   <Image 
-                    src="/images/logo.png" 
+                    src="/images/logo-transparent.png" 
                     alt="Pack & Go Logo" 
                     fill 
                     className="object-contain" 
                   />
                 </div>
-                <span className={styles.footerLogoText}>Pack & Go</span>
               </Link>
             </div>
             <p className={styles.footerDescription}>
-              Pack & Go bietet eine einfache und transparente Lösung für Umzugsdienstleistungen mit klarer Preisgestaltung und verifizierter Qualität.
+              Pack & Go offers a simple and transparent solution for moving services with clear pricing and verified quality.
             </p>
             <div className={styles.footerSocial}>
               <a href="#" className={styles.socialIcon} aria-label="Facebook">
@@ -53,54 +50,54 @@ const Footer = () => {
             <ul className={styles.footerLinks}>
               <li className={styles.footerLink}>
                 <Link href="/moving">
-                  Umzug Deutschland
+                  Moving in Germany
                 </Link>
               </li>
               <li className={styles.footerLink}>
                 <Link href="/international-moving">
-                  Auslandsumzug
+                  International Moving
                 </Link>
               </li>
               <li className={styles.footerLink}>
                 <Link href="/pricing">
-                  Preise
+                  Prices
                 </Link>
               </li>
               <li className={styles.footerLink}>
                 <Link href="/reviews">
-                  Bewertungen
+                  Reviews
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Unternehmen */}
+          {/* Company */}
           <div>
-            <h3 className={styles.footerHeading}>Unternehmen</h3>
+            <h3 className={styles.footerHeading}>Company</h3>
             <ul className={styles.footerLinks}>
               <li className={styles.footerLink}>
                 <Link href="/about-us">
-                  Über uns
+                  About Us
                 </Link>
               </li>
               <li className={styles.footerLink}>
                 <Link href="/contact">
-                  Kontakt
+                  Contact
                 </Link>
               </li>
               <li className={styles.footerLink}>
                 <Link href="/privacy">
-                  Datenschutz
+                  Privacy Policy
                 </Link>
               </li>
               <li className={styles.footerLink}>
                 <Link href="/imprint">
-                  Impressum
+                  Imprint
                 </Link>
               </li>
               <li className={styles.footerLink}>
                 <Link href="/terms">
-                  AGB
+                  Terms and Conditions
                 </Link>
               </li>
             </ul>
@@ -110,10 +107,9 @@ const Footer = () => {
         {/* Copyright */}
         <div className={styles.footerBottom}>
           <p>
-            &copy; {currentYear} Pack & Go. Alle Rechte vorbehalten.
+            &copy; {currentYear} Pack & Go. All Rights Reserved.
           </p>
         </div>
-      </div>
     </footer>
   );
 };
