@@ -1,32 +1,30 @@
 // src/lib/auth.js
-import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 // JWT-Token erstellen
 export const createToken = (userId, role) => {
-  return jwt.sign(
-    { id: userId, role },
-    process.env.JWT_SECRET,
-    { expiresIn: '7d' }
-  );
+  return jwt.sign({ id: userId, role }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
 };
 
 // Token in Cookie speichern
 export const setTokenCookie = (token) => {
   cookies().set({
-    name: 'token',
+    name: "token",
     value: token,
     httpOnly: true,
-    path: '/',
-    secure: process.env.NODE_ENV === 'production',
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 24 * 7, // 7 Tage
-    sameSite: 'strict'
+    sameSite: "strict",
   });
 };
 
 // Token aus Cookie entfernen
 export const removeTokenCookie = () => {
-  cookies().delete('token');
+  cookies().delete("token");
 };
 
 // Token verifizieren
@@ -39,13 +37,14 @@ export const verifyToken = (token) => {
 };
 
 // Aktuelle Session abrufen
-export const getSession = () => {
-  const token = cookies().get('token')?.value;
-  
+export const getSession = async () => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+
   if (!token) {
     return null;
   }
-  
+
   return verifyToken(token);
 };
 
@@ -54,28 +53,34 @@ export const authMiddleware = (handler, allowedRoles = []) => {
   return async (req, res) => {
     try {
       const token = req.cookies.token;
-      
+
       if (!token) {
-        return res.status(401).json({ success: false, message: 'Nicht autorisiert' });
+        return res
+          .status(401)
+          .json({ success: false, message: "Nicht autorisiert" });
       }
-      
+
       const decoded = verifyToken(token);
-      
+
       if (!decoded) {
-        return res.status(401).json({ success: false, message: 'Ungültiger Token' });
+        return res
+          .status(401)
+          .json({ success: false, message: "Ungültiger Token" });
       }
-      
+
       // Rollenbasierte Zugriffskontrolle
       if (allowedRoles.length > 0 && !allowedRoles.includes(decoded.role)) {
-        return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
+        return res
+          .status(403)
+          .json({ success: false, message: "Keine Berechtigung" });
       }
-      
+
       // Benutzerinformationen an Request anhängen
       req.user = decoded;
-      
+
       return handler(req, res);
     } catch (error) {
-      return res.status(500).json({ success: false, message: 'Serverfehler' });
+      return res.status(500).json({ success: false, message: "Serverfehler" });
     }
   };
 };

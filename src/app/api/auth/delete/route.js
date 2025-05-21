@@ -11,7 +11,7 @@ import { deleteFile } from '@/lib/fileUpload';
 export async function DELETE(request) {
   try {
     // Check if user is authenticated
-    const session = getSession();
+    const session = await getSession();
     
     if (!session) {
       return NextResponse.json(
