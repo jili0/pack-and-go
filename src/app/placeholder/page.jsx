@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import styles from './styles/Placeholder.module.css';
+import styles from '@/app/styles/Placeholder.module.css';
 
 export default function PlaceholderPage() {
   return (
