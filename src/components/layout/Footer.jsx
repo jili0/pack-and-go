@@ -49,12 +49,12 @@ const Footer = () => {
             <h3 className={styles.footerHeading}>Service</h3>
             <ul className={styles.footerLinks}>
               <li className={styles.footerLink}>
-                <Link href="/moving">
+                <Link href="/placeholder">
                   Moving in Germany
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="/international-moving">
+                <Link href="/placeholder">
                   International Moving
                 </Link>
               </li>
@@ -64,7 +64,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="/reviews">
+                <Link href="/placeholder">
                   Reviews
                 </Link>
               </li>
@@ -76,7 +76,7 @@ const Footer = () => {
             <h3 className={styles.footerHeading}>Company</h3>
             <ul className={styles.footerLinks}>
               <li className={styles.footerLink}>
-                <Link href="/about-us">
+                <Link href="/placeholder">
                   About Us
                 </Link>
               </li>
@@ -86,17 +86,17 @@ const Footer = () => {
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="/privacy">
+                <Link href="/placeholder">
                   Privacy Policy
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="/imprint">
+                <Link href="/placeholder">
                   Imprint
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="/terms">
+                <Link href="/placeholder">
                   Terms and Conditions
                 </Link>
               </li>

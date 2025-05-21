@@ -22,8 +22,10 @@ const publicPaths = [
   '/reviews',
   '/tips',
   '/checklist',
-  '/staedte',
-  '/stadt'
+  '/cities',
+  '/city',
+  '/placeholder',
+  '/not-found'
 ];
 
 // Prüfen, ob ein Pfad öffentlich ist
