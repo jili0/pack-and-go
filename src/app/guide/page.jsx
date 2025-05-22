@@ -35,7 +35,7 @@ export default function HowItWorks() {
           <div className={styles.stepsContainer}>
 
             <div className={styles.connectionLine}></div>
-            <div className={styles.carIcon}>#</div>
+            <div className={styles.carIcon}></div>
 
             {/* Step 1 */}
             <div className={styles.step}>

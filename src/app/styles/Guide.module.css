@@ -180,40 +180,38 @@
   display: flex;
   justify-content: space-between;
   max-width: 1200px;
-  margin: 4rem auto 0; /* 增加上边距 */
+  margin: 4rem auto 0; 
   padding: 0 2rem;
 }
 
-/* 连接虚线 - 精确对齐数字中心 */
 .connectionLine {
   position: absolute;
-  top: 1.5rem; /* 与数字中心对齐 */
-  left: calc(15% + 1.5rem); /* 第一个数字中心 */
-  right: calc(15% + 1.5rem); /* 最后一个数字中心 */
+  top: 1.5rem; 
+  left: calc(15% + 1.5rem); 
+  right: calc(15% + 1.5rem); 
   height: 2px;
   border-top: 3px dashed var(--gray-500);
   z-index: 1;
 }
 
-/* 移动的小汽车 - 从1到3 */
 .carIcon {
   position: absolute;
-  top: 1rem; /* 调整垂直位置 */
-  left: calc(15% + 1.5rem); /* 从第一个数字中心开始 */
+  top: 0.7rem; 
+  left: calc(15% + 1.5rem); 
   width: 2rem;
   height: 2rem;
-  background-image: url('/images/car-icon.svg');
+  background-image: url('/images/car-icon.png');
   background-size: contain;
   background-repeat: no-repeat;
   z-index: 2;
   animation: moveCar 12s infinite linear;
-  transform: translateX(-50%); /* 居中定位 */
+  transform: translateX(-50%); 
 }
 
 @keyframes moveCar {
-  0% { left: calc(15% + 1.5rem); } /* 第一个数字中心 */
-  50% { left: 50%; } /* 中间点 */
-  100% { left: calc(85% - 1.5rem); } /* 最后一个数字中心 */
+  0% { left: calc(15% + 1.5rem); } 
+  50% { left: 50%; } 
+  100% { left: calc(85% - 1.5rem); } 
 }
 
 
@@ -238,7 +236,7 @@
   border-radius: 50%;
   font-weight: 600;
   margin-bottom: 1rem;
-  box-shadow: 0 0 0 5px white; /* 白色边框使数字在虚线上方更明显 */
+  box-shadow: 0 0 0 5px white; 
 }
 
 .stepTitle {
@@ -277,7 +275,6 @@
   visibility: visible;
 }
 
-/* 响应式调整 - 移动端 */
 @media (max-width: 768px) {
   .stepsContainer {
     flex-direction: column;
@@ -288,11 +285,11 @@
   }
   
   .connectionLine {
-    display: none; /* 移动端隐藏连接线 */
+    display: none; 
   }
   
   .carIcon {
-    display: none; /* 移动端隐藏小汽车 */
+    display: none; 
   }
   
   .step {
@@ -300,7 +297,7 @@
     max-width: 300px;
     padding-bottom: 1rem;
     margin-bottom: 0;
-    border-bottom: 1px solid var(--gray-200); /* 添加分隔线 */
+    border-bottom: 1px solid var(--gray-200); 
   }
   
   .step:last-child {
@@ -308,7 +305,7 @@
   }
   
   .stepContent {
-    align-items: flex-start; /* 左对齐 */
+    align-items: flex-start; 
   }
   
   .stepNumber {
@@ -323,7 +320,7 @@
   
   .stepDescription {
     position: relative;
-    max-height: none !important; /* 强制显示 */
+    max-height: none !important; 
     opacity: 1 !important;
     visibility: visible !important;
     padding: 0.5rem 0 0 0 !important;
@@ -502,6 +499,37 @@
   height: auto;
   /* border-radius: var(--border-radius);
   box-shadow: var(--box-shadow); */
+}
+
+
+@media (max-width: 767px) {
+  .certificationGrid::before {
+    content: '';
+    position: absolute;
+    /* top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0; */
+    transform: translateX(30%);
+    background-image: url('/images/certification.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.2; 
+    z-index: 1;
+    pointer-events: none;
+    min-height: 60%;
+    min-width: 60%;
+  }
+  
+  .certificationImage {
+    display: none;
+  }
+  
+  .certificationInfo {
+    position: relative;
+    z-index: 2;
+  }
 }
 
 .certificationInfo {
