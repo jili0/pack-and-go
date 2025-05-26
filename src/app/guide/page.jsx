@@ -1,4 +1,4 @@
-// src/app/how-it-works/page.jsx
+// src/app/guide/page.jsx
 import React from 'react';
 import Link from 'next/link';
 import Image from '@/components/ui/Image';
@@ -33,22 +33,24 @@ export default function HowItWorks() {
           </div>
 
           <div className={styles.stepsContainer}>
-            <div className={styles.stepLine}></div>
+
+            <div className={styles.connectionLine}></div>
+            <div className={styles.carIcon}></div>
 
             {/* Step 1 */}
             <div className={styles.step}>
               <div className={styles.stepNumber}>1</div>
               <div className={styles.stepContent}>
                 <h3 className={styles.stepTitle}>Submit a Request</h3>
-                <div className={styles.stepImageContainer}>
+                {/* <div className={styles.stepImageContainer}>
                   <Image
-                    src="/images/step1.jpg"
+                    src="/images/step1.gif"
                     alt="Submit a request"
                     width={400}
                     height={300}
                     className={styles.stepImage}
                   />
-                </div>
+                </div> */}
                 <p className={styles.stepDescription}>
                   Enter your starting and destination addresses, select the number of helpers needed, and estimate the required time. No complicated moving calculator necessary!
                 </p>
@@ -60,7 +62,7 @@ export default function HowItWorks() {
               <div className={styles.stepNumber}>2</div>
               <div className={styles.stepContent}>
                 <h3 className={styles.stepTitle}>Compare Offers</h3>
-                <div className={styles.stepImageContainer}>
+                {/* <div className={styles.stepImageContainer}>
                   <Image
                     src="/images/step2.jpg"
                     alt="Compare offers"
@@ -68,7 +70,7 @@ export default function HowItWorks() {
                     height={300}
                     className={styles.stepImage}
                   />
-                </div>
+                </div> */}
                 <p className={styles.stepDescription}>
                   Immediately receive a list of available moving companies for your route. Compare reviews, prices, and availability to make an informed decision.
                 </p>
@@ -80,7 +82,7 @@ export default function HowItWorks() {
               <div className={styles.stepNumber}>3</div>
               <div className={styles.stepContent}>
                 <h3 className={styles.stepTitle}>Book Your Move</h3>
-                <div className={styles.stepImageContainer}>
+                {/* <div className={styles.stepImageContainer}>
                   <Image
                     src="/images/step3.jpg"
                     alt="Book your move"
@@ -88,7 +90,7 @@ export default function HowItWorks() {
                     height={300}
                     className={styles.stepImage}
                   />
-                </div>
+                </div> */}
                 <p className={styles.stepDescription}>
                   Choose your preferred moving company and up to three desired dates. After confirmation by the company, your move is all set!
                 </p>
@@ -99,7 +101,7 @@ export default function HowItWorks() {
       </section>
 
       {/* Transparent Pricing Model */}
-      <section className={styles.pricingSection}>
+      <section className={styles.pricesSection}>
         <div className={styles.sectionContent}>
           <div className={styles.pricingGrid}>
             <div className={styles.pricingInfo}>
@@ -107,7 +109,7 @@ export default function HowItWorks() {
               <p className={styles.sectionText}>
                 At Pack & Go, there are no hidden costs or complicated calculations. Our pricing model is simple and transparent.
               </p>
-              
+
               <div className={styles.pricingCard}>
                 <h3 className={styles.cardTitle}>How we calculate the price:</h3>
                 <div className={styles.pricingItems}>
@@ -117,21 +119,21 @@ export default function HowItWorks() {
                       <span className={styles.bold}>Hourly rate per helper:</span> Each moving company sets their own hourly rate (typically between 40€ and 60€ per helper)
                     </p>
                   </div>
-                  
+
                   <div className={styles.pricingItem}>
                     <div className={styles.pricingIcon}>👥</div>
                     <p>
                       <span className={styles.bold}>Number of helpers:</span> You choose how many helpers you need (minimum: 2)
                     </p>
                   </div>
-                  
+
                   <div className={styles.pricingItem}>
                     <div className={styles.pricingIcon}>⏱️</div>
                     <p>
                       <span className={styles.bold}>Estimated hours:</span> You estimate how long the move will take
                     </p>
                   </div>
-                  
+
                   <div className={styles.pricingFormula}>
                     <div className={styles.pricingIcon}>🧮</div>
                     <p className={styles.bold}>
@@ -140,15 +142,15 @@ export default function HowItWorks() {
                   </div>
                 </div>
               </div>
-              
+
               <p className={styles.disclaimer}>
                 <strong>Note:</strong> The final price may vary if the actual duration of the move differs from the estimated time. Billing is always based on the actual time needed.
               </p>
             </div>
-            
+
             <div className={styles.pricingExamples}>
               <h3 className={styles.examplesTitle}>Price Examples</h3>
-              
+
               <div className={styles.exampleCard}>
                 <h4 className={styles.exampleTitle}>Small Move (1-room apartment)</h4>
                 <div className={styles.exampleDetails}>
@@ -170,7 +172,7 @@ export default function HowItWorks() {
                   </div>
                 </div>
               </div>
-              
+
               <div className={styles.exampleCard}>
                 <h4 className={styles.exampleTitle}>Medium Move (2-3 room apartment)</h4>
                 <div className={styles.exampleDetails}>
@@ -192,7 +194,7 @@ export default function HowItWorks() {
                   </div>
                 </div>
               </div>
-              
+
               <div className={styles.exampleCard}>
                 <h4 className={styles.exampleTitle}>Large Move (4+ room apartment)</h4>
                 <div className={styles.exampleDetails}>
@@ -225,7 +227,7 @@ export default function HowItWorks() {
           <div className={styles.certificationGrid}>
             <div className={styles.certificationImage}>
               <Image
-                src="/images/certification.jpg"
+                src="/images/certification.png"
                 alt="KisteKlar Certification"
                 width={500}
                 height={400}
@@ -268,7 +270,7 @@ export default function HowItWorks() {
                   </div>
                 </div>
               </div>
-              
+
               <div className={styles.certificationNote}>
                 <p>
                   The KisteKlar certificate is only awarded to companies that meet our strict quality criteria and are regularly reviewed.
@@ -291,7 +293,7 @@ export default function HowItWorks() {
               Find answers to the most common questions about Pack & Go and our service.
             </p>
           </div>
-          
+
           <div className={styles.faqContainer}>
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>How exactly does the price calculation work?</h3>
@@ -301,7 +303,7 @@ export default function HowItWorks() {
                 </p>
               </div>
             </div>
-            
+
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>What happens if my move takes longer than estimated?</h3>
               <div className={styles.faqAnswer}>
@@ -310,7 +312,7 @@ export default function HowItWorks() {
                 </p>
               </div>
             </div>
-            
+
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>How is my furniture insured during the move?</h3>
               <div className={styles.faqAnswer}>
@@ -319,7 +321,7 @@ export default function HowItWorks() {
                 </p>
               </div>
             </div>
-            
+
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>Can I cancel or reschedule a booking?</h3>
               <div className={styles.faqAnswer}>
@@ -337,7 +339,7 @@ export default function HowItWorks() {
                 </p>
               </div>
             </div>
-            
+
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>How can I be sure that the moving company is reputable?</h3>
               <div className={styles.faqAnswer}>
@@ -347,7 +349,7 @@ export default function HowItWorks() {
               </div>
             </div>
           </div>
-          
+
           <div className={styles.contactSection}>
             <p className={styles.contactText}>
               Do you have more questions? Feel free to contact us!
