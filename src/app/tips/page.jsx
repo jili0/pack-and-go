@@ -1,7 +1,7 @@
-// src/app/moving-tips/page.jsx
 import Image from '@/components/ui/Image';
 import Link from 'next/link';
 import styles from '@/app/styles/Tips.module.css';
+
 export const metadata = {
   title: 'Moving Tips | Pack & Go',
   description: 'Helpful tips and tricks for a stress-free and efficient move with Pack & Go'
@@ -33,7 +33,7 @@ export default function MovingTips() {
             <div className={styles.introImage}>
               <Image
                 src="/images/moving-planning.jpg"
-                alt="Person planning a move with checklist and calendar"
+                alt="Woman preparing a move"
                 width={400}
                 height={300}
                 className={styles.roundedImage}
@@ -50,11 +50,9 @@ export default function MovingTips() {
                 <div className={styles.timelineContent}>
                   <h3>Two Months Before</h3>
                   <ul className={styles.tipsList}>
-                    <li>Create a moving folder or binder to keep track of all moving-related documents</li>
                     <li>Research moving companies and get quotes</li>
-                    <li>Begin decluttering and decide what to keep, sell, donate, or discard</li>
+                    <li>Begin decluttering - decide what to keep, sell, or donate</li>
                     <li>Start collecting free boxes from local stores</li>
-                    <li>Create an inventory of valuable items</li>
                   </ul>
                 </div>
               </div>
@@ -65,10 +63,8 @@ export default function MovingTips() {
                   <h3>Six Weeks Before</h3>
                   <ul className={styles.tipsList}>
                     <li>Book your moving company through Pack & Go</li>
-                    <li>Start using up frozen food and pantry items</li>
-                    <li>Contact insurance companies to transfer policies</li>
-                    <li>Begin collecting packing supplies (boxes, tape, bubble wrap, markers)</li>
-                    <li>Start packing rarely used items</li>
+                    <li>Start using up frozen and pantry items</li>
+                    <li>Begin collecting packing supplies (boxes, tape, bubble wrap)</li>
                   </ul>
                 </div>
               </div>
@@ -79,10 +75,8 @@ export default function MovingTips() {
                   <h3>One Month Before</h3>
                   <ul className={styles.tipsList}>
                     <li>File change of address with the post office</li>
-                    <li>Notify important parties of your address change (bank, employer, etc.)</li>
-                    <li>Transfer utilities and services to your new address</li>
-                    <li>Begin packing non-essential items</li>
-                    <li>Plan for pet and plant transportation</li>
+                    <li>Notify bank, employer, and insurance of address change</li>
+                    <li>Transfer utilities to your new address</li>
                   </ul>
                 </div>
               </div>
@@ -94,9 +88,7 @@ export default function MovingTips() {
                   <ul className={styles.tipsList}>
                     <li>Confirm your moving date with Pack & Go</li>
                     <li>Continue packing room by room</li>
-                    <li>Create a floor plan for your new home</li>
-                    <li>Clean out your refrigerator and defrost the freezer</li>
-                    <li>Schedule disconnection of utilities at your current home</li>
+                    <li>Clean out refrigerator and defrost freezer</li>
                   </ul>
                 </div>
               </div>
@@ -106,11 +98,9 @@ export default function MovingTips() {
                 <div className={styles.timelineContent}>
                   <h3>One Week Before</h3>
                   <ul className={styles.tipsList}>
-                    <li>Pack a suitcase with essentials for the first few days</li>
+                    <li>Pack a suitcase with essentials for first few days</li>
                     <li>Finish most of your packing</li>
-                    <li>Clean your current home</li>
                     <li>Disassemble furniture that needs to be taken apart</li>
-                    <li>Confirm parking arrangements for the moving truck</li>
                   </ul>
                 </div>
               </div>
@@ -122,9 +112,7 @@ export default function MovingTips() {
                   <ul className={styles.tipsList}>
                     <li>Keep important documents and valuables with you</li>
                     <li>Do a final walkthrough of your old home</li>
-                    <li>Take meter readings at both properties</li>
-                    <li>Check all closets, drawers, and shelves for forgotten items</li>
-                    <li>Make sure the moving team has your contact information and new address</li>
+                    <li>Check all closets and drawers for forgotten items</li>
                   </ul>
                 </div>
               </div>
@@ -169,56 +157,23 @@ export default function MovingTips() {
                   kitchen items.
                 </p>
               </div>
-              
-              <div className={styles.gridItem}>
-                <div className={styles.iconContainer}>
-                  <span className={styles.icon}>🧪</span>
-                </div>
-                <h3>Handle Fragile Items Carefully</h3>
-                <p>
-                  Wrap fragile items individually in bubble wrap or packing paper. Use dividers for 
-                  glasses and stemware. Fill empty spaces in boxes with packing peanuts or crumpled 
-                  paper to prevent movement.
-                </p>
-              </div>
-              
-              <div className={styles.gridItem}>
-                <div className={styles.iconContainer}>
-                  <span className={styles.icon}>🧳</span>
-                </div>
-                <h3>Use the Right Size Boxes</h3>
-                <p>
-                  Pack heavy items like books in small boxes and lighter items in larger boxes. 
-                  This makes boxes easier to carry and prevents overloading that could lead to damage.
-                </p>
-              </div>
-              
-              <div className={styles.gridItem}>
-                <div className={styles.iconContainer}>
-                  <span className={styles.icon}>🔒</span>
-                </div>
-                <h3>Keep Valuables Separate</h3>
-                <p>
-                  Transport important documents, jewelry, and other valuables yourself rather than 
-                  packing them with your household goods. Keep medications and essential papers in 
-                  a secure, easily accessible location.
-                </p>
-              </div>
             </div>
           </div>
           
           <div className={styles.tipsWithImage}>
-            <div className={styles.tipImage}>
-              <Image
-                src="/images/moving-day.jpg"
-                alt="Moving day with boxes and movers"
-                width={500}
-                height={350}
-                className={styles.roundedImage}
-              />
+            <div className={styles.tipImageWrapper}>
+              <h2>Moving Day Survival Tips</h2>
+              <div className={styles.tipImage}>
+                <Image
+                  src="/images/moving-day.jpg"
+                  alt="Moving day with boxes and movers"
+                  width={500}
+                  height={350}
+                  className={styles.roundedImage}
+                />
+              </div>
             </div>
             <div className={styles.tipContent}>
-              <h2>Moving Day Survival Tips</h2>
               <ul className={styles.detailedList}>
                 <li>
                   <h4>Start Early</h4>
@@ -235,10 +190,6 @@ export default function MovingTips() {
                 <li>
                   <h4>Stay Hydrated and Fed</h4>
                   <p>Prepare a cooler with water, snacks, and sandwiches to keep everyone energized throughout the day.</p>
-                </li>
-                <li>
-                  <h4>Be Available to Answer Questions</h4>
-                  <p>Make yourself available to the movers to answer questions and provide direction as needed.</p>
                 </li>
               </ul>
             </div>
