@@ -119,8 +119,6 @@ pack-and-go/
 │   │   │   └── page.jsx
 │   │   ├── tips/
 │   │   │   └── page.jsx
-│   │   ├── checklist/
-│   │   │   └── page.jsx
 │   │   ├── styles/               # CSS styles (modules)
 │   │   │   ├── global.css        # Global CSS
 │   │   │   ├── Home.module.css
