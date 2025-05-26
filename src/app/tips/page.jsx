@@ -251,10 +251,6 @@ export default function MovingTips() {
           <div className={styles.resourcesSection}>
             <h2>Additional Resources</h2>
             <div className={styles.resourceLinks}>
-              <Link href="/checklist" className={styles.resourceLink}>
-                <span className={styles.resourceIcon}>📋</span>
-                <span className={styles.resourceText}>Comprehensive Moving Checklist</span>
-              </Link>
               <Link href="/pricing" className={styles.resourceLink}>
                 <span className={styles.resourceIcon}>💰</span>
                 <span className={styles.resourceText}>Understanding Moving Costs</span>
