@@ -8,6 +8,10 @@ import styles from '@/app/styles/Layout.module.css';
 
 const Header = () => {
   const { user, logout } = useAuth();
+
+  // console.log('Current user:', user);
+  // console.log('User role:', user?.role);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {

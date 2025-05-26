@@ -65,11 +65,15 @@ const LoginContent = () => {
     
     try {
       const result = await login(formData.email, formData.password);
-      
+     
       if (result.success) {
-        // Redirect to dashboard after login
-        const fromUrl = searchParams.get('from');
-        router.push(fromUrl || '/dashboard');
+        router.push(`/${result.user.role}`);
+
+    // Redirect to dashboard after login
+    // const fromUrl = searchParams.get('redirect');
+    // console.log('redirect URL:', fromUrl);
+    //     router.push(fromUrl || '/dashboard');
+
       } else {
         setLoginError(result.message || 'Login failed');
       }
