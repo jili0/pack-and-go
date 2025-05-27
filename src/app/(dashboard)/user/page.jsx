@@ -385,16 +385,6 @@ export default function UserDashboard() {
                 </div>
               </Link>
               
-              <Link href="/checkliste" className="block">
-                <div className="p-6 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                  </svg>
-                  <h3 className="text-base font-medium text-gray-900 mb-1">Umzugs-Checkliste</h3>
-                  <p className="text-sm text-gray-600">Schritt-für-Schritt-Anleitung für Ihren Umzug</p>
-                </div>
-              </Link>
-              
               <Link href="/kontakt" className="block">
                 <div className="p-6 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
