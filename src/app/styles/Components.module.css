@@ -614,3 +614,91 @@ select.formInput {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   }
 }
+
+
+/* Admin Badge */
+.adminBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.adminBadge svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Admin Note */
+.adminNote {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 6px;
+  border-left: 4px solid #ef4444;
+}
+
+/* Admin Icon Button in Header */
+.adminIconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  margin-left: 12px;
+  background-color: #1e40af;
+  color: white;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.adminIconButton:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.adminIconButton svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Enhanced form styling for admin login */
+.authForm .submitButton {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+}
+
+.authForm .submitButton:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+}
+
+/* Dark mode considerations */
+@media (prefers-color-scheme: dark) {
+  .adminBadge {
+    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  }
+  
+  .adminNote {
+    background-color: #1f2937;
+    color: #9ca3af;
+    border-left-color: #f87171;
+  }
+  
+  .adminIconButton {
+    background-color: #3b82f6;
+  }
+  
+  .adminIconButton:hover {
+    background-color: #2563eb;
+  }
+}
