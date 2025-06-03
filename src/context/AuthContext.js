@@ -11,6 +11,17 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  const [authInitialized, setAuthInitialized] = useState(false);
+
+useEffect(() => {
+  // 给 AuthContext 一些时间来初始化
+  const timer = setTimeout(() => {
+    setAuthInitialized(true);
+  }, 100);
+  
+  return () => clearTimeout(timer);
+}, []);
+
   // Benutzer beim ersten Laden prüfen
   useEffect(() => {
     checkUserLoggedIn();
