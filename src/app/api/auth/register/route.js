@@ -7,9 +7,15 @@ import { sendWelcomeEmail } from '@/lib/email';
 
 export async function POST(request) {
   try {
+    console.log('=== REGISTER REQUEST START ===');
     await connectDB();
+    console.log('✓ Database connected');
+
+    const requestData = await request.json();
+    console.log('📦 Request data:', requestData);
     
-    const { name, email, password, phone, role = 'user' } = await request.json();
+    const { name, email, password, phone, role = 'user' } = requestData;
+    console.log('🔍 Extracted fields:', { name, email, phone, role, passwordLength: password?.length });
     
     // Validierung der Eingabedaten
     if (!name || !email || !password || !phone) {
