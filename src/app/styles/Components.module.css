@@ -498,7 +498,7 @@
 }
 
 .formFooterLink {
-  color: #031659;
+  color: #e8e9ee;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
@@ -506,7 +506,7 @@
 }
 
 .formFooterLink:hover {
-  color: #031659;
+  color: #fafbfd;
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 2px;
