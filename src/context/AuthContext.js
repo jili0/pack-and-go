@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
 
       if (data.success) {
         setUser(data.user);
-        return { success: true };
+        return { success: true , user: data.user };
       } else {
         return { 
           success: false, 
