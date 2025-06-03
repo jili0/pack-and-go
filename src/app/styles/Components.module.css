@@ -324,293 +324,312 @@
   font-size: 1rem;
 }
 
-/* Components.module.css - Ajouts pour les formulaires d'authentification */
+/* Ajouts et améliorations pour Components.module.css */
 
-/* Container principal pour les formulaires d'authentification */
+/* Container principal avec plus d'espacement vertical */
 .authForm {
   max-width: 480px;
-  margin: 0 auto;
-  padding: 2.5rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+  margin: 3rem auto; /* Ajout d'espace en haut et en bas */
+  padding: 3rem 2.5rem; /* Plus d'espace interne en haut/bas */
+  background: linear-gradient(135deg, #5388b0 0%, #1b2c67 100%);
   background-size: 200% 200%;
   animation: gradientShift 8s ease infinite;
-  border-radius: var(--border-radius);
+  border-radius: 16px; /* Border radius plus moderne */
   box-shadow: 
-    0 20px 40px rgba(59, 130, 246, 0.2),
-    0 10px 20px rgba(0, 0, 0, 0.1);
+    0 25px 50px rgba(34, 95, 141, 0.3),
+    0 15px 30px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Titre avec plus d'espacement */
+.authTitle {
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: white;
+  text-align: center;
+  margin-bottom: 1rem; /* Plus d'espace sous le titre */
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, #ffffff, #e2e8f0, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.025em;
+}
+
+/* Description avec plus d'espacement */
+.authDescription {
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  margin-bottom: 2.5rem; /* Plus d'espace sous la description */
+  font-size: 1.125rem;
+  line-height: 1.7;
+  font-weight: 400;
+}
+
+/* Espacement amélioré pour les champs */
+.formField {
+  margin-bottom: 2rem; /* Plus d'espace entre les champs */
+}
+
+/* Labels avec plus d'espacement */
+.formLabel {
+  display: block;
+  margin-bottom: 0.75rem; /* Plus d'espace sous les labels */
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+  font-size: 1rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.025em;
+}
+
+/* Inputs améliorés */
+.formInput {
+  width: 100%;
+  padding: 1.25rem 1.5rem; /* Plus de padding */
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 1.05rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Animation de dégradé */
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.formInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
 }
 
-/* Effet de brillance */
-.authForm::before {
+.formInput:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 0 0 4px rgba(255, 255, 255, 0.08),
+    0 8px 25px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+/* Checkbox avec plus d'espacement */
+.formCheckbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2.5rem; /* Plus d'espace avant le bouton */
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.checkboxInput {
+  width: 22px;
+  height: 22px;
+  
+  cursor: pointer;
+  margin-top: 0.125rem;
+  border-radius: 4px;
+}
+
+/* Bouton de soumission amélioré */
+.submitButton {
+  width: 100%;
+  padding: 1.5rem; /* Plus de padding vertical */
+  background: linear-gradient(135deg, #2872d9 0%, #3f5ecc 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 8px 25px rgba(96, 96, 240, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem; /* Espace avant le footer */
+}
+
+.submitButton::before {
   content: '';
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
-  animation: shimmer 2s infinite;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
-@keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
-}
-
-/* Titre principal */
-.authTitle {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: white;
-  text-align: center;
-  margin-bottom: 0.5rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(135deg, #ffffff, #f0f0f0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Description */
-.authDescription {
-  color: rgba(255, 255, 255, 0.9);
-  text-align: center;
-  margin-bottom: 2rem;
-  font-size: 1.1rem;
-  line-height: 1.6;
-}
-
-/* Champs de formulaire d'authentification */
-.formField {
-  margin-bottom: 1.5rem;
-}
-
-.formLabel {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: white;
-  font-weight: 600;
-  font-size: 0.95rem;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.formInput {
-  width: 100%;
-  padding: 1rem 1.25rem;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
-}
-
-.formInput::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.formInput:focus {
-  outline: none;
-  border-color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 
-    0 0 0 3px rgba(255, 255, 255, 0.1),
-    0 8px 16px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
-}
-
-.formInput:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* Erreurs de validation pour les formulaires d'auth */
-.formInputError {
-  border-color: var(--error-color) !important;
-  background: rgba(239, 68, 68, 0.1) !important;
-}
-
-.formError {
-  color: var(--error-color);
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(239, 68, 68, 0.1);
-  padding: 0.5rem;
-  border-radius: 8px;
-  border-left: 3px solid var(--error-color);
-}
-
-/* Checkbox styling */
-.formCheckbox {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.checkboxInput {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--success-color);
-  cursor: pointer;
-  margin-top: 0.125rem;
-}
-
-.checkboxLabel {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  cursor: pointer;
-}
-
-/* Bouton de soumission des formulaires */
-.submitButton {
-  width: 100%;
-  padding: 1.25rem;
-  background: linear-gradient(135deg, var(--success-color), #059669);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 6px 12px rgba(34, 197, 94, 0.3);
-  position: relative;
-  overflow: hidden;
+.submitButton:hover:not(:disabled)::before {
+  left: 100%;
 }
 
 .submitButton:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(34, 197, 94, 0.4);
-  background: linear-gradient(135deg, #059669, var(--success-color));
+  transform: translateY(-3px);
+  box-shadow: 
+    0 12px 35px #031659,
+    0 6px 15px;
+  background: linear-gradient(135deg,#031659 0%, #1f2aa4 100%);
 }
 
-.submitButton:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.submitButton:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Footer du formulaire */
+/* Footer avec plus d'espacement */
 .formFooter {
   text-align: center;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 2.5rem; /* Plus d'espace avant le footer */
+  padding-top: 2rem; /* Plus de padding interne */
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .formFooter p {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.75);
   margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 .formFooterLink {
-  color: var(--success-color);
+  color: #031659;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .formFooterLink:hover {
-  color: #059669;
+  color: #031659;
   text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
 }
 
-/* Alertes pour les formulaires d'auth - Override du style existant */
-.alert.alertDanger {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: var(--error-color);
+/* Alertes améliorées */
+.alert {
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem; /* Plus d'espace sous les alertes */
   border-radius: 12px;
+  display: flex;
+  align-items: flex-start;
+  backdrop-filter: blur(10px);
 }
 
-.alertIcon {
-  flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+.alertDanger {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
-.alert p {
-  margin: 0;
+.alertSuccess {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #255743;
+  box-shadow: 0 4px 12px rgba(6, 2, 54, 0.2);
 }
 
-/* Responsive */
+/* Responsive amélioré */
 @media (max-width: 640px) {
   .authForm {
-    margin: 1rem;
-    padding: 2rem 1.5rem;
+    margin: 1.5rem 1rem; /* Plus d'espace sur mobile */
+    padding: 2.5rem 1.5rem; /* Plus de padding sur mobile */
   }
   
   .authTitle {
-    font-size: 2rem;
+    font-size: 2.25rem;
+    margin-bottom: 0.75rem;
   }
   
   .authDescription {
     font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .formField {
+    margin-bottom: 1.75rem;
+  }
+  
+  .submitButton {
+    padding: 1.25rem;
+    font-size: 1rem;
   }
 }
 
-/* Animations d'entrée */
-.authForm {
-  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+@media (max-width: 480px) {
+  .authForm {
+    margin: 1rem 0.5rem;
+    padding: 2rem 1.25rem;
+  }
 }
 
+/* Animation d'entrée améliorée */
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(40px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-/* Effet de focus sur les champs */
-.formInput:focus + .formLabel,
-.formInput:not(:placeholder-shown) + .formLabel {
-  transform: translateY(-8px);
-  font-size: 0.875rem;
+/* Micro-interactions */
+.formInput:hover:not(:focus) {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
 }
 
-/* Style pour les select */
+.checkboxInput:hover {
+  transform: scale(1.05);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(-1px) scale(0.98);
+}
+
+/* Select styling amélioré */
 select.formInput {
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.75rem center;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 1.25rem center;
   background-repeat: no-repeat;
-  background-size: 1.5em 1.5em;
+  background-size: 1.25em 1.25em;
   appearance: none;
-  padding-right: 3rem;
+  padding-right: 3.5rem;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .authForm {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  }
+select.formInput:focus {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M14 12l-4-4-4 4'/%3e%3c/svg%3e");
 }
+
+/* Effet de loading sur le bouton */
+.submitButton[disabled] {
+  position: relative;
+  color: transparent;
+}
+
+.submitButton[disabled]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Variables supprimées - CSS Modules ne supporte pas :root */
+/* Les couleurs sont maintenant directement dans le code */
