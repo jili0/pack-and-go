@@ -11,7 +11,15 @@ export async function POST(request) {
     await connectDB();
     console.log('✓ Database connected');
 
-    const requestData = await request.json();
+    let requestData;
+      try {
+  requestData = await request.json();
+    } catch (err) {
+  return NextResponse.json(
+    { success: false, message: 'Ungültiger oder bereits gelesener Request-Body' },
+    { status: 400 }
+  );
+}
     console.log('📦 Request data:', requestData);
     
     const { name, email, password, phone, role = 'user' } = requestData;
