@@ -1,0 +1,75 @@
+.company-setup-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  
+  .company-setup-form label {
+    display: block;
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+  
+  .company-setup-form input[type="text"],
+  .company-setup-form input[type="number"],
+  .company-setup-form textarea {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.25rem;
+    box-sizing: border-box;
+  }
+  
+  .company-setup-form textarea {
+    resize: vertical;
+  }
+  
+  fieldset {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  legend {
+    font-weight: bold;
+  }
+  
+  .service-area {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .service-area label {
+    flex: 1;
+    font-weight: normal;
+  }
+  
+  .add-area-btn,
+  .remove-area-btn,
+  .submit-btn {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    background-color: #0070f3;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .remove-area-btn {
+    background-color: #e00;
+  }
+  
+  .submit-message {
+    margin-top: 1rem;
+    font-weight: bold;
+    color: green;
+  }
+  
+  .error {
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
