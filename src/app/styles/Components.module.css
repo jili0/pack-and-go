@@ -1,14 +1,3 @@
-/* CSS Custom Properties for better maintainability */
-:root {
-  --transition-base: all 0.2s ease;
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --shadow-base: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.15);
-  --border-radius-sm: 0.25rem;
-  --border-radius-md: 0.5rem;
-  --border-radius-lg: 12px;
-}
-
 /* Company Card */
 .companyCard {
   background: white;
@@ -16,7 +5,7 @@
   box-shadow: var(--box-shadow);
   border: 1px solid var(--gray-200);
   overflow: hidden;
-  transition: var(--transition-base);
+  transition: all 0.2s ease;
 }
 
 .companyCard:hover {
@@ -100,11 +89,10 @@
   align-items: center;
 }
 
+.starSmall, .starMedium, .starLarge { line-height: 1; }
 .starSmall { font-size: 1rem; }
 .starMedium { font-size: 1.25rem; }
 .starLarge { font-size: 1.5rem; }
-
-.starSmall, .starMedium, .starLarge { line-height: 1; }
 
 .starFilled { color: var(--warning-color); }
 .starEmpty { color: var(--gray-300); }
@@ -151,10 +139,12 @@
 .alert {
   padding: 1rem;
   margin-bottom: 1.5rem;
-  border-radius: var(--border-radius-sm);
+  border-radius: 0.25rem;
   display: flex;
   align-items: flex-start;
 }
+
+.alert p { margin: 0; }
 
 .alertDanger {
   background: #fee2e2;
@@ -175,16 +165,14 @@
   height: 24px;
 }
 
-.alert p { margin: 0; }
-
 /* Forms - Unified Input Styles */
-.input, .formInput, .select {
+.input, .select {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--gray-300);
-  border-radius: var(--border-radius-sm);
+  border-radius: 0.25rem;
   font-size: 0.875rem;
-  transition: var(--transition-smooth);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .input:focus, .select:focus {
@@ -236,18 +224,18 @@
 }
 
 /* Buttons - Consolidated */
-.btn, .submitButton {
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0.5rem 1rem;
   border: 1px solid transparent;
-  border-radius: var(--border-radius-sm);
+  border-radius: 0.25rem;
   font-weight: 500;
   font-size: 0.875rem;
   cursor: pointer;
   text-align: center;
-  transition: var(--transition-base);
+  transition: all 0.2s ease;
   text-decoration: none;
 }
 
@@ -368,12 +356,14 @@
 }
 
 .formInput {
+  width: 100%;
   padding: 1rem 1.25rem;
   border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--border-radius-lg);
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.1);
   color: white;
   font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
 }
 
@@ -382,6 +372,7 @@
 }
 
 .formInput:focus {
+  outline: none;
   border-color: rgba(255, 255, 255, 0.6);
   background: rgba(255, 255, 255, 0.15);
   box-shadow: 
@@ -441,12 +432,18 @@
   background: linear-gradient(135deg, var(--success-color), #059669);
   color: white;
   border: none;
-  border-radius: var(--border-radius-lg);
+  border-radius: 12px;
   font-size: 1.1rem;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 6px 12px rgba(34, 197, 94, 0.3);
   position: relative;
   overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
 .submitButton:hover:not(:disabled) {
@@ -481,7 +478,7 @@
   color: var(--success-color);
   text-decoration: none;
   font-weight: 600;
-  transition: var(--transition-base);
+  transition: all 0.2s ease;
 }
 
 .formFooterLink:hover {
@@ -494,11 +491,12 @@
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: var(--error-color);
-  border-radius: var(--border-radius-lg);
+  border-radius: 12px;
 }
 
 /* Select styling for auth forms */
 select.formInput {
+  cursor: pointer;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 0.75rem center;
   background-repeat: no-repeat;
@@ -507,30 +505,38 @@ select.formInput {
   padding-right: 3rem;
 }
 
-/* Admin Components - Consolidated */
-.adminBadge, .adminIconButton {
+/* Admin Components */
+.adminBadge {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   color: white;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: var(--transition-base);
-  text-decoration: none;
-}
-
-.adminBadge {
-  gap: 8px;
   padding: 12px 20px;
+  border-radius: 8px;
   margin-bottom: 24px;
+  font-weight: 600;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
+.adminBadge svg {
+  width: 20px;
+  height: 20px;
+}
+
 .adminIconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px;
   margin-left: 12px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
   border-radius: 6px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 .adminIconButton:hover {
@@ -539,7 +545,7 @@ select.formInput {
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.adminBadge svg, .adminIconButton svg {
+.adminIconButton svg {
   width: 20px;
   height: 20px;
 }
