@@ -67,7 +67,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import Image from '@/components/ui/Image';
-import styles from '@/app/styles/UserDashboard.module.css';
+import styles from '@/app/styles/CompanyDashboard.module.css';
 
 export default function CompanyDashboard() {
   const router = useRouter();
@@ -104,7 +104,7 @@ export default function CompanyDashboard() {
     try {
       setLoading(true);
       
-      // Lade Firmendaten
+      // Load company data
       const [companyRes, ordersRes] = await Promise.all([
         fetch('/api/company/me'),
         fetch('/api/orders')
@@ -112,11 +112,11 @@ export default function CompanyDashboard() {
 
       if (!companyRes.ok) {
         if (companyRes.status === 404) {
-          // Keine Firmendaten gefunden - zur Setup-Seite weiterleiten
+          // No company data found - redirect to setup page
           router.push('/company/setup');
           return;
         }
-        throw new Error('Fehler beim Laden der Firmendaten');
+        throw new Error('Error loading company data');
       }
 
       const companyData = await companyRes.json();
@@ -133,8 +133,8 @@ export default function CompanyDashboard() {
       }
 
     } catch (error) {
-      console.error('Fehler beim Laden der Daten:', error);
-      setError('Ein Fehler ist aufgetreten beim Laden der Dashboard-Daten.');
+      console.error('Error loading data:', error);
+      setError('An error occurred while loading dashboard data.');
     } finally {
       setLoading(false);
     }
@@ -168,30 +168,30 @@ export default function CompanyDashboard() {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('de-DE', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'EUR'
     }).format(amount);
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'Kein Datum';
+    if (!dateString) return 'No date';
     
     const options = { 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric'
     };
-    return new Date(dateString).toLocaleDateString('de-DE', options);
+    return new Date(dateString).toLocaleDateString('en-US', options);
   };
 
   const getStatusBadge = (status) => {
     const statusMap = {
-      pending: { class: styles.statusBadge + ' ' + styles.statuspending, text: 'Anfrage erhalten' },
-      confirmed: { class: styles.statusBadge + ' ' + styles.statusconfirmed, text: 'Bestätigt' },
-      declined: { class: styles.statusBadge + ' ' + styles.statusdeclined, text: 'Abgelehnt' },
-      completed: { class: styles.statusBadge + ' ' + styles.statuscompleted, text: 'Abgeschlossen' },
-      cancelled: { class: styles.statusBadge + ' ' + styles.statuscancelled, text: 'Storniert' }
+      pending: { class: styles.statusBadge + ' ' + styles.statuspending, text: 'Request Received' },
+      confirmed: { class: styles.statusBadge + ' ' + styles.statusconfirmed, text: 'Confirmed' },
+      declined: { class: styles.statusBadge + ' ' + styles.statusdeclined, text: 'Declined' },
+      completed: { class: styles.statusBadge + ' ' + styles.statuscompleted, text: 'Completed' },
+      cancelled: { class: styles.statusBadge + ' ' + styles.statuscancelled, text: 'Cancelled' }
     };
     
     const statusInfo = statusMap[status] || { class: styles.statusBadge, text: status };
@@ -207,7 +207,7 @@ export default function CompanyDashboard() {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner}></div>
-        <p>Dashboard wird geladen...</p>
+        <p>Loading dashboard...</p>
       </div>
     );
   }
@@ -223,7 +223,7 @@ export default function CompanyDashboard() {
               </svg>
             </div>
             <div className={styles.errorText}>
-              <h3 className={styles.errorTitle}>Fehler</h3>
+              <h3 className={styles.errorTitle}>Error</h3>
               <p>{error}</p>
             </div>
           </div>
@@ -236,15 +236,15 @@ export default function CompanyDashboard() {
     return (
       <div className={styles.dashboardContainer}>
         <div className={styles.emptyState}>
-          <h3 className={styles.emptyTitle}>Firmenprofil nicht gefunden</h3>
+          <h3 className={styles.emptyTitle}>Company Profile Not Found</h3>
           <p className={styles.emptyDescription}>
-            Sie müssen zuerst Ihr Firmenprofil einrichten.
+            You need to set up your company profile first.
           </p>
           <Link 
             href="/company/setup"
             className={`${styles.primaryButton} ${styles.bgBlue600}`}
           >
-            Firmenprofil einrichten
+            Set Up Company Profile
           </Link>
         </div>
       </div>
@@ -255,9 +255,9 @@ export default function CompanyDashboard() {
     <div className={styles.dashboardContainer}>
       {/* Header */}
       <div className={styles.dashboardHeader}>
-        <h1 className={styles.dashboardTitle}>Willkommen, {company.companyName}!</h1>
+        <h1 className={styles.dashboardTitle}>Welcome, {company.companyName}!</h1>
         <p className={styles.welcomeMessage}>
-          Verwalten Sie Ihre Umzugsanfragen und Ihr Firmenprofil
+          Manage your moving requests and company profile
         </p>
       </div>
 
@@ -271,10 +271,10 @@ export default function CompanyDashboard() {
               </svg>
             </div>
             <div className={styles.errorText}>
-              <h3 className={styles.errorTitle}>Verifizierung ausstehend</h3>
+              <h3 className={styles.errorTitle}>Verification Pending</h3>
               <p>
-                Ihr Firmenprofil wird derzeit von unserem Team überprüft. 
-                Sie können erst nach der Verifizierung Umzugsanfragen erhalten.
+                Your company profile is currently being reviewed by our team. 
+                You can only receive moving requests after verification.
               </p>
             </div>
           </div>
@@ -285,60 +285,60 @@ export default function CompanyDashboard() {
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
           <div className={styles.statContent}>
-            <h3 className={styles.statTitle}>Gesamte Anfragen</h3>
+            <h3 className={styles.statTitle}>Total Requests</h3>
             <p className={styles.statValue}>{stats.totalOrders}</p>
-            <p className={styles.statDescription}>Alle eingegangenen Anfragen</p>
+            <p className={styles.statDescription}>All received requests</p>
           </div>
         </div>
 
         <div className={styles.statCard}>
           <div className={styles.statContent}>
-            <h3 className={styles.statTitle}>Ausstehend</h3>
+            <h3 className={styles.statTitle}>Pending</h3>
             <p className={styles.statValue}>{stats.pendingOrders}</p>
-            <p className={styles.statDescription}>Warten auf Ihre Antwort</p>
+            <p className={styles.statDescription}>Awaiting your response</p>
           </div>
         </div>
 
         <div className={styles.statCard}>
           <div className={styles.statContent}>
-            <h3 className={styles.statTitle}>Diesen Monat</h3>
+            <h3 className={styles.statTitle}>This Month</h3>
             <p className={styles.statValue}>{stats.thisMonthOrders}</p>
-            <p className={styles.statDescription}>Neue Anfragen</p>
+            <p className={styles.statDescription}>New requests</p>
           </div>
         </div>
 
         <div className={styles.statCard}>
           <div className={styles.statContent}>
-            <h3 className={styles.statTitle}>Umsatz</h3>
+            <h3 className={styles.statTitle}>Revenue</h3>
             <p className={styles.statValue}>{formatCurrency(stats.revenue)}</p>
-            <p className={styles.statDescription}>Abgeschlossene Aufträge</p>
+            <p className={styles.statDescription}>Completed jobs</p>
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
       <div className={styles.quickActions}>
-        <h2 className={styles.sectionTitle}>Schnellzugriff</h2>
+        <h2 className={styles.sectionTitle}>Quick Access</h2>
         <div className={styles.actionButtons}>
           <Link href="/company/orders" className={styles.actionButton}>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
               <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
             </svg>
-            Alle Anfragen verwalten
+            Manage All Requests
           </Link>
           <Link href="/company/profile" className={styles.actionButton}>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            Firmenprofil bearbeiten
+            Edit Company Profile
           </Link>
           <Link href="/company/reviews" className={styles.actionButton}>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
-            Bewertungen ansehen
+            View Reviews
           </Link>
         </div>
       </div>
@@ -346,9 +346,9 @@ export default function CompanyDashboard() {
       {/* Company Info */}
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Ihr Firmenprofil</h2>
+          <h2 className={styles.sectionTitle}>Your Company Profile</h2>
           <Link href="/company/profile" className={styles.viewAllLink}>
-            Bearbeiten →
+            Edit →
           </Link>
         </div>
         
@@ -376,11 +376,11 @@ export default function CompanyDashboard() {
               </p>
               <div className={styles.companyMeta}>
                 <span className={styles.hourlyRate}>
-                  Stundensatz: {company.hourlyRate}€ pro Helfer
+                  Hourly Rate: €{company.hourlyRate} per helper
                 </span>
                 {company.isKisteKlarCertified && (
                   <span className={`${styles.statusBadge} ${styles.statuskisteklar}`}>
-                    KisteKlar Zertifiziert
+                    KisteKlar Certified
                   </span>
                 )}
               </div>
@@ -389,9 +389,9 @@ export default function CompanyDashboard() {
           
           <div className={styles.companyStats}>
             <div className={styles.statItem}>
-              <span className={styles.statLabel}>Bewertung:</span>
+              <span className={styles.statLabel}>Rating:</span>
               <span className={styles.statValue}>
-                {stats.averageRating.toFixed(1)} / 5.0 ({stats.totalReviews} Bewertungen)
+                {stats.averageRating.toFixed(1)} / 5.0 ({stats.totalReviews} reviews)
               </span>
             </div>
             <div className={styles.statItem}>
@@ -399,11 +399,11 @@ export default function CompanyDashboard() {
               <span className={styles.statValue}>
                 {company.isVerified ? (
                   <span className={`${styles.statusBadge} ${styles.statusverified}`}>
-                    Verifiziert
+                    Verified
                   </span>
                 ) : (
                   <span className={`${styles.statusBadge} ${styles.statuspending}`}>
-                    Verifizierung ausstehend
+                    Verification Pending
                   </span>
                 )}
               </span>
@@ -415,9 +415,9 @@ export default function CompanyDashboard() {
       {/* Recent Orders */}
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Aktuelle Anfragen</h2>
+          <h2 className={styles.sectionTitle}>Recent Requests</h2>
           <Link href="/company/orders" className={styles.viewAllLink}>
-            Alle anzeigen →
+            View All →
           </Link>
         </div>
         
@@ -426,9 +426,9 @@ export default function CompanyDashboard() {
             <svg xmlns="http://www.w3.org/2000/svg" className={styles.emptyIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
-            <h3 className={styles.emptyTitle}>Keine Anfragen vorhanden</h3>
+            <h3 className={styles.emptyTitle}>No Requests Available</h3>
             <p className={styles.emptyDescription}>
-              Sie haben derzeit keine Umzugsanfragen erhalten.
+              You currently have no moving requests.
             </p>
           </div>
         ) : (
@@ -436,12 +436,12 @@ export default function CompanyDashboard() {
             <table className={styles.ordersTable}>
               <thead>
                 <tr>
-                  <th>Kunde</th>
+                  <th>Customer</th>
                   <th>Route</th>
-                  <th>Datum</th>
+                  <th>Date</th>
                   <th>Status</th>
-                  <th>Preis</th>
-                  <th>Aktion</th>
+                  <th>Price</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -449,7 +449,7 @@ export default function CompanyDashboard() {
                   <tr key={order._id}>
                     <td>
                       <div className={styles.customerInfo}>
-                        <div className={styles.customerName}>{order.userId?.name || 'Unbekannt'}</div>
+                        <div className={styles.customerName}>{order.userId?.name || 'Unknown'}</div>
                         <div className={styles.customerEmail}>{order.userId?.email || ''}</div>
                       </div>
                     </td>
@@ -490,9 +490,9 @@ export default function CompanyDashboard() {
       {company.serviceAreas && company.serviceAreas.length > 0 && (
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Ihre Servicegebiete</h2>
+            <h2 className={styles.sectionTitle}>Your Service Areas</h2>
             <Link href="/company/profile" className={styles.viewAllLink}>
-              Bearbeiten →
+              Edit →
             </Link>
           </div>
           
@@ -509,7 +509,7 @@ export default function CompanyDashboard() {
       {/* Tips Section */}
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Tipps für Ihr Unternehmen</h2>
+          <h2 className={styles.sectionTitle}>Tips for Your Business</h2>
         </div>
         
         <div className={styles.quickAccessGrid}>
@@ -518,8 +518,8 @@ export default function CompanyDashboard() {
               <svg xmlns="http://www.w3.org/2000/svg" className={`${styles.tipIcon} ${styles.textBlue600}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              <h3 className={styles.tipTitle}>Schnell antworten</h3>
-              <p className={styles.tipDescription}>Beantworten Sie Anfragen innerhalb von 24 Stunden für bessere Bewertungen</p>
+              <h3 className={styles.tipTitle}>Respond Quickly</h3>
+              <p className={styles.tipDescription}>Answer requests within 24 hours for better ratings</p>
             </div>
           </Link>
           
@@ -528,8 +528,8 @@ export default function CompanyDashboard() {
               <svg xmlns="http://www.w3.org/2000/svg" className={`${styles.tipIcon} ${styles.textGreen600}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <h3 className={styles.tipTitle}>Profil vervollständigen</h3>
-              <p className={styles.tipDescription}>Ein vollständiges Profil erhöht Ihre Chancen auf mehr Aufträge</p>
+              <h3 className={styles.tipTitle}>Complete Your Profile</h3>
+              <p className={styles.tipDescription}>A complete profile increases your chances of getting more jobs</p>
             </div>
           </Link>
           
@@ -538,8 +538,8 @@ export default function CompanyDashboard() {
               <svg xmlns="http://www.w3.org/2000/svg" className={`${styles.tipIcon} ${styles.textYellow600}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
               </svg>
-              <h3 className={styles.tipTitle}>Bewertungen sammeln</h3>
-              <p className={styles.tipDescription}>Bitten Sie zufriedene Kunden um Bewertungen für mehr Vertrauen</p>
+              <h3 className={styles.tipTitle}>Collect Reviews</h3>
+              <p className={styles.tipDescription}>Ask satisfied customers for reviews to build more trust</p>
             </div>
           </Link>
         </div>

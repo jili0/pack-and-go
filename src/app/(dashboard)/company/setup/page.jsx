@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import "@/app/styles/companySetup.css";
+import "@/app/styles/CompanySetup.module.css";
 
 export default function CompanySetup() {
   const router = useRouter();
@@ -128,7 +128,7 @@ export default function CompanySetup() {
           {errors.hourlyRate && <div className="error">{errors.hourlyRate}</div>}
         </label>
 
-        <fieldset>
+        <fieldset className="fieldset">
           <legend>Adresse</legend>
 
           <label>
@@ -160,7 +160,7 @@ export default function CompanySetup() {
           <input type="checkbox" name="isKisteKlarCertified" checked={formData.isKisteKlarCertified} onChange={handleChange} />
         </label>
 
-        <fieldset>
+        <fieldset className="fieldset">
           <legend>Servicegebiete</legend>
           {formData.serviceAreas.map((area, index) => (
             <div key={index} className="service-area">

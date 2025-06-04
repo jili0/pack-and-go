@@ -23,13 +23,13 @@
     resize: vertical;
   }
   
-  fieldset {
+  .fieldset {
     border: 1px solid #ccc;
     padding: 1rem;
     margin-bottom: 1rem;
   }
   
-  legend {
+  .legend {
     font-weight: bold;
   }
   
@@ -95,15 +95,6 @@
   resize: vertical;
 }
 
-fieldset {
-  border: 1px solid #ccc;
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
-
-legend {
-  font-weight: bold;
-}
 
 .service-area {
   display: flex;
