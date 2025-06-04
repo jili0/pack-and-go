@@ -687,7 +687,7 @@ export default function SearchResults() {
   // console.log('✅ Rendering main content with', sortedCompanies.length, 'companies');
 
   return (
-    <div className={styles.container}>
+    <div className={styles.searchResultsContainer}>
 
        {/* Development mode warning banner */}
       {isDev && usingMockData && (
@@ -732,7 +732,7 @@ export default function SearchResults() {
       </div>
 
       {/* Header Section */}
-      <div className={styles.header}>
+      <div className={styles.searchResultsHeader}>
         <h1 className={styles.title}>Moving Companies Found</h1>
         <p className={styles.subtitle}>
           From {formData?.fromAddress?.city || 'Start location'} to {formData?.toAddress?.city || 'Destination'}
