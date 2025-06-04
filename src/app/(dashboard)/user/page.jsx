@@ -82,7 +82,7 @@ export default function UserDashboard() {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <h2 className={styles.loadingText}>Wird geladen...</h2>
+              <h2 className={styles.loadingText}>Loading...</h2>
             </div>
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function UserDashboard() {
   }
   
   const formatDate = (dateString) => {
-    if (!dateString) return 'Kein Datum';
+    if (!dateString) return 'No date set';
     
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('de-DE', options);
@@ -104,23 +104,23 @@ export default function UserDashboard() {
     switch (status) {
       case 'pending':
         colorClass = `${styles.bgYellow100} ${styles.textYellow800}`;
-        text = 'Anfrage gesendet';
+        text = 'Request Sent';
         break;
       case 'confirmed':
         colorClass = `${styles.bgGreen100} ${styles.textGreen800}`;
-        text = 'Bestätigt';
+        text = 'Confirmed';
         break;
       case 'declined':
         colorClass = `${styles.bgRed100} ${styles.textRed800}`;
-        text = 'Abgelehnt';
+        text = 'Declined';
         break;
       case 'completed':
         colorClass = `${styles.bgBlue100} ${styles.textBlue800}`;
-        text = 'Abgeschlossen';
+        text = 'Completed';
         break;
       case 'cancelled':
         colorClass = `${styles.bgGray100} ${styles.textGray800}`;
-        text = 'Storniert';
+        text = 'Cancelled';
         break;
       default:
         colorClass = `${styles.bgGray100} ${styles.textGray800}`;
@@ -139,16 +139,16 @@ export default function UserDashboard() {
       <div className={styles.dashboardContainer}>
         {/* Greeting */}
         <div className={styles.greeting}>
-          <h1 className={styles.greetingTitle}>Hallo, {user.name}</h1>
+          <h1 className={styles.greetingTitle}>Hello, {user.name}</h1>
           <p className={styles.greetingSubtitle}>
-            Willkommen in Ihrem persönlichen Dashboard
+            Welcome to your personal dashboard
           </p>
         </div>
         
         {/* Quick Access */}
         <div className={styles.quickAccessContainer}>
           <div className={`${styles.quickAccessHeader} ${styles.bgGray50}`}>
-            <h2 className={styles.quickAccessTitle}>Schnellzugriff</h2>
+            <h2 className={styles.quickAccessTitle}>Quick Access</h2>
           </div>
           <div className={styles.quickAccessGrid}>
             <Link
@@ -161,8 +161,8 @@ export default function UserDashboard() {
                 </svg>
               </div>
               <div className={styles.quickAccessCardContent}>
-                <h3 className={styles.quickAccessCardTitle}>Neuen Umzug planen</h3>
-                <p className={styles.quickAccessCardDescription}>Erhalten Sie Angebote von Umzugsfirmen</p>
+                <h3 className={styles.quickAccessCardTitle}>Plan a New Move</h3>
+                <p className={styles.quickAccessCardDescription}>Receive offers from moving companies</p>
               </div>
             </Link>
             
@@ -176,8 +176,8 @@ export default function UserDashboard() {
                 </svg>
               </div>
               <div className={styles.quickAccessCardContent}>
-                <h3 className={styles.quickAccessCardTitle}>Meine Bestellungen</h3>
-                <p className={styles.quickAccessCardDescription}>Alle Ihre Umzüge anzeigen</p>
+                <h3 className={styles.quickAccessCardTitle}>My Orders</h3>
+                <p className={styles.quickAccessCardDescription}>View all your moves</p>
               </div>
             </Link>
             
@@ -191,8 +191,8 @@ export default function UserDashboard() {
                 </svg>
               </div>
               <div className={styles.quickAccessCardContent}>
-                <h3 className={styles.quickAccessCardTitle}>Mein Profil</h3>
-                <p className={styles.quickAccessCardDescription}>Persönliche Daten verwalten</p>
+                <h3 className={styles.quickAccessCardTitle}>My Profile</h3>
+                <p className={styles.quickAccessCardDescription}>Manage personal data</p>
               </div>
             </Link>
           </div>
@@ -208,7 +208,7 @@ export default function UserDashboard() {
               </div>
               <div className={styles.errorText}>
                 <h3 className={styles.errorTitle}>
-                  Es ist ein Fehler aufgetreten
+                  An error has occurred
                 </h3>
                 <div className={styles.errorDescription}>
                   <p>{error}</p>
@@ -221,12 +221,12 @@ export default function UserDashboard() {
         {/* Upcoming Orders */}
         <div className={styles.ordersSection}>
           <div className={`${styles.ordersHeader} ${styles.bgGray50}`}>
-            <h2 className={styles.ordersTitle}>Bevorstehende Umzüge</h2>
+            <h2 className={styles.ordersTitle}>Upcoming Moves</h2>
             <Link
               href="/user/orders"
               className={styles.viewAllLink}
             >
-              Alle anzeigen
+              View All
             </Link>
           </div>
           <div className={styles.ordersContent}>
@@ -236,7 +236,7 @@ export default function UserDashboard() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <p className={styles.emptyDescription}>Bestellungen werden geladen...</p>
+                <p className={styles.emptyDescription}>Loading orders...</p>
               </div>
             ) : upcomingOrders.length > 0 ? (
               <div className={styles.divideY}>
@@ -244,33 +244,33 @@ export default function UserDashboard() {
                   <div key={order._id} className={styles.orderItem}>
                     <div className={styles.orderHeader}>
                       <h3 className={styles.orderTitle}>
-                        Umzug von {order.fromAddress.city} nach {order.toAddress.city}
+                        Move from {order.fromAddress.city} to {order.toAddress.city}
                       </h3>
                       <StatusBadge status={order.status} />
                     </div>
                     <div className={styles.orderDetailsGrid}>
                       <div>
-                        <p className={styles.detailLabel}>Umzugsfirma</p>
+                        <p className={styles.detailLabel}>Moving Company</p>
                         <p className={styles.detailValue}>{order.companyName}</p>
                       </div>
                       <div>
-                        <p className={styles.detailLabel}>Umzugsdatum</p>
+                        <p className={styles.detailLabel}>Moving Date</p>
                         <p className={styles.detailValue}>
                           {order.confirmedDate 
                             ? formatDate(order.confirmedDate) 
                             : (order.preferredDates && order.preferredDates.length > 0
-                                ? formatDate(order.preferredDates[0]) + ' (nicht bestätigt)'
-                                : 'Kein Datum festgelegt'
+                                ? formatDate(order.preferredDates[0]) + ' (not confirmed)'
+                                : 'No date set'
                               )
                           }
                         </p>
                       </div>
                       <div>
-                        <p className={styles.detailLabel}>Helfer / Stunden</p>
-                        <p className={styles.detailValue}>{order.helpersCount} Helfer / {order.estimatedHours} Std.</p>
+                        <p className={styles.detailLabel}>Helpers / Hours</p>
+                        <p className={styles.detailValue}>{order.helpersCount} Helpers / {order.estimatedHours} Hours</p>
                       </div>
                       <div>
-                        <p className={styles.detailLabel}>Preis</p>
+                        <p className={styles.detailLabel}>Price</p>
                         <p className={styles.detailValue}>{order.totalPrice} €</p>
                       </div>
                     </div>
@@ -279,7 +279,7 @@ export default function UserDashboard() {
                         href={`/order/${order._id}`}
                         className={`${styles.detailLink} ${styles.bgBlue100}`}
                       >
-                        Details anzeigen
+                        View Details
                       </Link>
                     </div>
                   </div>
@@ -290,13 +290,13 @@ export default function UserDashboard() {
                 <svg xmlns="http://www.w3.org/2000/svg" className={styles.emptyIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
-                <h3 className={`${styles.emptyTitle} ${styles.textGray900}`}>Keine bevorstehenden Umzüge</h3>
-                <p className={styles.emptyDescription}>Sie haben derzeit keine geplanten Umzüge.</p>
+                <h3 className={`${styles.emptyTitle} ${styles.textGray900}`}>No Upcoming Moves</h3>
+                <p className={styles.emptyDescription}>You currently have no planned moves.</p>
                 <Link 
                   href="/"
                   className={`${styles.primaryButton} ${styles.bgBlue600}`}
                 >
-                  Jetzt Umzug planen
+                  Plan a Move Now
                 </Link>
               </div>
             )}
@@ -306,7 +306,7 @@ export default function UserDashboard() {
         {/* Recent Activities */}
         <div className={styles.ordersSection}>
           <div className={`${styles.ordersHeader} ${styles.bgGray50}`}>
-            <h2 className={styles.ordersTitle}>Letzte Aktivitäten</h2>
+            <h2 className={styles.ordersTitle}>Recent Activities</h2>
           </div>
           <div className={styles.ordersContent}>
             {dataLoading ? (
@@ -315,7 +315,7 @@ export default function UserDashboard() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <p className={styles.emptyDescription}>Aktivitäten werden geladen...</p>
+                <p className={styles.emptyDescription}>Loading activities...</p>
               </div>
             ) : orders.length > 0 ? (
               <div className={styles.p6}>
@@ -327,14 +327,14 @@ export default function UserDashboard() {
                       <div className={styles.activityHeader}>
                         <div>
                           <h3 className={styles.activityTitle}>
-                            {order.status === 'pending' && 'Umzugsanfrage gesendet'}
-                            {order.status === 'confirmed' && 'Umzug bestätigt'}
-                            {order.status === 'declined' && 'Umzugsanfrage abgelehnt'}
-                            {order.status === 'completed' && 'Umzug abgeschlossen'}
-                            {order.status === 'cancelled' && 'Umzug storniert'}
+                            {order.status === 'pending' && 'Move request sent'}
+                            {order.status === 'confirmed' && 'Move confirmed'}
+                            {order.status === 'declined' && 'Move request declined'}
+                            {order.status === 'completed' && 'Move completed'}
+                            {order.status === 'cancelled' && 'Move cancelled'}
                           </h3>
                           <p className={styles.activityDescription}>
-                            Umzug von {order.fromAddress.city} nach {order.toAddress.city}
+                            Move from {order.fromAddress.city} to {order.toAddress.city}
                           </p>
                         </div>
                         <time className={styles.activityTime}>{formatDate(order.createdAt)}</time>
@@ -344,7 +344,7 @@ export default function UserDashboard() {
                           href={`/order/${order._id}`}
                           className={styles.activityLink}
                         >
-                          Details anzeigen
+                          View Order Details
                         </Link>
                       </div>
                     </li>
@@ -356,8 +356,8 @@ export default function UserDashboard() {
                 <svg xmlns="http://www.w3.org/2000/svg" className={styles.emptyIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h3 className={styles.emptyTitle}>Keine Aktivitäten</h3>
-                <p className={styles.emptyDescription}>Sie haben noch keine Aktivitäten auf der Plattform.</p>
+                <h3 className={styles.emptyTitle}>No Aktivits</h3>
+                <p className={styles.emptyDescription}>There is no activity on your account yet.</p>
               </div>
             )}
           </div>
@@ -366,36 +366,36 @@ export default function UserDashboard() {
         {/* Tips & Help */}
         <div className={styles.ordersSection}>
           <div className={`${styles.ordersHeader} ${styles.bgGray50}`}>
-            <h2 className={styles.ordersTitle}>Tipps & Hilfe</h2>
+            <h2 className={styles.ordersTitle}>Tips & Help</h2>
           </div>
           <div className={styles.quickAccessGrid}>
-            <Link href="/umzugstipps" className={styles.block}>
+            <Link href="/tips" className={styles.block}>
               <div className={`${styles.tipCard} ${styles.bgYellow50}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" className={`${styles.tipIcon} ${styles.textYellow600}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                <h3 className={styles.tipTitle}>Umzugstipps</h3>
-                <p className={styles.tipDescription}>Nützliche Tipps und Tricks für einen stressfreien Umzug</p>
+                <h3 className={styles.tipTitle}>Moving Tips</h3>
+                <p className={styles.tipDescription}>Useful tips and tricks for a stress-free move</p>
               </div>
             </Link>
             
-            <Link href="/checkliste" className={styles.block}>
+            <Link href="/guide" className={styles.block}>
               <div className={`${styles.tipCard} ${styles.bgGreen50}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" className={`${styles.tipIcon} ${styles.textGreen600}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
-                <h3 className={styles.tipTitle}>Umzugs-Checkliste</h3>
-                <p className={styles.tipDescription}>Schritt-für-Schritt-Anleitung für Ihren Umzug</p>
+                <h3 className={styles.tipTitle}>Moving Checklist</h3>
+                <p className={styles.tipDescription}>Step-by-step guide for your move</p>
               </div>
             </Link>
             
-            <Link href="/kontakt" className={styles.block}>
+            <Link href="/contact" className={styles.block}>
               <div className={`${styles.tipCard} ${styles.bgBlue50}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" className={`${styles.tipIcon} ${styles.textBlue600}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                 </svg>
                 <h3 className={styles.tipTitle}>Support</h3>
-                <p className={styles.tipDescription}>Haben Sie Fragen? Unser Team hilft Ihnen gerne weiter</p>
+                <p className={styles.tipDescription}>Do you have any questions? Our team will be happy to help you</p>
               </div>
             </Link>
           </div>
