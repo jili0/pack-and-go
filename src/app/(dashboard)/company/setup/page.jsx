@@ -72,7 +72,7 @@ export default function CompanySetup() {
     data.append("city", formData.city);
     data.append("postalCode", formData.postalCode);
     data.append("country", formData.country);
-    data.append("isKisteKlarCertified", formData.isKisteKlarCertified);
+    data.append("isKisteKlarCertified", formData.isKisteKlarCertified ? "true" : "false");
 
     data.append("businessLicense", formData.businessLicense);
 
