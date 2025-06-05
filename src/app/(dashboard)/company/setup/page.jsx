@@ -11,7 +11,6 @@ export default function CompanySetup() {
     companyName: "",
     taxId: "",
     description: "",
-    hourlyRate: "",
     street: "",
     city: "",
     postalCode: "",
@@ -60,7 +59,6 @@ export default function CompanySetup() {
     data.append("companyName", formData.companyName);
     data.append("taxId", formData.taxId);
     data.append("description", formData.description);
-    data.append("hourlyRate", formData.hourlyRate);
     data.append("street", formData.street);
     data.append("city", formData.city);
     data.append("postalCode", formData.postalCode);

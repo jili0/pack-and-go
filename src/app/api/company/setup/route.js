@@ -129,7 +129,6 @@ export async function POST(request) {
       taxId,
       description,
       serviceAreas,
-      hourlyRate: parseFloat(hourlyRate),
       isVerified: false, // Muss von einem Administrator bestätigt werden
       isKisteKlarCertified,
       documents: {
