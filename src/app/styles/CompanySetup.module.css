@@ -1,137 +1,355 @@
-.company-setup-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 1rem;
-  }
-  
-  .company-setup-form label {
-    display: block;
-    margin-bottom: 1rem;
-    font-weight: bold;
-  }
-  
-  .company-setup-form input[type="text"],
-  .company-setup-form input[type="number"],
-  .company-setup-form textarea {
-    width: 100%;
-    padding: 0.5rem;
-    margin-top: 0.25rem;
-    box-sizing: border-box;
-  }
-  
-  .company-setup-form textarea {
-    resize: vertical;
-  }
-  
-  .fieldset {
-    border: 1px solid #ccc;
-    padding: 1rem;
-    margin-bottom: 1rem;
-  }
-  
-  .legend {
-    font-weight: bold;
-  }
-  
-  .service-area {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    margin-bottom: 0.5rem;
-  }
-  
-  .service-area label {
-    flex: 1;
-    font-weight: normal;
-  }
-  
-  .add-area-btn,
-  .remove-area-btn,
-  .submit-btn {
-    cursor: pointer;
-    padding: 0.5rem 1rem;
-    background-color: #0070f3;
-    border: none;
-    color: white;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  
-  .remove-area-btn {
-    background-color: #e00;
-  }
-  
-  .submit-message {
-    margin-top: 1rem;
-    font-weight: bold;
-    color: green;
-  }
-  
-  .error {
-    color: red;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
+/* Company Setup Styles - Matching Pack & Go Design */
+
+.companySetupContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+.companySetupHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.companySetupHeader h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+}
+
+.companySetupHeader p {
+  font-size: 1.1rem;
+  color: #64748b;
   max-width: 600px;
   margin: 0 auto;
-  padding: 1rem;
 }
 
-.company-setup-form label {
-  display: block;
-  margin-bottom: 1rem;
-  font-weight: bold;
+.companySetupForm {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
 }
 
-.company-setup-form input[type="text"],
-.company-setup-form input[type="number"],
-.company-setup-form textarea {
-  width: 100%;
-  padding: 0.5rem;
-  margin-top: 0.25rem;
-  box-sizing: border-box;
+.formSection {
+  padding: 2rem;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.company-setup-form textarea {
-  resize: vertical;
+.formSection:last-child {
+  border-bottom: none;
 }
 
-
-.service-area {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
+.formSection h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e3a8a;
   margin-bottom: 0.5rem;
 }
 
-.service-area label {
-  flex: 1;
-  font-weight: normal;
+.sectionDescription {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
 }
 
-.add-area-btn,
-.remove-area-btn,
-.submit-btn {
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-  background-color: #0070f3;
-  border: none;
-  color: white;
-  border-radius: 4px;
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.formGroup label {
+  display: block;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.formGroup input,
+.formGroup textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
   font-size: 1rem;
+  transition: all 0.2s ease;
+  background-color: #ffffff;
 }
 
-.remove-area-btn {
-  background-color: #e00;
+.formGroup input:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
 }
 
-.submit-message {
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+  color: #9ca3af;
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.formGroup small {
+  display: block;
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+/* Checkbox Styling */
+.checkboxGroup {
+  margin: 1.5rem 0;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+  font-weight: 500;
+  color: #374151;
+  position: relative;
+  padding-left: 2rem;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+}
+
+.checkmark {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  height: 20px;
+  width: 20px;
+  background-color: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.checkboxLabel:hover input ~ .checkmark {
+  border-color: #0ea5e9;
+}
+
+.checkboxLabel input:checked ~ .checkmark {
+  background-color: #0ea5e9;
+  border-color: #0ea5e9;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkboxLabel input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkboxLabel small {
+  display: block;
+  margin-top: 0.5rem;
+  color: #64748b;
+  font-weight: normal;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Service Areas */
+.serviceArea {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.serviceAreaInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.removeBtn:hover {
+  background-color: #dc2626;
+}
+
+.addBtn {
+  background-color: transparent;
+  color: #0ea5e9;
+  border: 2px dashed #0ea5e9;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.addBtn:hover {
+  background-color: #f0f9ff;
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+/* File Upload Styling */
+.formGroup input[type="file"] {
+  padding: 0.5rem;
+  border: 2px dashed #e2e8f0;
+  background-color: #f8fafc;
+  cursor: pointer;
+}
+
+.formGroup input[type="file"]:hover {
+  border-color: #0ea5e9;
+  background-color: #f0f9ff;
+}
+
+/* Form Actions */
+.formActions {
+  padding: 2rem;
+  background-color: #f8fafc;
+  text-align: center;
+}
+
+.submitBtn {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.submitBtn:hover {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.submitBtn:active {
+  transform: translateY(0);
+}
+
+/* Messages */
+.submitMessage {
   margin-top: 1rem;
-  font-weight: bold;
-  color: green;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.submitMessage.success {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.submitMessage.error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
 }
 
 .error {
-  color: red;
-  font-size: 0.875rem;
+  color: #ef4444;
+  font-size: 0.85rem;
   margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .companySetupContainer {
+    padding: 1rem 0.5rem;
+  }
+  
+  .companySetupHeader h1 {
+    font-size: 2rem;
+  }
+  
+  .formSection {
+    padding: 1.5rem 1rem;
+  }
+  
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .serviceAreaInputs {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .removeBtn {
+    position: static;
+    margin-top: 1rem;
+    width: 100%;
+  }
+  
+  .checkboxLabel {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .companySetupHeader h1 {
+    font-size: 1.75rem;
+  }
+  
+  .formSection h2 {
+    font-size: 1.25rem;
+  }
+  
+  .submitBtn {
+    width: 100%;
+    padding: 1rem;
+  }
 }
