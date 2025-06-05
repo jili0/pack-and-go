@@ -31,28 +31,6 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Header */
-.dashboardHeader {
-  background: white;
-  border-radius: 8px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.dashboardTitle {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0 0 0.5rem 0;
-}
-
-.welcomeMessage {
-  font-size: 1rem;
-  color: #64748b;
-  margin: 0;
-}
-
 /* Error Alert */
 .errorAlert {
   display: flex;
@@ -165,7 +143,6 @@
 
 .searchContainer {
   position: relative;
-  max-width: 400px;
   display: flex;
   gap: 0.5rem;
 }

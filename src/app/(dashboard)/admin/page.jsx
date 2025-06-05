@@ -212,13 +212,7 @@ export default function AdminDashboard() {
 
   return (
     <div className={styles.dashboardContainer}>
-      {/* Header */}
-      <div className={styles.dashboardHeader}>
-        <h1 className={styles.dashboardTitle}>Admin Dashboard</h1>
-        <p className={styles.welcomeMessage}>
-          Welcome back, {user?.name || "Administrator"}!
-        </p>
-      </div>
+
 
       {/* Error Alert */}
       {error && (
