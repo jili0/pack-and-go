@@ -19,6 +19,7 @@ const s3Client = new S3Client({
  * @returns {Promise<string>} - URL zur gespeicherten Datei
  */
 export const saveUploadedFile = async (file, type, userId) => {
+  console.log("Empfangene Datei:", file);
   try {
     // Generiere einen eindeutigen Dateinamen
     const fileExtension = file.name.split('.').pop();
