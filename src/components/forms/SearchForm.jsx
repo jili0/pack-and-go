@@ -23,7 +23,9 @@ export default function SearchForm() {
       to: toLocation.trim()
     });
     
-    // hier muss angepasst werden!
+    // hier muss angepasst werden! 
+    // (wie z.B router.push(`/search-results?${searchParams.toString()}`);)
+
     router.push(`/search-results`);
   };
 
