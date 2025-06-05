@@ -330,27 +330,27 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className={styles.userMeta}>
-                    <div className={styles.metaRow}>
+                    <div className={styles.metaInfo}>
                       {getRoleBadge(userData.role)}
                       <span className={styles.dateText}>
                         {formatDate(userData.createdAt)}
                       </span>
-                      <div className={styles.actionButtons}>
-                        <button
-                          onClick={() => handleEditUser(userData._id)}
-                          className={styles.editButton}
-                          disabled={actionLoading}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleUserAction(userData._id, 'delete')}
-                          className={styles.deleteButton}
-                          disabled={actionLoading}
-                        >
-                          Delete
-                        </button>
-                      </div>
+                    </div>
+                    <div className={styles.actionButtons}>
+                      <button
+                        onClick={() => handleEditUser(userData._id)}
+                        className={styles.editButton}
+                        disabled={actionLoading}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleUserAction(userData._id, 'delete')}
+                        className={styles.deleteButton}
+                        disabled={actionLoading}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -384,27 +384,27 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className={styles.userMeta}>
-                    <div className={styles.metaRow}>
+                    <div className={styles.metaInfo}>
                       {getRoleBadge(userData.role)}
                       <span className={styles.dateText}>
                         {formatDate(userData.createdAt)}
                       </span>
-                      <div className={styles.actionButtons}>
-                        <button
-                          onClick={() => handleEditUser(userData._id)}
-                          className={styles.editButton}
-                          disabled={actionLoading}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleUserAction(userData._id, 'delete')}
-                          className={styles.deleteButton}
-                          disabled={actionLoading}
-                        >
-                          Delete
-                        </button>
-                      </div>
+                    </div>
+                    <div className={styles.actionButtons}>
+                      <button
+                        onClick={() => handleEditUser(userData._id)}
+                        className={styles.editButton}
+                        disabled={actionLoading}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleUserAction(userData._id, 'delete')}
+                        className={styles.deleteButton}
+                        disabled={actionLoading}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -438,27 +438,27 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className={styles.userMeta}>
-                    <div className={styles.metaRow}>
+                    <div className={styles.metaInfo}>
                       {getRoleBadge(userData.role)}
                       <span className={styles.dateText}>
                         {formatDate(userData.createdAt)}
                       </span>
-                      <div className={styles.actionButtons}>
-                        <button
-                          onClick={() => handleEditUser(userData._id)}
-                          className={styles.editButton}
-                          disabled={actionLoading}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleUserAction(userData._id, 'delete')}
-                          className={styles.deleteButton}
-                          disabled={actionLoading}
-                        >
-                          Delete
-                        </button>
-                      </div>
+                    </div>
+                    <div className={styles.actionButtons}>
+                      <button
+                        onClick={() => handleEditUser(userData._id)}
+                        className={styles.editButton}
+                        disabled={actionLoading}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleUserAction(userData._id, 'delete')}
+                        className={styles.deleteButton}
+                        disabled={actionLoading}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 </div>
