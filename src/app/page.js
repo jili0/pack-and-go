@@ -277,7 +277,7 @@ export default function Home() {
             Get free and non-binding offers from verified moving companies in
             your region now.
           </p>
-          <Link href="#calculator" className={styles.ctaBtn}>
+          <Link href="#searchCompanies" className={styles.ctaBtn}>
             Plan your move now
             <svg
               xmlns="http://www.w3.org/2000/svg"
