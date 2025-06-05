@@ -436,3 +436,31 @@
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+.searchSection {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.searchContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Responsive Design for Search Section */
+@media (max-width: 768px) {
+  .searchSection {
+    padding: 60px 0;
+  }
+  
+  .searchContainer {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .searchSection {
+    padding: 40px 0;
+  }
+}
