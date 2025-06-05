@@ -13,6 +13,8 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchDashboardData();
@@ -43,6 +45,66 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUserAction = async (userId, action) => {
+    if (action === 'delete') {
+      if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+        return;
+      }
+    }
+
+    try {
+      setActionLoading(true);
+      
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: action === 'delete' ? 'DELETE' : 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: action !== 'delete' ? JSON.stringify({ action }) : undefined,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (action === 'delete') {
+          // Remove user from the list
+          setUsers(users.filter(user => user._id !== userId));
+        } else {
+          // Update user in the list
+          setUsers(users.map(user => 
+            user._id === userId 
+              ? { ...user, ...data.user }
+              : user
+          ));
+        }
+      } else {
+        setError(data.message || `Error performing ${action} action`);
+      }
+    } catch (error) {
+      console.error('Error with user action:', error);
+      setError('An error occurred. Please try again later.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleEditUser = (userId) => {
+    router.push(`/admin/users/${userId}/edit`);
+  };
+
+  const getFilteredUsers = (role) => {
+    let filtered = users.filter(u => u.role === role);
+    
+    if (searchTerm) {
+      filtered = filtered.filter(user =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    return filtered.slice(0, 5); // Show max 5 items
   };
 
   const formatDate = (dateString) => {
@@ -137,7 +199,6 @@ export default function AdminDashboard() {
 
   const userStats = getUserStats();
   const orderStats = getOrderStats();
-  const recentUsers = users.slice(0, 5);
   const recentOrders = orders.slice(0, 5);
 
   if (loading) {
@@ -212,39 +273,88 @@ export default function AdminDashboard() {
           </Link>
         </div>
 
+        {/* Search Function */}
+        <div className={styles.searchSection}>
+          <div className={styles.searchContainer}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.searchIcon}>
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input
+              type="text"
+              placeholder="Search accounts by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && setSearchTerm(e.target.value)}
+              className={styles.searchInput}
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className={styles.clearSearch}
+              >
+                ×
+              </button>
+            )}
+            <button
+              onClick={() => {/* Search is live, but this provides visual feedback */}}
+              className={styles.searchButton}
+            >
+              Search
+            </button>
+          </div>
+        </div>
+
         {/* Manage Customers */}
         <div className={styles.dataSection}>
           <div className={styles.dataSectionHeader}>
-            <h3 className={styles.dataTitle}>Manage Customers</h3>
+            <h3 className={styles.dataTitle}>
+              Manage Customers ({getFilteredUsers('user').length})
+            </h3>
           </div>
-          {users.filter((u) => u.role === "user").slice(0, 3).length === 0 ? (
+          {getFilteredUsers('user').length === 0 ? (
             <div className={styles.emptyState}>
-              <p>No customers found</p>
+              <p>{searchTerm ? 'No customers match your search' : 'No customers found'}</p>
             </div>
           ) : (
             <div className={styles.dataTable}>
-              {users
-                .filter((u) => u.role === "user")
-                .slice(0, 3)
-                .map((userData) => (
-                  <div key={userData._id} className={styles.dataRow}>
-                    <div className={styles.userInfo}>
-                      <div className={styles.userAvatar}>
-                        <span>{userData.name.charAt(0)}</span>
-                      </div>
-                      <div className={styles.userDetails}>
-                        <h4 className={styles.userName}>{userData.name}</h4>
-                        <p className={styles.userEmail}>{userData.email}</p>
-                      </div>
+              {getFilteredUsers('user').map((userData) => (
+                <div key={userData._id} className={styles.dataRow}>
+                  <div className={styles.userInfo}>
+                    <div className={styles.userAvatar}>
+                      <span>{userData.name.charAt(0)}</span>
                     </div>
-                    <div className={styles.userMeta}>
+                    <div className={styles.userDetails}>
+                      <h4 className={styles.userName}>{userData.name}</h4>
+                      <p className={styles.userEmail}>{userData.email}</p>
+                    </div>
+                  </div>
+                  <div className={styles.userMeta}>
+                    <div className={styles.metaRow}>
                       {getRoleBadge(userData.role)}
                       <span className={styles.dateText}>
                         {formatDate(userData.createdAt)}
                       </span>
+                      <div className={styles.actionButtons}>
+                        <button
+                          onClick={() => handleEditUser(userData._id)}
+                          className={styles.editButton}
+                          disabled={actionLoading}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleUserAction(userData._id, 'delete')}
+                          className={styles.deleteButton}
+                          disabled={actionLoading}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -252,37 +362,53 @@ export default function AdminDashboard() {
         {/* Manage Companies */}
         <div className={styles.dataSection}>
           <div className={styles.dataSectionHeader}>
-            <h3 className={styles.dataTitle}>Manage Companies</h3>
+            <h3 className={styles.dataTitle}>
+              Manage Companies ({getFilteredUsers('company').length})
+            </h3>
           </div>
-          {users.filter((u) => u.role === "company").slice(0, 3).length ===
-          0 ? (
+          {getFilteredUsers('company').length === 0 ? (
             <div className={styles.emptyState}>
-              <p>No companies found</p>
+              <p>{searchTerm ? 'No companies match your search' : 'No companies found'}</p>
             </div>
           ) : (
             <div className={styles.dataTable}>
-              {users
-                .filter((u) => u.role === "company")
-                .slice(0, 3)
-                .map((userData) => (
-                  <div key={userData._id} className={styles.dataRow}>
-                    <div className={styles.userInfo}>
-                      <div className={styles.userAvatar}>
-                        <span>{userData.name.charAt(0)}</span>
-                      </div>
-                      <div className={styles.userDetails}>
-                        <h4 className={styles.userName}>{userData.name}</h4>
-                        <p className={styles.userEmail}>{userData.email}</p>
-                      </div>
+              {getFilteredUsers('company').map((userData) => (
+                <div key={userData._id} className={styles.dataRow}>
+                  <div className={styles.userInfo}>
+                    <div className={styles.userAvatar}>
+                      <span>{userData.name.charAt(0)}</span>
                     </div>
-                    <div className={styles.userMeta}>
+                    <div className={styles.userDetails}>
+                      <h4 className={styles.userName}>{userData.name}</h4>
+                      <p className={styles.userEmail}>{userData.email}</p>
+                    </div>
+                  </div>
+                  <div className={styles.userMeta}>
+                    <div className={styles.metaRow}>
                       {getRoleBadge(userData.role)}
                       <span className={styles.dateText}>
                         {formatDate(userData.createdAt)}
                       </span>
+                      <div className={styles.actionButtons}>
+                        <button
+                          onClick={() => handleEditUser(userData._id)}
+                          className={styles.editButton}
+                          disabled={actionLoading}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleUserAction(userData._id, 'delete')}
+                          className={styles.deleteButton}
+                          disabled={actionLoading}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -290,36 +416,53 @@ export default function AdminDashboard() {
         {/* Manage Admins */}
         <div className={styles.dataSection}>
           <div className={styles.dataSectionHeader}>
-            <h3 className={styles.dataTitle}>Manage Admins</h3>
+            <h3 className={styles.dataTitle}>
+              Manage Admins ({getFilteredUsers('admin').length})
+            </h3>
           </div>
-          {users.filter((u) => u.role === "admin").slice(0, 3).length === 0 ? (
+          {getFilteredUsers('admin').length === 0 ? (
             <div className={styles.emptyState}>
-              <p>No administrators found</p>
+              <p>{searchTerm ? 'No administrators match your search' : 'No administrators found'}</p>
             </div>
           ) : (
             <div className={styles.dataTable}>
-              {users
-                .filter((u) => u.role === "admin")
-                .slice(0, 3)
-                .map((userData) => (
-                  <div key={userData._id} className={styles.dataRow}>
-                    <div className={styles.userInfo}>
-                      <div className={styles.userAvatar}>
-                        <span>{userData.name.charAt(0)}</span>
-                      </div>
-                      <div className={styles.userDetails}>
-                        <h4 className={styles.userName}>{userData.name}</h4>
-                        <p className={styles.userEmail}>{userData.email}</p>
-                      </div>
+              {getFilteredUsers('admin').map((userData) => (
+                <div key={userData._id} className={styles.dataRow}>
+                  <div className={styles.userInfo}>
+                    <div className={styles.userAvatar}>
+                      <span>{userData.name.charAt(0)}</span>
                     </div>
-                    <div className={styles.userMeta}>
+                    <div className={styles.userDetails}>
+                      <h4 className={styles.userName}>{userData.name}</h4>
+                      <p className={styles.userEmail}>{userData.email}</p>
+                    </div>
+                  </div>
+                  <div className={styles.userMeta}>
+                    <div className={styles.metaRow}>
                       {getRoleBadge(userData.role)}
                       <span className={styles.dateText}>
                         {formatDate(userData.createdAt)}
                       </span>
+                      <div className={styles.actionButtons}>
+                        <button
+                          onClick={() => handleEditUser(userData._id)}
+                          className={styles.editButton}
+                          disabled={actionLoading}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleUserAction(userData._id, 'delete')}
+                          className={styles.deleteButton}
+                          disabled={actionLoading}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
           )}
         </div>

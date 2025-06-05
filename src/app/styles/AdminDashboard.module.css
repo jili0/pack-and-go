@@ -158,6 +158,83 @@
   margin: 0;
 }
 
+/* Search Section */
+.searchSection {
+  margin-bottom: 2rem;
+}
+
+.searchContainer {
+  position: relative;
+  max-width: 400px;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px 0 0 8px;
+  font-size: 0.875rem;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.searchButton {
+  padding: 0.75rem 1.5rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.searchButton:hover {
+  background-color: #1d4ed8;
+}
+
+.clearSearch {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.clearSearch:hover {
+  color: #1e293b;
+}
+
 /* Data Sections */
 .dataSection {
   background: white;
@@ -236,9 +313,54 @@
 
 .userMeta {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.25rem;
+  align-items: center;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Action Buttons */
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editButton,
+.deleteButton {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.editButton {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.editButton:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.deleteButton {
+  background-color: #dc2626;
+  color: white;
+}
+
+.deleteButton:hover:not(:disabled) {
+  background-color: #b91c1c;
+}
+
+.editButton:disabled,
+.deleteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Order Info */
@@ -364,9 +486,15 @@
   
   .userMeta,
   .orderDetails {
-    flex-direction: row;
-    align-items: center;
-    gap: 0.75rem;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+  }
+  
+  .metaRow {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
   }
 }
 
@@ -392,6 +520,20 @@
     gap: 0.5rem;
   }
   
+  .searchContainer {
+    flex-direction: column;
+    max-width: 100%;
+  }
+  
+  .searchInput {
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+  }
+  
+  .searchButton {
+    border-radius: 8px;
+  }
+  
   .dataRow {
     flex-direction: column;
     align-items: flex-start;
@@ -405,7 +547,18 @@
   .userMeta,
   .orderDetails {
     align-self: flex-start;
-    flex-direction: row;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 0.5rem;
+  }
+  
+  .metaRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .actionButtons {
+    margin-top: 0.5rem;
   }
 }
