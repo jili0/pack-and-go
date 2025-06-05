@@ -28,7 +28,7 @@ const Header = () => {
       <Link href="/">
         <Image
           className={styles.logoImage}
-          src="/images/logo.png"
+          src="/images/logo-transparent.png"
           alt="Pack & Go Logo"
           width={225}
           height={100}

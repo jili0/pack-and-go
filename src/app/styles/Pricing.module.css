@@ -46,7 +46,7 @@
 }
 
 .heroSection {
-  background: linear-gradient(135deg, #3f52ce, #4461F2);
+  background: linear-gradient(135deg, #77a0c9e6, #77a0c9e6);
   color: white;
   padding: 6rem 0 5rem;
   position: relative;
@@ -240,7 +240,7 @@
 
 .cardHighlight {
   background-color: #EEF1FF;
-  color: #2E42B6;;
+  color: #77a0c9e6;
   font-weight: 600;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
@@ -299,7 +299,7 @@
   right: 0;
   bottom: 0;
   border-radius: 0.5rem;
-  border: 2px dashed  #4461F2;
+  border: 2px dashed  #77a0c9e6;
   opacity: 0.15;
   pointer-events: none;
 }
@@ -593,7 +593,7 @@
   left: 0;
   width: 6px;
   height: 100%;
-  background-color: #4461F2;
+  background-color: #77a0c9e6;
 }
 
 .serviceIcon {
@@ -731,7 +731,7 @@ details[open] .faqArrow {
 
 /* CTA Section */
 .ctaSection {
-  background: linear-gradient(135deg,  #3f52ce, #4461F2);
+  background: linear-gradient(135deg,  #263389, #77a0c9e6);
   color: white;
   padding: 5rem 0;
   position: relative;

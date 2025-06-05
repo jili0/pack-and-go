@@ -4,7 +4,7 @@
     var(--primary-color),
     var(--primary-dark)
   );
-  color: white;
+  color: #77a0c9e6;
   padding: 5rem 0;
   text-align: center;
   position: relative;
@@ -28,7 +28,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  color: white;
+  color: #77a0c9e6;
 }
 
 .heroText {
@@ -56,7 +56,11 @@
 
 /* Calculator Section */
 .calculator {
-  background-color: white;
+  background-color: linear-gradient(
+    to bottom,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   padding: 3rem 0;
 }
 
@@ -125,7 +129,7 @@
   width: 3rem;
   height: 3rem;
   font-size: 1.25rem;
-  background-color: var(--primary-color);
+  background-color: #77a0c9e6;
   color: white;
   font-weight: 700;
   border-radius: 50%;
@@ -263,7 +267,7 @@
 .cityOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  background: linear-gradient(to top, #152B42(0, 0, 0, 0.8), transparent);
 }
 
 .cityContent {
@@ -271,18 +275,20 @@
   bottom: 0;
   left: 0;
   padding: 1.5rem;
-  color: white;
+  color: #152B42;
 }
 
 .cityTitle {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
+  color: white;
 }
 
 .citySubtitle {
   font-size: 0.875rem;
   opacity: 0.8;
+  color: white;
 }
 
 /* CTA Section */
@@ -303,11 +309,12 @@
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: white;
+  color: blue;
 }
 
 .ctaText {
   font-size: 1.25rem;
+  color: #152B42;
   margin-bottom: 2rem;
   max-width: 700px;
   margin-left: auto;
