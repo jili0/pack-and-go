@@ -52,8 +52,9 @@ export async function POST(request) {
     }
 
     // Überprüfe, ob die Firma existiert
-    const company = await Company.findById(companyId);
-
+    // const company = await Company.findById(companyId);
+    const company = await Company.findOne({userId:companyId});
+ 
     if (!company) {
       return NextResponse.json(
         {
@@ -70,7 +71,8 @@ export async function POST(request) {
       companyId,
       fromAddress,
       toAddress,
-      preferredDates,
+      // preferredDates,
+      preferredDates: preferredDates.map(date => new Date(date)), // Convert strings to Dates
       helpersCount,
       estimatedHours,
       totalPrice,
