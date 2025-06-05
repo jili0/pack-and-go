@@ -1,24 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
-import styles from '@/app/styles/AdminDashboard.module.css';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import styles from "@/app/styles/AdminDashboard.module.css";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const { user } = useAuth();
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalCompanies: 0,
-    pendingCompanies: 0,
-    totalOrders: 0,
-    activeOrders: 0,
-    completedOrders: 0
-  });
-  const [pendingCompanies, setPendingCompanies] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -26,31 +20,125 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const statsRes = await fetch('/api/admin/stats');
-      if (statsRes.ok) {
-        const statsData = await statsRes.json();
-        setStats(statsData);
+      // Fetch users
+      const usersRes = await fetch("/api/admin/users");
+      if (usersRes.ok) {
+        const usersData = await usersRes.json();
+        if (usersData.success) {
+          setUsers(usersData.users);
+        }
       }
 
-      const companiesRes = await fetch('/api/admin/companies/pending');
-      if (companiesRes.ok) {
-        const companiesData = await companiesRes.json();
-        setPendingCompanies(companiesData.companies || []);
+      // Fetch orders
+      const ordersRes = await fetch("/api/orders");
+      if (ordersRes.ok) {
+        const ordersData = await ordersRes.json();
+        if (ordersData.success) {
+          setOrders(ordersData.orders);
+        }
       }
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error("Error fetching dashboard data:", error);
+      setError("Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    if (!dateString) return "Not available";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "EUR",
+    }).format(amount);
+  };
+
+  const getRoleBadge = (role) => {
+    const roleMap = {
+      user: {
+        class: `${styles.roleBadge} ${styles.roleUser}`,
+        text: "Customer",
+      },
+      company: {
+        class: `${styles.roleBadge} ${styles.roleCompany}`,
+        text: "Company",
+      },
+      admin: {
+        class: `${styles.roleBadge} ${styles.roleAdmin}`,
+        text: "Admin",
+      },
+    };
+    const roleInfo = roleMap[role] || { class: styles.roleBadge, text: role };
+    return <span className={roleInfo.class}>{roleInfo.text}</span>;
+  };
+
+  const getStatusBadge = (status) => {
+    const statusMap = {
+      pending: {
+        class: `${styles.statusBadge} ${styles.statusPending}`,
+        text: "Pending",
+      },
+      confirmed: {
+        class: `${styles.statusBadge} ${styles.statusConfirmed}`,
+        text: "Confirmed",
+      },
+      declined: {
+        class: `${styles.statusBadge} ${styles.statusDeclined}`,
+        text: "Declined",
+      },
+      completed: {
+        class: `${styles.statusBadge} ${styles.statusCompleted}`,
+        text: "Completed",
+      },
+      cancelled: {
+        class: `${styles.statusBadge} ${styles.statusCancelled}`,
+        text: "Cancelled",
+      },
+    };
+    const statusInfo = statusMap[status] || {
+      class: styles.statusBadge,
+      text: status,
+    };
+    return <span className={statusInfo.class}>{statusInfo.text}</span>;
+  };
+
+  const getUserStats = () => {
+    const customers = users.filter((u) => u.role === "user").length;
+    const companies = users.filter((u) => u.role === "company").length;
+    const admins = users.filter((u) => u.role === "admin").length;
+    return { total: users.length, customers, companies, admins };
+  };
+
+  const getOrderStats = () => {
+    const pending = orders.filter((o) => o.status === "pending").length;
+    const confirmed = orders.filter((o) => o.status === "confirmed").length;
+    const completed = orders.filter((o) => o.status === "completed").length;
+    const cancelled = orders.filter((o) => o.status === "cancelled").length;
+    const totalRevenue = orders
+      .filter((o) => o.status === "completed")
+      .reduce((sum, o) => sum + (o.totalPrice || 0), 0);
+    return {
+      total: orders.length,
+      pending,
+      confirmed,
+      completed,
+      cancelled,
+      totalRevenue,
+    };
+  };
+
+  const userStats = getUserStats();
+  const orderStats = getOrderStats();
+  const recentUsers = users.slice(0, 5);
+  const recentOrders = orders.slice(0, 5);
 
   if (loading) {
     return (
@@ -65,201 +153,254 @@ export default function AdminDashboard() {
     <div className={styles.dashboardContainer}>
       {/* Header */}
       <div className={styles.dashboardHeader}>
-        <div className={styles.headerContent}>
-          <div className={styles.headerText}>
-            <h1 className={styles.dashboardTitle}>Admin Dashboard</h1>
-            <p className={styles.welcomeMessage}>
-              Welcome back, {user?.name || 'Administrator'}!
-            </p>
-          </div>
-          <div className={styles.headerIcon}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        <h1 className={styles.dashboardTitle}>Admin Dashboard</h1>
+        <p className={styles.welcomeMessage}>
+          Welcome back, {user?.name || "Administrator"}!
+        </p>
+      </div>
+
+      {/* Error Alert */}
+      {error && (
+        <div className={styles.errorAlert}>
+          <div className={styles.errorIcon}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
             </svg>
           </div>
-        </div>
-      </div>
-
-      {/* Statistics Cards */}
-      <div className={styles.statsGrid}>
-        <div className={styles.statCard}>
-          <div className={styles.statHeader}>
-            <div className={styles.statIcon}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-            </div>
-            <h3 className={styles.statTitle}>Users</h3>
-          </div>
-          <div className={styles.statContent}>
-            <p className={styles.statValue}>{stats.totalUsers}</p>
-            <p className={styles.statDescription}>Registered users</p>
-          </div>
-        </div>
-
-        <div className={styles.statCard}>
-          <div className={styles.statHeader}>
-            <div className={styles.statIcon}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                <polyline points="3.27,6.96 12,12.01 20.73,6.96"></polyline>
-                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-              </svg>
-            </div>
-            <h3 className={styles.statTitle}>Companies</h3>
-          </div>
-          <div className={styles.statContent}>
-            <p className={styles.statValue}>{stats.totalCompanies}</p>
-            <div className={styles.statMeta}>
-              {stats.pendingCompanies > 0 && (
-                <span className={styles.pendingBadge}>
-                  {stats.pendingCompanies} pending
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className={styles.statCard}>
-          <div className={styles.statHeader}>
-            <div className={styles.statIcon}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-              </svg>
-            </div>
-            <h3 className={styles.statTitle}>Orders</h3>
-          </div>
-          <div className={styles.statContent}>
-            <p className={styles.statValue}>{stats.totalOrders}</p>
-            <div className={styles.statMeta}>
-              <span className={styles.activeBadge}>
-                {stats.activeOrders} active
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className={styles.quickActionsSection}>
-        <h2 className={styles.sectionTitle}>Quick Access</h2>
-        <div className={styles.actionButtons}>
-          <Link href="/admin/companies" className={styles.actionButton}>
-            <div className={styles.actionIcon}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                <polyline points="3.27,6.96 12,12.01 20.73,6.96"></polyline>
-                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-              </svg>
-            </div>
-            <div className={styles.actionContent}>
-              <h3 className={styles.actionTitle}>Manage Companies</h3>
-              <p className={styles.actionDescription}>Review and verify moving companies</p>
-            </div>
-          </Link>
-
-          <Link href="/admin/users" className={styles.actionButton}>
-            <div className={styles.actionIcon}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-            </div>
-            <div className={styles.actionContent}>
-              <h3 className={styles.actionTitle}>Manage Users</h3>
-              <p className={styles.actionDescription}>View and manage user accounts</p>
-            </div>
-          </Link>
-
-          <Link href="/admin/orders" className={styles.actionButton}>
-            <div className={styles.actionIcon}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-              </svg>
-            </div>
-            <div className={styles.actionContent}>
-              <h3 className={styles.actionTitle}>Manage Orders</h3>
-              <p className={styles.actionDescription}>Monitor and manage all orders</p>
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* Pending Companies */}
-      {pendingCompanies.length > 0 && (
-        <div className={styles.pendingSection}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Pending Company Verifications</h2>
-            <Link href="/admin/companies?filter=pending" className={styles.viewAllLink}>
-              View all →
-            </Link>
-          </div>
-          <div className={styles.pendingList}>
-            {pendingCompanies.slice(0, 3).map((company) => (
-              <div key={company._id} className={styles.pendingCard}>
-                <div className={styles.pendingInfo}>
-                  <h3 className={styles.pendingName}>{company.companyName}</h3>
-                  <p className={styles.pendingDetails}>
-                    {company.city} • Registered on {formatDate(company.createdAt)}
-                  </p>
-                </div>
-                <Link 
-                  href={`/admin/companies/${company._id}`} 
-                  className={styles.reviewButton}
-                >
-                  Review
-                </Link>
-              </div>
-            ))}
+          <div className={styles.errorText}>
+            <h3 className={styles.errorTitle}>Error</h3>
+            <p>{error}</p>
           </div>
         </div>
       )}
 
-      {/* System Status */}
-      <div className={styles.systemSection}>
-        <h2 className={styles.sectionTitle}>System Overview</h2>
-        <div className={styles.systemGrid}>
-          <div className={styles.systemCard}>
-            <div className={styles.systemIcon}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-            </div>
-            <div className={styles.systemContent}>
-              <h3 className={styles.systemTitle}>Platform Status</h3>
-              <p className={styles.systemStatus}>All systems operational</p>
-            </div>
-          </div>
+      {/* User Management Section */}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>User & Account Management</h2>
+        </div>
 
-          <div className={styles.systemCard}>
-            <div className={styles.systemIcon}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
-            </div>
-            <div className={styles.systemContent}>
-              <h3 className={styles.systemTitle}>Active Regions</h3>
-              <p className={styles.systemStatus}>Germany nationwide</p>
-            </div>
-          </div>
+        {/* User Statistics */}
+        <div className={styles.statsGrid}>
+          <Link href="/admin/users?filter=all" className={styles.statCard}>
+            <h3 className={styles.statTitle}>Total Users</h3>
+            <p className={styles.statValue}>{userStats.total}</p>
+            <p className={styles.statDescription}>All registered accounts</p>
+          </Link>
+          <Link href="/admin/users?filter=user" className={styles.statCard}>
+            <h3 className={styles.statTitle}>Customers</h3>
+            <p className={styles.statValue}>{userStats.customers}</p>
+            <p className={styles.statDescription}>Regular users</p>
+          </Link>
+          <Link href="/admin/users?filter=company" className={styles.statCard}>
+            <h3 className={styles.statTitle}>Companies</h3>
+            <p className={styles.statValue}>{userStats.companies}</p>
+            <p className={styles.statDescription}>Business accounts</p>
+          </Link>
+          <Link href="/admin/users?filter=admin" className={styles.statCard}>
+            <h3 className={styles.statTitle}>Admins</h3>
+            <p className={styles.statValue}>{userStats.admins}</p>
+            <p className={styles.statDescription}>Administrator accounts</p>
+          </Link>
+        </div>
 
-          <div className={styles.systemCard}>
-            <div className={styles.systemIcon}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-              </svg>
-            </div>
-            <div className={styles.systemContent}>
-              <h3 className={styles.systemTitle}>Performance</h3>
-              <p className={styles.systemStatus}>Optimal response times</p>
-            </div>
+        {/* Manage Customers */}
+        <div className={styles.dataSection}>
+          <div className={styles.dataSectionHeader}>
+            <h3 className={styles.dataTitle}>Manage Customers</h3>
           </div>
+          {users.filter((u) => u.role === "user").slice(0, 3).length === 0 ? (
+            <div className={styles.emptyState}>
+              <p>No customers found</p>
+            </div>
+          ) : (
+            <div className={styles.dataTable}>
+              {users
+                .filter((u) => u.role === "user")
+                .slice(0, 3)
+                .map((userData) => (
+                  <div key={userData._id} className={styles.dataRow}>
+                    <div className={styles.userInfo}>
+                      <div className={styles.userAvatar}>
+                        <span>{userData.name.charAt(0)}</span>
+                      </div>
+                      <div className={styles.userDetails}>
+                        <h4 className={styles.userName}>{userData.name}</h4>
+                        <p className={styles.userEmail}>{userData.email}</p>
+                      </div>
+                    </div>
+                    <div className={styles.userMeta}>
+                      {getRoleBadge(userData.role)}
+                      <span className={styles.dateText}>
+                        {formatDate(userData.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+
+        {/* Manage Companies */}
+        <div className={styles.dataSection}>
+          <div className={styles.dataSectionHeader}>
+            <h3 className={styles.dataTitle}>Manage Companies</h3>
+          </div>
+          {users.filter((u) => u.role === "company").slice(0, 3).length ===
+          0 ? (
+            <div className={styles.emptyState}>
+              <p>No companies found</p>
+            </div>
+          ) : (
+            <div className={styles.dataTable}>
+              {users
+                .filter((u) => u.role === "company")
+                .slice(0, 3)
+                .map((userData) => (
+                  <div key={userData._id} className={styles.dataRow}>
+                    <div className={styles.userInfo}>
+                      <div className={styles.userAvatar}>
+                        <span>{userData.name.charAt(0)}</span>
+                      </div>
+                      <div className={styles.userDetails}>
+                        <h4 className={styles.userName}>{userData.name}</h4>
+                        <p className={styles.userEmail}>{userData.email}</p>
+                      </div>
+                    </div>
+                    <div className={styles.userMeta}>
+                      {getRoleBadge(userData.role)}
+                      <span className={styles.dateText}>
+                        {formatDate(userData.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+
+        {/* Manage Admins */}
+        <div className={styles.dataSection}>
+          <div className={styles.dataSectionHeader}>
+            <h3 className={styles.dataTitle}>Manage Admins</h3>
+          </div>
+          {users.filter((u) => u.role === "admin").slice(0, 3).length === 0 ? (
+            <div className={styles.emptyState}>
+              <p>No administrators found</p>
+            </div>
+          ) : (
+            <div className={styles.dataTable}>
+              {users
+                .filter((u) => u.role === "admin")
+                .slice(0, 3)
+                .map((userData) => (
+                  <div key={userData._id} className={styles.dataRow}>
+                    <div className={styles.userInfo}>
+                      <div className={styles.userAvatar}>
+                        <span>{userData.name.charAt(0)}</span>
+                      </div>
+                      <div className={styles.userDetails}>
+                        <h4 className={styles.userName}>{userData.name}</h4>
+                        <p className={styles.userEmail}>{userData.email}</p>
+                      </div>
+                    </div>
+                    <div className={styles.userMeta}>
+                      {getRoleBadge(userData.role)}
+                      <span className={styles.dateText}>
+                        {formatDate(userData.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Order Management Section */}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Order Management</h2>
+          <Link href="/admin/orders" className={styles.viewAllLink}>
+            Manage All Orders →
+          </Link>
+        </div>
+
+        {/* Order Statistics */}
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <h3 className={styles.statTitle}>Total Orders</h3>
+            <p className={styles.statValue}>{orderStats.total}</p>
+            <p className={styles.statDescription}>All platform orders</p>
+          </div>
+          <div className={styles.statCard}>
+            <h3 className={styles.statTitle}>Pending</h3>
+            <p className={styles.statValue}>{orderStats.pending}</p>
+            <p className={styles.statDescription}>Awaiting response</p>
+          </div>
+          <div className={styles.statCard}>
+            <h3 className={styles.statTitle}>Active</h3>
+            <p className={styles.statValue}>{orderStats.confirmed}</p>
+            <p className={styles.statDescription}>Confirmed orders</p>
+          </div>
+          <div className={styles.statCard}>
+            <h3 className={styles.statTitle}>Completed</h3>
+            <p className={styles.statValue}>{orderStats.completed}</p>
+            <p className={styles.statDescription}>Finished moves</p>
+          </div>
+        </div>
+
+        {/* Manage Orders */}
+        <div className={styles.dataSection}>
+          <h3 className={styles.dataTitle}>Manage Orders</h3>
+          {recentOrders.length === 0 ? (
+            <div className={styles.emptyState}>
+              <p>No orders found</p>
+            </div>
+          ) : (
+            <div className={styles.dataTable}>
+              {recentOrders.map((order) => (
+                <div key={order._id} className={styles.dataRow}>
+                  <div className={styles.orderInfo}>
+                    <div className={styles.orderMeta}>
+                      <span className={styles.orderId}>
+                        #{order._id.slice(-8)}
+                      </span>
+                      <span className={styles.orderCustomer}>
+                        {order.customerName || "Unknown"}
+                      </span>
+                    </div>
+                    <div className={styles.orderRoute}>
+                      <span className={styles.routeFrom}>
+                        {order.fromAddress?.city}
+                      </span>
+                      <span className={styles.routeArrow}>→</span>
+                      <span className={styles.routeTo}>
+                        {order.toAddress?.city}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.orderDetails}>
+                    {getStatusBadge(order.status)}
+                    <span className={styles.priceValue}>
+                      {formatCurrency(order.totalPrice)}
+                    </span>
+                    <span className={styles.dateText}>
+                      {formatDate(order.createdAt)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
