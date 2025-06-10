@@ -7,9 +7,10 @@ import styles from "@/app/styles/SearchForm.module.css";
 export default function SearchForm() {
   const [fromLocation, setFromLocation] = useState("");
   const [toLocation, setToLocation] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!fromLocation.trim() || !toLocation.trim()) {
@@ -17,16 +18,58 @@ export default function SearchForm() {
       return;
     }
 
-    // Create search parameters and navigate to search results page
-    const searchParams = new URLSearchParams({
-      from: fromLocation.trim(),
-      to: toLocation.trim()
-    });
-    
-    // hier muss angepasst werden! 
-    // (wie z.B router.push(`/search-results?${searchParams.toString()}`);)
+    setLoading(true);
 
-    router.push(`/search-results`);
+    try {
+      // Create form data with default values
+      const formData = {
+        fromAddress: {
+          city: fromLocation.trim(),
+          postalCode: "00000", // Default postal code
+          street: "Address not specified"
+        },
+        toAddress: {
+          city: toLocation.trim(),
+          postalCode: "00000", // Default postal code
+          street: "Address not specified"
+        },
+        moveDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+        estimatedHours: 4, // Default 4 hours
+        helpersCount: 2, // Default 2 helpers
+        additionalServices: [] // Empty by default
+      };
+
+      // Search for companies based on locations
+      const response = await fetch('/api/search-companies', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fromCity: fromLocation.trim(),
+          toCity: toLocation.trim()
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const companies = await response.json();
+
+      // Save to session storage
+      sessionStorage.setItem('movingFormData', JSON.stringify(formData));
+      sessionStorage.setItem('searchResults', JSON.stringify(companies));
+
+      // Navigate to search results
+      router.push('/search-results');
+
+    } catch (error) {
+      console.error('Search failed:', error);
+      alert('Search failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,6 +88,7 @@ export default function SearchForm() {
               placeholder="Enter your current city"
               className={styles.searchInput}
               required
+              disabled={loading}
             />
           </div>
           
@@ -78,12 +122,13 @@ export default function SearchForm() {
               placeholder="Enter your destination city"
               className={styles.searchInput}
               required
+              disabled={loading}
             />
           </div>
         </div>
         
-        <button type="submit" className={styles.submitButton}>
-          Find companies
+        <button type="submit" className={styles.submitButton} disabled={loading}>
+          {loading ? 'Searching...' : 'Find companies'}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
