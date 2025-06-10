@@ -107,6 +107,67 @@
   margin-bottom: 6px;
 }
 
+.fieldHelp {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.fieldError {
+  display: block;
+  font-size: 12px;
+  color: #dc2626;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Password Input Container */
+.passwordInputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordInputContainer .input {
+  padding-right: 48px; /* More space for the icon */
+  width: 100%;
+}
+
+.toggleButton {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+.toggleButton:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.toggleButton:active {
+  background-color: #e5e7eb;
+}
+
+.toggleButton svg {
+  width: 18px;
+  height: 18px;
+}
+
 .input {
   width: 100%;
   padding: 10px 12px;

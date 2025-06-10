@@ -21,8 +21,61 @@ export default function EditUserPage() {
     email: '',
     name: '',
     phone: '',
-    role: 'user'
+    role: 'user',
+    newPassword: '', // Add this
+    confirmPassword: '' // Add this
   });
+
+  // Password visibility state
+  const [showPassword, setShowPassword] = useState(false);
+
+  // SVG Icons for password visibility
+  const EyeOpenIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path 
+        d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        fill="none"
+      />
+      <circle 
+        cx="12" 
+        cy="12" 
+        r="3" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        fill="none"
+      />
+    </svg>
+  );
+
+  const EyeClosedIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path 
+        d="m1 1 22 22" 
+        stroke="currentColor" 
+        strokeWidth="2"
+      />
+      <path 
+        d="M6.71 6.71a13.94 13.94 0 0 0-4.7 5.29s4 8 11 8a13.94 13.94 0 0 0 5.29-1.71" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        fill="none"
+      />
+      <path 
+        d="m14 14a3 3 0 0 1-4-4" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        fill="none"
+      />
+      <path 
+        d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        fill="none"
+      />
+    </svg>
+  ); // Add this
 
   // Company form data state
   const [companyFormData, setCompanyFormData] = useState({
@@ -211,9 +264,16 @@ export default function EditUserPage() {
 
     try {
       // Validate new password if provided
-      if (formData.newPassword && formData.newPassword.trim() !== "" && formData.newPassword.length < 6) {
-        setError("New password must be at least 6 characters long");
-        return;
+      if (formData.newPassword && formData.newPassword.trim() !== "") {
+        if (formData.newPassword.length < 6) {
+          setError("New password must be at least 6 characters long");
+          return;
+        }
+        
+        if (formData.newPassword !== formData.confirmPassword) {
+          setError("New password and confirmation password do not match");
+          return;
+        }
       }
 
       // Update user basic info first
@@ -231,6 +291,24 @@ export default function EditUserPage() {
 
       if (!userResponse.ok) {
         throw new Error('Failed to update user profile');
+      }
+
+      // Update password if provided
+      if (formData.newPassword && formData.newPassword.trim() !== "") {
+        const passwordResponse = await fetch(`/api/admin/users/${userId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            action: "changePassword",
+            newPassword: formData.newPassword,
+          }),
+        });
+
+        if (!passwordResponse.ok) {
+          throw new Error("Failed to update password");
+        }
       }
 
       // Update role if it changed
@@ -271,15 +349,23 @@ export default function EditUserPage() {
         }
       }
 
-      setSuccess('User data updated successfully');
+      let successMessage = "User data updated successfully";
+      
+      // Add specific success messages
+      if (formData.newPassword && formData.newPassword.trim() !== "") {
+        successMessage += " (including password change)";
+        // Clear the password fields after successful update
+        setFormData(prev => ({ 
+          ...prev, 
+          newPassword: "",
+          confirmPassword: ""
+        }));
+      }
+
+      setSuccess(successMessage);
       
       // Refresh data to show updated info
       await fetchUserData();
-      
-      // Redirect back to users list after 3 seconds
-      setTimeout(() => {
-        router.push('/admin');
-      }, 3000);
 
     } catch (err) {
       setError('Failed to update user: ' + err.message);
@@ -405,19 +491,60 @@ export default function EditUserPage() {
           {/* New Password Field */}
           <div className={styles.field}>
             <label className={styles.label}>New Password (Optional)</label>
-            <input
-              type="password"
-              name="newPassword"
-              value={formData.newPassword}
-              onChange={handleInputChange}
-              className={styles.input}
-              placeholder="Enter new password to change it"
-              minLength="6"
-            />
+            <div className={styles.passwordInputContainer}>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="newPassword"
+                value={formData.newPassword}
+                onChange={handleInputChange}
+                className={styles.input}
+                placeholder="Enter new password to change it"
+                minLength="6"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className={styles.toggleButton}
+                title={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
+              </button>
+            </div>
             <small className={styles.fieldHelp}>
               Leave empty to keep current password. Minimum 6 characters.
             </small>
           </div>
+
+          {/* Confirm Password Field */}
+          {formData.newPassword && formData.newPassword.trim() !== "" && (
+            <div className={styles.field}>
+              <label className={styles.label}>Confirm New Password</label>
+              <div className={styles.passwordInputContainer}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  className={styles.input}
+                  placeholder="Confirm new password"
+                  minLength="6"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={styles.toggleButton}
+                  title={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
+                </button>
+              </div>
+              {formData.confirmPassword && formData.newPassword !== formData.confirmPassword && (
+                <small className={styles.fieldError}>
+                  Passwords do not match
+                </small>
+              )}
+            </div>
+          )}
         </div>
 
         {/* User Statistics (for regular users) */}
