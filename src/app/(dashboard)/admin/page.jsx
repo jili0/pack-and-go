@@ -245,26 +245,26 @@ export default function AdminDashboard() {
 
         {/* User Statistics */}
         <div className={styles.statsGrid}>
-          <Link href="/admin/users?filter=all" className={styles.statCard}>
+          <div className={styles.statCard}>
             <h3 className={styles.statTitle}>Total Users</h3>
             <p className={styles.statValue}>{userStats.total}</p>
             <p className={styles.statDescription}>All registered accounts</p>
-          </Link>
-          <Link href="/admin/users?filter=user" className={styles.statCard}>
+          </div>
+          <div className={styles.statCard}>
             <h3 className={styles.statTitle}>Customers</h3>
             <p className={styles.statValue}>{userStats.customers}</p>
             <p className={styles.statDescription}>Regular users</p>
-          </Link>
-          <Link href="/admin/users?filter=company" className={styles.statCard}>
+          </div>
+          <div className={styles.statCard}>
             <h3 className={styles.statTitle}>Companies</h3>
             <p className={styles.statValue}>{userStats.companies}</p>
             <p className={styles.statDescription}>Business accounts</p>
-          </Link>
-          <Link href="/admin/users?filter=admin" className={styles.statCard}>
+          </div>
+          <div className={styles.statCard}>
             <h3 className={styles.statTitle}>Admins</h3>
             <p className={styles.statValue}>{userStats.admins}</p>
             <p className={styles.statDescription}>Administrator accounts</p>
-          </Link>
+          </div>
         </div>
 
         {/* Search Function */}
