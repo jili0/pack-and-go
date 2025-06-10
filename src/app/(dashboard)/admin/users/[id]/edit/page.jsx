@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import styles from '@/app/styles/AdminUsersEdit.module.css';
+import styles from "@/app/styles/AdminUsersEdit.module.css";
 
 export default function EditUserPage() {
   const params = useParams();
@@ -175,6 +175,9 @@ export default function EditUserPage() {
   const handleResetPassword = async () => {
     try {
       setSaving(true);
+      setError('');
+      setSuccess('');
+      
       const response = await fetch(`/api/admin/users/${userId}/reset-password`, {
         method: 'POST',
         headers: {
@@ -186,7 +189,13 @@ export default function EditUserPage() {
         throw new Error('Failed to reset password');
       }
 
-      setSuccess('Password reset email sent successfully');
+      const data = await response.json();
+      
+      if (data.success) {
+        setSuccess(`Password reset successfully! Temporary password: ${data.tempPassword} (for ${data.userEmail})`);
+      } else {
+        throw new Error(data.message || 'Failed to reset password');
+      }
     } catch (err) {
       setError('Failed to reset password: ' + err.message);
     } finally {
@@ -201,6 +210,12 @@ export default function EditUserPage() {
     setSaving(true);
 
     try {
+      // Validate new password if provided
+      if (formData.newPassword && formData.newPassword.trim() !== "" && formData.newPassword.length < 6) {
+        setError("New password must be at least 6 characters long");
+        return;
+      }
+
       // Update user basic info first
       const userResponse = await fetch(`/api/admin/users/${userId}`, {
         method: 'PATCH',
@@ -263,7 +278,7 @@ export default function EditUserPage() {
       
       // Redirect back to users list after 3 seconds
       setTimeout(() => {
-        router.push('/admin/users');
+        router.push('/admin');
       }, 3000);
 
     } catch (err) {
@@ -302,7 +317,7 @@ export default function EditUserPage() {
         </div>
         <button 
           className={styles.backButton}
-          onClick={() => router.push('/admin/users')}
+          onClick={() => router.push('/admin')}
         >
           ← Back to Users
         </button>
@@ -368,7 +383,7 @@ export default function EditUserPage() {
 
           {/* Password Reset */}
           <div className={styles.field}>
-            <label className={styles.label}>Password</label>
+            <label className={styles.label}>Current Password</label>
             <div className={styles.passwordField}>
               <input
                 type="password"
@@ -385,6 +400,23 @@ export default function EditUserPage() {
                 Reset Password
               </button>
             </div>
+          </div>
+
+          {/* New Password Field */}
+          <div className={styles.field}>
+            <label className={styles.label}>New Password (Optional)</label>
+            <input
+              type="password"
+              name="newPassword"
+              value={formData.newPassword}
+              onChange={handleInputChange}
+              className={styles.input}
+              placeholder="Enter new password to change it"
+              minLength="6"
+            />
+            <small className={styles.fieldHelp}>
+              Leave empty to keep current password. Minimum 6 characters.
+            </small>
           </div>
         </div>
 
@@ -586,7 +618,7 @@ export default function EditUserPage() {
         <div className={styles.actions}>
           <button
             type="button"
-            onClick={() => router.push('/admin/users')}
+            onClick={() => router.push('/admin')}
             className={styles.cancelButton}
           >
             Cancel

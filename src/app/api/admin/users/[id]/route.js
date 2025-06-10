@@ -161,6 +161,35 @@ export async function PATCH(request, { params }) {
 
         break;
 
+      case "changePassword":
+        const { newPassword } = updateData;
+
+        if (!newPassword || newPassword.length < 6) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: "Password must be at least 6 characters long",
+            },
+            { status: 400 }
+          );
+        }
+
+        const bcryptjs = require("bcryptjs");
+        const saltRounds = 10;
+        const hashedPassword = await bcryptjs.hash(newPassword, saltRounds);
+
+        updatedUser = await User.findByIdAndUpdate(
+          id,
+          {
+            password: hashedPassword,
+            passwordChangedAt: new Date(),
+            requirePasswordChange: false,
+          },
+          { new: true }
+        ).select("-password");
+
+        break;
+
       default:
         return NextResponse.json(
           { success: false, message: "Invalid action specified" },
