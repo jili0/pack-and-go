@@ -119,13 +119,14 @@ export default function EditUserPage() {
       
       setUser(userData);
       
-      // Set basic user form data with existing values
-      setFormData({
+      // Set basic user form data with existing values - PRESERVE password fields
+      setFormData(prev => ({
+        ...prev, // Keep existing values including newPassword and confirmPassword
         email: userData.email || '',
         name: userData.name || '',
         phone: userData.phone || '',
         role: userData.role || 'user'
-      });
+      }));
 
       // If user is a company and we have company details
       if (userData.role === 'company') {
@@ -190,7 +191,7 @@ export default function EditUserPage() {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : (value || '') // Ensure value is never undefined
     }));
   };
 
