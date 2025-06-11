@@ -19,14 +19,14 @@ const ReviewSchema = new mongoose.Schema({
   },
   rating: {
     type: Number,
-    required: [true, 'Bitte geben Sie eine Bewertung ab'],
-    min: [1, 'Die Bewertung muss mindestens 1 sein'],
-    max: [5, 'Die Bewertung darf maximal 5 sein']
+    required: [true, 'Please provide a rating'],
+    min: [1, 'Rating must be at least 1'],
+    max: [5, 'Rating cannot exceed 5']
   },
   comment: {
     type: String,
-    required: [true, 'Bitte geben Sie einen Kommentar ab'],
-    maxlength: [500, 'Der Kommentar darf maximal 500 Zeichen lang sein']
+    required: [true, 'Please provide a comment'],
+    maxlength: [500, 'Comment cannot exceed 500 characters']
   },
   createdAt: {
     type: Date,
@@ -34,12 +34,12 @@ const ReviewSchema = new mongoose.Schema({
   }
 });
 
-// Trigger für die Aktualisierung der durchschnittlichen Bewertung der Firma
+// Trigger to update company average rating
 ReviewSchema.post('save', async function() {
   try {
     const Company = mongoose.model('Company');
     
-    // Berechne die durchschnittliche Bewertung und Anzahl der Bewertungen
+    // Calculate average rating and review count
     const stats = await this.constructor.aggregate([
       { $match: { companyId: this.companyId } },
       { 
@@ -51,10 +51,10 @@ ReviewSchema.post('save', async function() {
       }
     ]);
     
-    // Aktualisiere die Unternehmensdaten
+    // Update company data
     if (stats.length > 0) {
       await Company.findByIdAndUpdate(this.companyId, {
-        averageRating: Math.round(stats[0].averageRating * 10) / 10, // Runde auf eine Dezimalstelle
+        averageRating: Math.round(stats[0].averageRating * 10) / 10, // Round to one decimal place
         reviewsCount: stats[0].reviewsCount
       });
     } else {
@@ -64,7 +64,7 @@ ReviewSchema.post('save', async function() {
       });
     }
   } catch (err) {
-    console.error('Fehler beim Aktualisieren der Unternehmensbewertung:', err);
+    console.error('Error updating company rating:', err);
   }
 });
 
