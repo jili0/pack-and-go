@@ -53,7 +53,7 @@ export async function POST(request) {
 
     // Überprüfe, ob die Firma existiert
     // const company = await Company.findById(companyId);
-    const company = await Company.findOne({userId:companyId});
+    const company = await Company.findOne({_id:companyId});
  
     if (!company) {
       return NextResponse.json(

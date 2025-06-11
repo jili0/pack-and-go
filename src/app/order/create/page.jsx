@@ -166,7 +166,7 @@ export default function CreateOrder() {
       const calculatedPrice = hourlyRate * formData.helpersCount * formData.estimatedHours;
       // Prepare order data
       const orderData = {
-        companyId: selectedCompany.userId,
+        companyId: selectedCompany._id,
         fromAddress: formData.fromAddress,
         toAddress: formData.toAddress,
         preferredDates: (formData.preferredDates || []).filter(date => date),
