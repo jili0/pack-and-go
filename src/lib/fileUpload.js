@@ -19,6 +19,7 @@ const s3Client = new S3Client({
  * @returns {Promise<string>} - URL zur gespeicherten Datei
  */
 export const saveUploadedFile = async (file, type, userId) => {
+  console.log("Empfangene Datei:", file);
   try {
     // Generiere einen eindeutigen Dateinamen
     const fileExtension = file.name.split('.').pop();
@@ -97,23 +98,20 @@ export const deleteFile = async (documentUrl) => {
   }
 };
 
-// Fallback für lokale Entwicklung ohne S3
-// Diese Funktion wird nur in der Entwicklungsumgebung verwendet
 export const saveUploadedFileLocal = async (file, type, userId) => {
   try {
     // Generiere einen eindeutigen Dateinamen
     const fileExtension = file.name.split('.').pop();
-    const filename = `${type}_${userId}_${uuidv4()}.${fileExtension}`;
+    const filename = `${type}_${userId}_${Date.now()}.${fileExtension}`;
     
-    // In einer echten Implementierung würde die Datei auf dem lokalen Dateisystem gespeichert werden
-    // Hier geben wir einfach einen Dummy-Pfad zurück
+    // Simuliere erfolgreichen Upload
     const fileUrl = `/uploads/${filename}`;
     
-    console.log(`[DEV] Datei würde gespeichert werden als: ${fileUrl}`);
+    console.log(`[DEV] Datei simuliert gespeichert: ${filename}`);
     
     return fileUrl;
   } catch (error) {
-    console.error('Fehler beim Speichern der Datei lokal:', error);
+    console.error('Fehler beim lokalen Speichern:', error);
     throw error;
   }
 };

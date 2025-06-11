@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import MovingCalculator from "@/components/forms/PriceCalculator";
+import SearchForm from "@/components/forms/SearchForm";
 import styles from "@/app/styles/Home.module.css";
 
 export default function Home() {
@@ -17,7 +18,7 @@ export default function Home() {
               At Pack & Go, you&apos;ll find certified moving helpers at fair
               prices. Compare offers and book your move in just a few clicks.
             </p>
-            <Link href="#calculator" className={styles.heroBtn}>
+            <Link href="#searchCompanies" className={styles.heroBtn}>
               Plan your move now
             </Link>
           </div>
@@ -25,12 +26,25 @@ export default function Home() {
       </section>
 
       {/* Moving Calculator */}
-      <section id="calculator" className={styles.calculator}>
+      <section  className={styles.calculator}>
         <div className={styles.calculatorContainer}>
           <h2 className={styles.calculatorTitle}>
             Calculate your moving price
           </h2>
           <MovingCalculator />
+        </div>
+      </section>
+
+      {/* Search Section */}
+      <section id="searchCompanies" className={styles.searchSection}>
+        <div className={styles.searchContainer}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Find moving companies</h2>
+            <p className={styles.sectionSubtitle}>
+              Enter your moving route to discover the best moving companies in your area
+            </p>
+          </div>
+          <SearchForm />
         </div>
       </section>
 
@@ -263,7 +277,7 @@ export default function Home() {
             Get free and non-binding offers from verified moving companies in
             your region now.
           </p>
-          <Link href="#calculator" className={styles.ctaBtn}>
+          <Link href="#searchCompanies" className={styles.ctaBtn}>
             Plan your move now
             <svg
               xmlns="http://www.w3.org/2000/svg"

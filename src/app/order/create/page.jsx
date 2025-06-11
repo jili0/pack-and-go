@@ -11,56 +11,64 @@ import AddressForm from '@/components/forms/AddressForm';
 
 export default function CreateOrder() {
   const router = useRouter();
-  const { user } = useAuth();
-  
+  const { user, loading: authLoading } = useAuth();
+
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [formData, setFormData] = useState({
     fromAddress: {},
     toAddress: {},
     helpersCount: 2,
     estimatedHours: 4,
-    preferredDates: ['', '', ''],
+    preferredDates: ['', '', ''], // Ensure this is always initialized
     notes: ''
   });
-  
+
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
-  
+
   // Load saved data from session storage
   useEffect(() => {
+    if (authLoading) return; // Wait for auth to complete
+    
     if (!user) {
       // Redirect to login if user is not logged in
       router.push('/login?redirect=order/create');
       return;
     }
-    
+
     const loadSessionData = async () => {
       try {
         const savedCompany = sessionStorage.getItem('selectedCompany');
         const savedFormData = sessionStorage.getItem('movingFormData');
+        
+        console.log('Loading session data:', { savedCompany, savedFormData });
         
         if (!savedCompany || !savedFormData) {
           // Redirect to home if no data is found
           router.push('/');
           return;
         }
-        
+
         const parsedCompany = JSON.parse(savedCompany);
         const parsedFormData = JSON.parse(savedFormData);
-        
+
         setSelectedCompany(parsedCompany);
         setFormData({
           ...parsedFormData,
-          notes: ''
+          // Ensure preferredDates is always an array with 3 elements
+          preferredDates: parsedFormData.preferredDates && Array.isArray(parsedFormData.preferredDates) 
+            ? [...parsedFormData.preferredDates, '', '', ''].slice(0, 3)
+            : ['', '', ''],
+          notes: parsedFormData.notes || ''
         });
-        
+
         // Calculate total price
         const hourlyRate = parsedCompany.hourlyRate || 50;
         const price = hourlyRate * parsedFormData.helpersCount * parsedFormData.estimatedHours;
         setTotalPrice(price);
-        
+
         setLoading(false);
       } catch (error) {
         console.error('Error loading order data:', error);
@@ -68,52 +76,54 @@ export default function CreateOrder() {
         setLoading(false);
       }
     };
-    
+
     loadSessionData();
-  }, [user, router]);
-  
+  }, [user, router, authLoading]);
+
   const handleFromAddressChange = (address) => {
-    setFormData({ ...formData, fromAddress: address });
+    setFormData(prev => ({ ...prev, fromAddress: address }));
   };
-  
+
   const handleToAddressChange = (address) => {
-    setFormData({ ...formData, toAddress: address });
+    setFormData(prev => ({ ...prev, toAddress: address }));
   };
-  
+
   const handleDateChange = (index, e) => {
-    const newDates = [...formData.preferredDates];
-    newDates[index] = e.target.value;
-    setFormData({ ...formData, preferredDates: newDates });
+    setFormData(prev => {
+      const newDates = [...(prev.preferredDates || ['', '', ''])];
+      newDates[index] = e.target.value;
+      return { ...prev, preferredDates: newDates };
+    });
   };
-  
+
   const handleNotesChange = (e) => {
-    setFormData({ ...formData, notes: e.target.value });
+    setFormData(prev => ({ ...prev, notes: e.target.value }));
   };
-  
+
   const validateForm = () => {
     // Check if from address is complete
-    if (!formData.fromAddress.street || !formData.fromAddress.city || !formData.fromAddress.postalCode) {
+    if (!formData.fromAddress?.street || !formData.fromAddress?.city || !formData.fromAddress?.postalCode) {
       setError('Please complete the origin address.');
       return false;
     }
-    
+
     // Check if to address is complete
-    if (!formData.toAddress.street || !formData.toAddress.city || !formData.toAddress.postalCode) {
+    if (!formData.toAddress?.street || !formData.toAddress?.city || !formData.toAddress?.postalCode) {
       setError('Please complete the destination address.');
       return false;
     }
-    
+
     // Check if at least one preferred date is selected
-    if (!formData.preferredDates[0]) {
+    if (!formData.preferredDates?.[0]) {
       setError('Please select at least one preferred date.');
       return false;
     }
-    
+
     // Validate that dates are in the future
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
-    for (const date of formData.preferredDates) {
+
+    for (const date of formData.preferredDates || []) {
       if (date) {
         const selectedDate = new Date(date);
         if (selectedDate < today) {
@@ -122,33 +132,33 @@ export default function CreateOrder() {
         }
       }
     }
-    
+
     return true;
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setSubmitting(true);
     setError(null);
-    
+
     try {
       // Prepare order data
       const orderData = {
-        companyId: selectedCompany._id,
+        companyId: selectedCompany.userId,
         fromAddress: formData.fromAddress,
         toAddress: formData.toAddress,
-        preferredDates: formData.preferredDates.filter(date => date),
+        preferredDates: (formData.preferredDates || []).filter(date => date),
         helpersCount: formData.helpersCount,
         estimatedHours: formData.estimatedHours,
         totalPrice: totalPrice,
         notes: formData.notes
       };
-      
+
       // Send request to create order
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -157,15 +167,15 @@ export default function CreateOrder() {
         },
         body: JSON.stringify(orderData),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         // Clear session storage data
         sessionStorage.removeItem('selectedCompany');
         sessionStorage.removeItem('movingFormData');
         sessionStorage.removeItem('searchResults');
-        
+
         // Redirect to order confirmation page
         router.push(`/order/${data.order._id}/confirmation`);
       } else {
@@ -178,14 +188,23 @@ export default function CreateOrder() {
       setSubmitting(false);
     }
   };
-  
+
   // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
-  
+
+  if (authLoading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+        <p>Authenticating...</p>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
@@ -194,7 +213,16 @@ export default function CreateOrder() {
       </div>
     );
   }
-  
+
+  // Don't render the form if we don't have the required data
+  if (!selectedCompany) {
+    return (
+      <div className={styles.loadingContainer}>
+        <p>No company selected. Redirecting...</p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.createOrderPage}>
       <div className={styles.container}>
@@ -202,14 +230,14 @@ export default function CreateOrder() {
           <h1>Create Order</h1>
           <p>Review your details and confirm your booking</p>
         </div>
-        
+
         {error && (
           <div className={styles.errorAlert}>
             <div className={styles.errorIcon}>!</div>
             <p>{error}</p>
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit}>
           {/* Company Information */}
           <div className={styles.card}>
@@ -218,20 +246,6 @@ export default function CreateOrder() {
             </div>
             <div className={styles.cardBody}>
               <div className={styles.companyInfo}>
-                <div className={styles.companyLogo}>
-                  {selectedCompany.logo ? (
-                    <Image 
-                      src={selectedCompany.logo} 
-                      alt={selectedCompany.companyName} 
-                      width={80} 
-                      height={80} 
-                    />
-                  ) : (
-                    <div className={styles.logoPlaceholder}>
-                      <span>{selectedCompany.companyName.charAt(0)}</span>
-                    </div>
-                  )}
-                </div>
                 <div className={styles.companyDetails}>
                   <h3>{selectedCompany.companyName}</h3>
                   <div className={styles.ratingContainer}>
@@ -239,14 +253,14 @@ export default function CreateOrder() {
                       {[...Array(5)].map((_, i) => (
                         <span
                           key={i}
-                          className={i < Math.round(selectedCompany.averageRating) ? styles.starFilled : styles.starEmpty}
+                          className={i < Math.round(selectedCompany.averageRating || 0) ? styles.starFilled : styles.starEmpty}
                         >
                           ★
                         </span>
                       ))}
                     </div>
                     <span className={styles.reviewCount}>
-                      ({selectedCompany.reviewsCount} {selectedCompany.reviewsCount === 1 ? 'review' : 'reviews'})
+                      ({selectedCompany.reviewsCount || 0} {selectedCompany.reviewsCount === 1 ? 'review' : 'reviews'})
                     </span>
                   </div>
                   {selectedCompany.isKisteKlarCertified && (
@@ -259,7 +273,7 @@ export default function CreateOrder() {
                   )}
                 </div>
               </div>
-              
+
               {selectedCompany.description && (
                 <div className={styles.companyDescription}>
                   <h4>About the Company</h4>
@@ -268,7 +282,7 @@ export default function CreateOrder() {
               )}
             </div>
           </div>
-          
+
           {/* Address Information */}
           <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -294,7 +308,7 @@ export default function CreateOrder() {
               </div>
             </div>
           </div>
-          
+
           {/* Moving Details */}
           <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -306,19 +320,19 @@ export default function CreateOrder() {
                   <label className={styles.detailLabel}>Number of Helpers</label>
                   <div className={styles.detailValue}>{formData.helpersCount}</div>
                 </div>
-                
+
                 <div className={styles.detailGroup}>
                   <label className={styles.detailLabel}>Estimated Hours</label>
                   <div className={styles.detailValue}>{formData.estimatedHours}</div>
                 </div>
               </div>
-              
+
               <div className={styles.datePicker}>
                 <h3>Preferred Dates</h3>
                 <p className={styles.dateInfo}>
                   Please select up to three preferred dates for your move. The company will confirm one of these dates.
                 </p>
-                
+
                 <div className={styles.dateInputs}>
                   {[0, 1, 2].map((index) => (
                     <div key={index} className={styles.dateInputGroup}>
@@ -331,7 +345,7 @@ export default function CreateOrder() {
                       </label>
                       <input
                         type="date"
-                        value={formData.preferredDates[index] || ''}
+                        value={(formData.preferredDates && formData.preferredDates[index]) || ''}
                         onChange={(e) => handleDateChange(index, e)}
                         min={new Date().toISOString().split('T')[0]}
                         required={index === 0}
@@ -341,11 +355,11 @@ export default function CreateOrder() {
                   ))}
                 </div>
               </div>
-              
+
               <div className={styles.notesSection}>
                 <h3>Additional Notes</h3>
                 <textarea
-                  value={formData.notes}
+                  value={formData.notes || ''}
                   onChange={handleNotesChange}
                   placeholder="Add any special instructions or information for the moving company..."
                   className={styles.notesInput}
@@ -354,7 +368,7 @@ export default function CreateOrder() {
               </div>
             </div>
           </div>
-          
+
           {/* Price Summary */}
           <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -364,7 +378,7 @@ export default function CreateOrder() {
               <div className={styles.priceBreakdown}>
                 <div className={styles.priceRow}>
                   <span>Hourly Rate per Helper</span>
-                  <span>{selectedCompany.hourlyRate} €</span>
+                  <span>{selectedCompany.hourlyRate || 50} €</span>
                 </div>
                 <div className={styles.priceRow}>
                   <span>Number of Helpers</span>
@@ -380,13 +394,13 @@ export default function CreateOrder() {
                   <span className={styles.totalPrice}>{totalPrice} €</span>
                 </div>
               </div>
-              
+
               <p className={styles.priceNote}>
                 Note: The final price may vary based on the actual duration of the move.
               </p>
             </div>
           </div>
-          
+
           {/* Action Buttons */}
           <div className={styles.actionButtons}>
             <Link href="/search-results" className={styles.backButton}>

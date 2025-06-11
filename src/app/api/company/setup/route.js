@@ -4,7 +4,7 @@ import connectDB from "@/lib/db";
 import Company from "@/models/Company";
 import User from "@/models/User";
 import { getSession } from "@/lib/auth";
-import { saveUploadedFile } from "@/lib/fileUpload";
+import saveUploadedFile from "@/lib/fileUpload";
 
 export async function POST(request) {
   try {
@@ -129,7 +129,6 @@ export async function POST(request) {
       taxId,
       description,
       serviceAreas,
-      hourlyRate: parseFloat(hourlyRate),
       isVerified: false, // Muss von einem Administrator bestätigt werden
       isKisteKlarCertified,
       documents: {

@@ -19,7 +19,7 @@ const Header = () => {
   };
 
   const handleLogout = async () => {
-    await logout(); // AuthContext übernimmt Weiterleitung
+    await logout(); // AuthContext handles redirection
   };
 
   return (
@@ -45,7 +45,7 @@ const Header = () => {
           <Link href="/tips" className={styles.navLink}>Tips</Link>
         </nav>
 
-        {/* User Menü (Desktop) */}
+        {/* User Menu (Desktop) */}
         <div className={styles.userMenu}>
           {user ? (
             <div className={styles.userMenuContainer}>
@@ -67,9 +67,17 @@ const Header = () => {
               <Link href="/register" className={styles.navLink}>Register</Link>
             </>
           )}
+          
+          {/* Admin Icon Button - Always visible */}
+          <Link href="/admin/login" className={styles.adminIconButton} aria-label="Admin Login">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </Link>
         </div>
 
-        {/* Mobile Menü Button */}
+        {/* Mobile Menu Button */}
         <button
           onClick={toggleMobileMenu}
           className={styles.mobileMenuButton}
@@ -97,24 +105,26 @@ const Header = () => {
           <Link href="/tips" className={styles.mobileMenuItem}>Tips</Link>
 
           <div className={styles.mobileMenuDivider}>
-            {user ? (
-              <>
-                <div className={styles.mobileMenuUser}>{user.name}</div>
-                <Link href={`/${user.role}`} className={styles.mobileMenuItem}>Dashboard</Link>
-                <Link href={`/${user.role}/profile`} className={styles.mobileMenuItem}>Profile</Link>
-                <button onClick={handleLogout} className={styles.mobileMenuItem}>Logout</button>
-              </>
-            ) : (
-              <>
-                <Link href="/login" className={styles.mobileMenuItem}>Login</Link>
-                <Link href="/register" className={styles.mobileMenuItem}>Register</Link>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-    </header>
-  );
+           {user ? (
+             <>
+               <div className={styles.mobileMenuUser}>{user.name}</div>
+               <Link href={`/${user.role}`} className={styles.mobileMenuItem}>Dashboard</Link>
+               <Link href={`/${user.role}/profile`} className={styles.mobileMenuItem}>Profile</Link>
+               <button onClick={handleLogout} className={styles.mobileMenuItem}>Logout</button>
+             </>
+           ) : (
+             <>
+               <Link href="/login" className={styles.mobileMenuItem}>Login</Link>
+               <Link href="/register" className={styles.mobileMenuItem}>Register</Link>
+             </>
+           )}
+           {/* Admin Link for Mobile - Always visible */}
+           <Link href="/admin/login" className={styles.mobileMenuItem}>Admin Login</Link>
+         </div>
+       </div>
+     )}
+   </header>
+ );
 };
 
 export default Header;

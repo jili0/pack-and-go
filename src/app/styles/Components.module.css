@@ -1,13 +1,11 @@
-
-
 /* Company Card */
 .companyCard {
-  background-color: white;
+  background: white;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
-  overflow: hidden;
   border: 1px solid var(--gray-200);
-  transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  transition: all 0.2s ease;
 }
 
 .companyCard:hover {
@@ -15,9 +13,7 @@
   box-shadow: var(--box-shadow-hover);
 }
 
-.companyCardBody {
-  padding: 1.25rem;
-}
+.companyCardBody { padding: 1.25rem; }
 
 .companyHeader {
   display: flex;
@@ -35,13 +31,13 @@
   width: 4rem;
   height: 4rem;
   border-radius: 50%;
-  overflow: hidden;
-  background-color: var(--gray-100);
+  background: var(--gray-100);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 1rem;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .logoPlaceholder {
@@ -55,9 +51,7 @@
   color: var(--gray-400);
 }
 
-.companyDetails {
-  flex: 1;
-}
+.companyDetails { flex: 1; }
 
 .companyName {
   font-size: 1.25rem;
@@ -72,6 +66,7 @@
   margin-bottom: 0.5rem;
 }
 
+/* Badges - Consolidated */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -79,61 +74,28 @@
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
-}
-
-.badgeGreen {
-  background-color: var(--success-color);
   color: white;
 }
 
-.badgeYellow {
-  background-color: var(--warning-color);
-  color: white;
-}
+.badgeGreen { background: var(--success-color); }
+.badgeYellow { background: var(--warning-color); }
+.badgeRed { background: var(--error-color); }
+.badgeGray { background: var(--gray-500); }
+.badgeBlue { background: var(--primary-color); }
 
-.badgeRed {
-  background-color: var(--error-color);
-  color: white;
-}
-
-.badgeGray {
-  background-color: var(--gray-500);
-  color: white;
-}
-
-.badgeBlue {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-/* Star Rating */
+/* Star Rating - Optimized */
 .starRating {
   display: flex;
   align-items: center;
 }
 
-.starSmall {
-  font-size: 1rem;
-  line-height: 1;
-}
+.starSmall, .starMedium, .starLarge { line-height: 1; }
+.starSmall { font-size: 1rem; }
+.starMedium { font-size: 1.25rem; }
+.starLarge { font-size: 1.5rem; }
 
-.starMedium {
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
-.starLarge {
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.starFilled {
-  color: var(--warning-color);
-}
-
-.starEmpty {
-  color: var(--gray-300);
-}
+.starFilled { color: var(--warning-color); }
+.starEmpty { color: var(--gray-300); }
 
 .starHalf {
   position: relative;
@@ -148,11 +110,9 @@
   overflow: hidden;
 }
 
-.starInteractive {
-  cursor: pointer;
-}
+.starInteractive { cursor: pointer; }
 
-/* Loading and Error States */
+/* Loading States */
 .loadingContainer {
   display: flex;
   flex-direction: column;
@@ -164,19 +124,18 @@
 .spinner {
   width: 3rem;
   height: 3rem;
-  border-radius: 50%;
   border: 3px solid rgba(59, 130, 246, 0.2);
   border-top-color: var(--primary-color);
+  border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
+/* Alerts - Consolidated */
 .alert {
   padding: 1rem;
   margin-bottom: 1.5rem;
@@ -185,14 +144,16 @@
   align-items: flex-start;
 }
 
+.alert p { margin: 0; }
+
 .alertDanger {
-  background-color: #fee2e2;
+  background: #fee2e2;
   border: 1px solid #fecaca;
   color: #b91c1c;
 }
 
 .alertSuccess {
-  background-color: #d1fae5;
+  background: #d1fae5;
   border: 1px solid #a7f3d0;
   color: #065f46;
 }
@@ -200,11 +161,44 @@
 .alertIcon {
   margin-right: 0.75rem;
   flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+}
+
+/* Forms - Unified Input Styles */
+.input, .select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input:focus, .select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.select {
+  background: white;
+  cursor: pointer;
+}
+
+.inputError {
+  border-color: var(--error-color);
+}
+
+.errorMessage {
+  color: var(--error-color);
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 /* Address Form */
 .addressForm {
-  background-color: white;
+  background: white;
   border-radius: var(--border-radius);
   padding: 1.5rem;
   box-shadow: var(--box-shadow);
@@ -229,52 +223,7 @@
   gap: 1rem;
 }
 
-@media (min-width: 640px) {
-  .addressGrid {
-    grid-template-columns: 1fr 2fr;
-  }
-}
-
-.input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--gray-300);
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-}
-
-.inputError {
-  border-color: var(--error-color);
-}
-
-.errorMessage {
-  color: var(--error-color);
-  font-size: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-.select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--gray-300);
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  background-color: white;
-}
-
-.select:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-}
-
-/* Buttons */
+/* Buttons - Consolidated */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -286,36 +235,37 @@
   font-size: 0.875rem;
   cursor: pointer;
   text-align: center;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  text-decoration: none;
 }
 
 .btnPrimary {
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   color: white;
 }
 
 .btnPrimary:hover {
-  background-color: var(--primary-dark);
+  background: var(--primary-dark);
 }
 
 .btnSecondary {
-  background-color: white;
+  background: white;
   color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
 .btnSecondary:hover {
-  background-color: var(--primary-light);
+  background: var(--primary-light);
 }
 
 .btnOutline {
-  background-color: transparent;
+  background: transparent;
   color: var(--gray-600);
   border-color: var(--gray-300);
 }
 
 .btnOutline:hover {
-  background-color: var(--gray-100);
+  background: var(--gray-100);
   color: var(--gray-800);
 }
 
@@ -324,9 +274,9 @@
   font-size: 1rem;
 }
 
-/* Ajouts et améliorations pour Components.module.css */
+/* Components.module.css - Ajouts pour les formulaires d'authentification */
 
-/* Container principal avec plus d'espacement vertical */
+/* Container principal pour les formulaires d'authentification */
 .authForm {
   max-width: 480px;
   margin: 3rem auto; /* Ajout d'espace en haut et en bas */
@@ -334,18 +284,46 @@
   background: linear-gradient(135deg, #5388b0 0%, #1b2c67 100%);
   background-size: 200% 200%;
   animation: gradientShift 8s ease infinite;
-  border-radius: 16px; /* Border radius plus moderne */
+  border-radius: var(--border-radius);
   box-shadow: 
     0 25px 50px rgba(34, 95, 141, 0.3),
     0 15px 30px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
-/* Titre avec plus d'espacement */
+/* Animation de dégradé */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Effet de brillance */
+.authForm::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Titre principal */
 .authTitle {
   font-size: 2.75rem;
   font-weight: 800;
@@ -360,7 +338,7 @@
   letter-spacing: -0.025em;
 }
 
-/* Description avec plus d'espacement */
+/* Description */
 .authDescription {
   color: rgba(255, 255, 255, 0.85);
   text-align: center;
@@ -370,9 +348,9 @@
   font-weight: 400;
 }
 
-/* Espacement amélioré pour les champs */
+/* Champs de formulaire d'authentification */
 .formField {
-  margin-bottom: 2rem; /* Plus d'espace entre les champs */
+  margin-bottom: 1.5rem;
 }
 
 /* Labels avec plus d'espacement */
@@ -410,13 +388,36 @@
   border-color: rgba(255, 255, 255, 0.4);
   background: rgba(255, 255, 255, 0.12);
   box-shadow: 
-    0 0 0 4px rgba(255, 255, 255, 0.08),
-    0 8px 25px rgba(0, 0, 0, 0.15),
-    inset 0 2px 4px rgba(0, 0, 0, 0.05);
-  transform: translateY(-1px);
+    0 0 0 3px rgba(255, 255, 255, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
-/* Checkbox avec plus d'espacement */
+.formInput:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Erreurs de validation pour les formulaires d'auth */
+.formInputError {
+  border-color: var(--error-color) !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.formError {
+  color: var(--error-color);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 0.5rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--error-color);
+}
+
+/* Checkbox styling */
 .formCheckbox {
   display: flex;
   align-items: flex-start;
@@ -437,7 +438,7 @@
   border-radius: 4px;
 }
 
-/* Bouton de soumission amélioré */
+/* Bouton de soumission des formulaires */
 .submitButton {
   width: 100%;
   padding: 1.5rem; /* Plus de padding vertical */
@@ -454,24 +455,6 @@
     0 4px 12px rgba(0, 0, 0, 0.15);
   position: relative;
   overflow: hidden;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 1rem; /* Espace avant le footer */
-}
-
-.submitButton::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s ease;
-}
-
-.submitButton:hover:not(:disabled)::before {
-  left: 100%;
 }
 
 .submitButton:hover:not(:disabled) {
@@ -482,7 +465,17 @@
   background: linear-gradient(135deg,#031659 0%, #1f2aa4 100%);
 }
 
-/* Footer avec plus d'espacement */
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Footer du formulaire */
 .formFooter {
   text-align: center;
   margin-top: 2.5rem; /* Plus d'espace avant le footer */
@@ -502,7 +495,6 @@
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .formFooterLink:hover {
@@ -512,91 +504,67 @@
   text-underline-offset: 2px;
 }
 
-/* Alertes améliorées */
-.alert {
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 2rem; /* Plus d'espace sous les alertes */
+/* Alertes pour les formulaires d'auth - Override du style existant */
+.alert.alertDanger {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--error-color);
   border-radius: 12px;
   display: flex;
   align-items: flex-start;
   backdrop-filter: blur(10px);
 }
 
-.alertDanger {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+.alertIcon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
 }
 
-.alertSuccess {
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #255743;
-  box-shadow: 0 4px 12px rgba(6, 2, 54, 0.2);
+.alert p {
+  margin: 0;
 }
 
-/* Responsive amélioré */
+/* Responsive */
 @media (max-width: 640px) {
   .authForm {
-    margin: 1.5rem 1rem; /* Plus d'espace sur mobile */
-    padding: 2.5rem 1.5rem; /* Plus de padding sur mobile */
+    margin: 1rem;
+    padding: 2rem 1.5rem;
   }
   
   .authTitle {
-    font-size: 2.25rem;
-    margin-bottom: 0.75rem;
+    font-size: 2rem;
   }
   
   .authDescription {
     font-size: 1rem;
-    margin-bottom: 2rem;
-  }
-  
-  .formField {
-    margin-bottom: 1.75rem;
-  }
-  
-  .submitButton {
-    padding: 1.25rem;
-    font-size: 1rem;
   }
 }
 
-@media (max-width: 480px) {
-  .authForm {
-    margin: 1rem 0.5rem;
-    padding: 2rem 1.25rem;
-  }
+/* Animations d'entrée */
+.authForm {
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Animation d'entrée améliorée */
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(40px) scale(0.95);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
-/* Micro-interactions */
-.formInput:hover:not(:focus) {
-  border-color: rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.1);
+/* Effet de focus sur les champs */
+.formInput:focus + .formLabel,
+.formInput:not(:placeholder-shown) + .formLabel {
+  transform: translateY(-8px);
+  font-size: 0.875rem;
 }
 
-.checkboxInput:hover {
-  transform: scale(1.05);
-}
-
-.submitButton:active:not(:disabled) {
-  transform: translateY(-1px) scale(0.98);
-}
-
-/* Select styling amélioré */
+/* Style pour les select */
 select.formInput {
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
@@ -607,29 +575,91 @@ select.formInput {
   padding-right: 3.5rem;
 }
 
-select.formInput:focus {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M14 12l-4-4-4 4'/%3e%3c/svg%3e");
+/* Admin Components */
+.adminBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-/* Effet de loading sur le bouton */
-.submitButton[disabled] {
-  position: relative;
-  color: transparent;
-}
-
-.submitButton[disabled]::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
+.adminBadge svg {
   width: 20px;
   height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
 }
 
-/* Variables supprimées - CSS Modules ne supporte pas :root */
-/* Les couleurs sont maintenant directement dans le code */
+.adminIconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  margin-left: 12px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.adminIconButton:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.adminIconButton svg {
+  width: 20px;
+  height: 20px;
+}
+
+.adminNote {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 16px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border-left: 4px solid #ef4444;
+}
+
+/* Admin form overrides */
+.authForm .submitButton {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+}
+
+.authForm .submitButton:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+}
+
+/* Responsive Design */
+@media (min-width: 640px) {
+  .addressGrid {
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .authForm {
+    margin: 1rem;
+    padding: 2rem 1.5rem;
+  }
+  
+  .authTitle { font-size: 2rem; }
+  .authDescription { font-size: 1rem; }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .authForm {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  }
+}
