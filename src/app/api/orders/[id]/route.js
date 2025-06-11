@@ -9,7 +9,7 @@ import { sendOrderStatusUpdateEmail } from "@/lib/email";
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } =await params;
     const session = await getSession();
 
     if (!session) {
@@ -89,7 +89,7 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } =await params;
     const session = await getSession();
 
     if (!session) {
@@ -202,7 +202,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const { id } =await params;
     const session = await getSession();
 
     if (!session) {

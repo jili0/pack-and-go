@@ -23,6 +23,8 @@ export async function GET(request) {
       createdAt: -1,
     });
 
+    // console.log("Gefundene Bestellungen in /api/user/orders/route.js:", orders);
+
     // Füge zusätzliche Informationen hinzu
     const ordersWithDetails = await Promise.all(
       orders.map(async (order) => {
