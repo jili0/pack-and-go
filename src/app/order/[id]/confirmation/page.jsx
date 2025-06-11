@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import Image from '@/components/ui/Image';
-import styles from '@/app/styles/Components.module.css';
+// import styles from '@/app/styles/Components.module.css';
+import styles from '@/app/styles/OrderConfirmation.module.css';
 
 export default function OrderConfirmation({ params }) {
   const { id } = params;
@@ -270,7 +271,7 @@ export default function OrderConfirmation({ params }) {
         {/* Action Buttons */}
         <div className={styles.actionButtons}>
           <Link 
-            href={`/order/${order._id}`} 
+            href={`/user/orders/${order._id}`} 
             className={`${styles.btn} ${styles.btnPrimary}`}
           >
             View Order Details

@@ -26,12 +26,12 @@ export default function CreateOrder() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [totalPrice, setTotalPrice] = useState(0);
+  // const [totalPrice, setTotalPrice] = useState(0);
 
   // Load saved data from session storage
   useEffect(() => {
     if (authLoading) return; // Wait for auth to complete
-    
+
     if (!user) {
       // Redirect to login if user is not logged in
       router.push('/login?redirect=order/create');
@@ -42,9 +42,9 @@ export default function CreateOrder() {
       try {
         const savedCompany = sessionStorage.getItem('selectedCompany');
         const savedFormData = sessionStorage.getItem('movingFormData');
-        
+
         console.log('Loading session data:', { savedCompany, savedFormData });
-        
+
         if (!savedCompany || !savedFormData) {
           // Redirect to home if no data is found
           router.push('/');
@@ -57,17 +57,19 @@ export default function CreateOrder() {
         setSelectedCompany(parsedCompany);
         setFormData({
           ...parsedFormData,
+          helpersCount: parsedFormData.helpersCount || 2, // Default to 2 helpers if not set
+          estimatedHours: parsedFormData.estimatedHours || 4, // Default to 4 hours if not set
           // Ensure preferredDates is always an array with 3 elements
-          preferredDates: parsedFormData.preferredDates && Array.isArray(parsedFormData.preferredDates) 
+          preferredDates: parsedFormData.preferredDates && Array.isArray(parsedFormData.preferredDates)
             ? [...parsedFormData.preferredDates, '', '', ''].slice(0, 3)
             : ['', '', ''],
           notes: parsedFormData.notes || ''
         });
 
-        // Calculate total price
-        const hourlyRate = parsedCompany.hourlyRate || 50;
-        const price = hourlyRate * parsedFormData.helpersCount * parsedFormData.estimatedHours;
-        setTotalPrice(price);
+        // // Calculate total price
+        // const hourlyRate = parsedCompany.hourlyRate || 50;
+        // const price = hourlyRate * parsedFormData.helpersCount * parsedFormData.estimatedHours;
+        // setTotalPrice(price);
 
         setLoading(false);
       } catch (error) {
@@ -94,6 +96,14 @@ export default function CreateOrder() {
       newDates[index] = e.target.value;
       return { ...prev, preferredDates: newDates };
     });
+  };
+
+  const handleHelpersChange = (e) => {
+    setFormData(prev => ({ ...prev, helpersCount: Number(e.target.value) }));
+  };
+
+  const handleHoursChange = (e) => {
+    setFormData(prev => ({ ...prev, estimatedHours: Number(e.target.value) }));
   };
 
   const handleNotesChange = (e) => {
@@ -136,6 +146,11 @@ export default function CreateOrder() {
     return true;
   };
 
+
+  const totalPrice = selectedCompany && formData.helpersCount && formData.estimatedHours
+    ? (selectedCompany.hourlyRate || 50) * formData.helpersCount * formData.estimatedHours
+    : 0;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -147,15 +162,18 @@ export default function CreateOrder() {
     setError(null);
 
     try {
+      const hourlyRate = selectedCompany.hourlyRate || 50;
+      const calculatedPrice = hourlyRate * formData.helpersCount * formData.estimatedHours;
       // Prepare order data
       const orderData = {
-        companyId: selectedCompany.userId,
+        companyId: selectedCompany._id,
         fromAddress: formData.fromAddress,
         toAddress: formData.toAddress,
         preferredDates: (formData.preferredDates || []).filter(date => date),
         helpersCount: formData.helpersCount,
         estimatedHours: formData.estimatedHours,
-        totalPrice: totalPrice,
+        //  totalPrice: totalPrice,
+        totalPrice: calculatedPrice,
         notes: formData.notes
       };
 
@@ -318,12 +336,42 @@ export default function CreateOrder() {
               <div className={styles.detailsGrid}>
                 <div className={styles.detailGroup}>
                   <label className={styles.detailLabel}>Number of Helpers</label>
-                  <div className={styles.detailValue}>{formData.helpersCount}</div>
+                  <input
+                    name="helpersCount"
+                    id="helpersCount"
+                    autoComplete="off"
+                    value={formData.helpersCount || 2}
+                    onChange={handleHelpersChange}
+                    placeholder="Add any number of helpers needed..."
+                    type="number"
+                    min="1"
+                    max="100"
+                    required
+                    className={styles.helpersInput}
+                  // className={styles.notesInput}
+
+                  />
+                  {/* <div className={styles.detailValue}>{formData.helpersCount}</div> */}
                 </div>
 
                 <div className={styles.detailGroup}>
                   <label className={styles.detailLabel}>Estimated Hours</label>
-                  <div className={styles.detailValue}>{formData.estimatedHours}</div>
+                  <input
+                    name="helpersCount"
+                    id="helpersCount"
+                    autoComplete="off"
+                    value={formData.estimatedHours || 4}
+                    onChange={handleHoursChange}
+                    placeholder="Add any number of hours needed..."
+                    type="number"
+                    min="1"
+                    max="100"
+                    required
+                    className={styles.estimatedHoursInput}
+                  // className={styles.notesInput}
+
+                  />
+                  {/* <div className={styles.detailValue}>{formData.estimatedHours}</div> */}
                 </div>
               </div>
 
