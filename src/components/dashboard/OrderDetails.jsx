@@ -3,7 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import styles from '@/app/styles/Components.module.css';
+
+import styles from '@/app/styles/OrderDetails.module.css'; // CSS Module import
 import Image from '@/components/ui/Image';
 
 const OrderDetails = ({ orderId }) => {

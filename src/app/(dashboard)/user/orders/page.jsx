@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import styles from '@/app/styles/UserDashboard.module.css'; // CSS Module import
+import OrderList from '@/components/dashboard/OrderList';
 
 export default function UserDashboard() {
 
@@ -14,8 +15,7 @@ export default function UserDashboard() {
  
   return (
     <div className={styles.userDashboard}>
-    
-       Hiiiiiiiiiiiiiiiiiiiiiiiiii, orders
+       <OrderList/>
     </div>
   );
 }
