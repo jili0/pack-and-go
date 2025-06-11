@@ -2,15 +2,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation'; // Add useParams import
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import Image from '@/components/ui/Image';
 // import styles from '@/app/styles/Components.module.css';
 import styles from '@/app/styles/OrderConfirmation.module.css';
 
-export default function OrderConfirmation({ params }) {
-  const { id } = params;
+export default function OrderConfirmation() { // Remove { params } from props
+  const params = useParams(); // Use the hook instead
+  const { id } = params; // Extract id from params
   const router = useRouter();
   const { user } = useAuth();
   
@@ -257,7 +258,7 @@ export default function OrderConfirmation({ params }) {
         <div className={styles.emailNotification}>
           <div className={styles.emailIcon}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2-2 2-2z"></path>
               <polyline points="22,6 12,13 2,6"></polyline>
             </svg>
           </div>
