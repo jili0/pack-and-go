@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import styles from '@/app/styles/Components.module.css';
+import styles from '@/app/styles/OrderList.module.css';
 
 const OrderList = () => {
   const router = useRouter();

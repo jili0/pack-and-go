@@ -1,0 +1,438 @@
+/* OrderList Container */
+.orderList {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Header Section */
+.orderListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.orderListHeader h2 {
+  color: #2c3e50;
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Filter Section */
+.filterContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filterLabel {
+  font-weight: 500;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.filterSelect {
+  padding: 8px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.filterSelect:hover {
+  border-color: #3498db;
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* Loading State */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 20px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Alert Messages */
+.alert {
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.alertDanger {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+}
+
+.alert h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+}
+
+.alert p {
+  margin: 0;
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.emptyStateIcon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.emptyState h3 {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.emptyState p {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
+/* Order Cards Container */
+.orderCards {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/* Individual Order Card */
+.orderCard {
+  background: white;
+  border: 1px solid #e1e8ed;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.orderCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Order Card Header */
+.orderCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.orderInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.orderDate {
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.orderPrice {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #27ae60;
+}
+
+/* Status Badges */
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badgeYellow {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.badgeGreen {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.badgeRed {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.badgeBlue {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.badgeGray {
+  background: #e2e3e5;
+  color: #383d41;
+  border: 1px solid #d6d8db;
+}
+
+/* Order Card Body */
+.orderCardBody {
+  margin-bottom: 20px;
+}
+
+/* Route Information */
+.routeInfo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.locationFrom,
+.locationTo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.locationLabel {
+  font-size: 0.8rem;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.locationCity {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.routeArrow {
+  font-size: 1.5rem;
+  color: #3498db;
+  font-weight: bold;
+  margin: 0 10px;
+}
+
+/* Company Information */
+.companyInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.companyLabel {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.companyName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Date Information */
+.dateInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dateLabel {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.dateValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.pendingNote {
+  font-size: 0.8rem;
+  color: #e67e22;
+  font-style: italic;
+  margin-left: 8px;
+}
+
+/* Order Card Footer */
+.orderCardFooter {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  min-width: 120px;
+}
+
+.btnPrimary {
+  background: #3498db;
+  color: white;
+}
+
+.btnPrimary:hover {
+  background: #2980b9;
+  transform: translateY(-1px);
+}
+
+.btnSecondary {
+  background: #95a5a6;
+  color: white;
+}
+
+.btnSecondary:hover {
+  background: #7f8c8d;
+  transform: translateY(-1px);
+}
+
+.btnLarge {
+  padding: 14px 28px;
+  font-size: 1rem;
+  min-width: 180px;
+}
+
+/* New Order Button Container */
+.newOrderButtonContainer {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid #e1e8ed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .orderList {
+    padding: 15px;
+  }
+  
+  .orderListHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .orderListHeader h2 {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  
+  .filterContainer {
+    justify-content: center;
+  }
+  
+  .orderCard {
+    padding: 20px;
+  }
+  
+  .orderCardHeader {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  
+  .routeInfo {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .routeArrow {
+    transform: rotate(90deg);
+    margin: 10px 0;
+  }
+  
+  .orderCardFooter {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+  
+  .companyInfo,
+  .dateInfo {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .orderCard {
+    padding: 16px;
+  }
+  
+  .orderPrice {
+    font-size: 1.3rem;
+  }
+  
+  .locationCity {
+    font-size: 1rem;
+  }
+}
