@@ -60,11 +60,7 @@ const OrderDetails = ({ orderId }) => {
       text: status,
     };
 
-    return (
-      <span className={`${styles.badge} ${statusInfo.class}`}>
-        {statusInfo.text}
-      </span>
-    );
+    return <span>{statusInfo.text}</span>;
   };
 
   const handleCancelOrder = async () => {
@@ -102,13 +98,10 @@ const OrderDetails = ({ orderId }) => {
 
   if (error) {
     return (
-      <div className={`${styles.alert} ${styles.alertDanger}`}>
+      <div>
         <h3>Error</h3>
         <p>{error}</p>
-        <button
-          className={`${styles.btn} ${styles.btnPrimary}`}
-          onClick={() => router.push("/user/orders")}
-        >
+        <button onClick={() => router.push("/user/orders")}>
           Back to Orders
         </button>
       </div>
@@ -117,13 +110,10 @@ const OrderDetails = ({ orderId }) => {
 
   if (!order || !company) {
     return (
-      <div className={`${styles.alert} ${styles.alertDanger}`}>
+      <div>
         <h3>Order Not Found</h3>
         <p>The requested order could not be found.</p>
-        <button
-          className={`${styles.btn} ${styles.btnPrimary}`}
-          onClick={() => router.push("/user/orders")}
-        >
+        <button onClick={() => router.push("/user/orders")}>
           Back to Orders
         </button>
       </div>
@@ -193,11 +183,7 @@ const OrderDetails = ({ orderId }) => {
                     {company.reviewsCount === 1 ? "review" : "reviews"})
                   </span>
                 </div>
-                {company.isKisteKlarCertified && (
-                  <div className={`${styles.badge} ${styles.badgeGreen}`}>
-                    KisteKlar Certified
-                  </div>
-                )}
+                {company.isKisteKlarCertified && <div>KisteKlar Certified</div>}
               </div>
             </div>
           </div>
@@ -254,9 +240,7 @@ const OrderDetails = ({ orderId }) => {
 
               <div>
                 <span>Total Price:</span>
-                <span className={`${styles.detailValue} ${styles.priceValue}`}>
-                  {order.totalPrice} €
-                </span>
+                <span>{order.totalPrice} €</span>
               </div>
             </div>
 
@@ -271,25 +255,16 @@ const OrderDetails = ({ orderId }) => {
 
         <div>
           <div>
-            <button
-              className={`${styles.btn} ${styles.btnSecondary}`}
-              onClick={() => router.back()}
-            >
-              Back
-            </button>
+            <button onClick={() => router.back()}>Back</button>
 
             {order.status === "pending" && (
-              <button
-                className={`${styles.btn} ${styles.btnDanger}`}
-                onClick={() => setShowCancelModal(true)}
-              >
+              <button onClick={() => setShowCancelModal(true)}>
                 Cancel Order
               </button>
             )}
 
             {order.status === "completed" && !order.review && (
               <button
-                className={`${styles.btn} ${styles.btnPrimary}`}
                 onClick={() => router.push(`/user/orders/${orderId}/review`)}
               >
                 Leave Review
@@ -311,17 +286,10 @@ const OrderDetails = ({ orderId }) => {
               <p>This action cannot be undone.</p>
             </div>
             <div>
-              <button
-                className={`${styles.btn} ${styles.btnSecondary}`}
-                onClick={() => setShowCancelModal(false)}
-              >
+              <button onClick={() => setShowCancelModal(false)}>
                 No, Keep Order
               </button>
-              <button
-                className={`${styles.btn} ${styles.btnDanger}`}
-                onClick={handleCancelOrder}
-                disabled={loading}
-              >
+              <button onClick={handleCancelOrder} disabled={loading}>
                 {loading ? "Cancelling..." : "Yes, Cancel Order"}
               </button>
             </div>

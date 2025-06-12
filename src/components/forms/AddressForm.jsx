@@ -29,7 +29,7 @@ const AddressForm = ({
   };
 
   return (
-    <div className={`${styles.addressForm} ${className}`}>
+    <div>
       {label && <h3>{label}</h3>}
 
       <div>
@@ -41,7 +41,6 @@ const AddressForm = ({
             name="street"
             value={address.street}
             onChange={handleChange}
-            className={`${styles.input} ${error ? styles.inputError : ""}`}
             placeholder="Example Street 123"
           />
         </div>
@@ -55,7 +54,6 @@ const AddressForm = ({
               name="postalCode"
               value={address.postalCode}
               onChange={handleChange}
-              className={`${styles.input} ${error ? styles.inputError : ""}`}
               placeholder="12345"
             />
           </div>
@@ -68,7 +66,6 @@ const AddressForm = ({
               name="city"
               value={address.city}
               onChange={handleChange}
-              className={`${styles.input} ${error ? styles.inputError : ""}`}
               placeholder="Berlin"
             />
           </div>

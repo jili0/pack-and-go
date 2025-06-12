@@ -240,7 +240,7 @@ export default function CompanySetup() {
         <div>
           <h2>Certification</h2>
 
-          <div className={`${styles.formGroup} ${styles.checkboxGroup}`}>
+          <div>
             <label>
               <input
                 type="checkbox"
@@ -348,13 +348,7 @@ export default function CompanySetup() {
 
         <div>
           <button type="submit">Create Company Profile</button>
-          {submitMessage && (
-            <div
-              className={`${styles.submitMessage} ${submitMessage.includes("success") ? styles.success : styles.error}`}
-            >
-              {submitMessage}
-            </div>
-          )}
+          {submitMessage && <div>{submitMessage}</div>}
         </div>
       </form>
     </div>

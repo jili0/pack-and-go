@@ -508,11 +508,7 @@ export default function AdminDashboard() {
           ) : (
             <div>
               {recentOrders.map((order) => (
-                <div
-                  key={order._id}
-                  className={`${styles.dataRow} ${styles.clickableRow}`}
-                  onClick={() => handleViewOrder(order._id)}
-                >
+                <div key={order._id} onClick={() => handleViewOrder(order._id)}>
                   <div>
                     <div>
                       <span>#{order._id.slice(-8)}</span>

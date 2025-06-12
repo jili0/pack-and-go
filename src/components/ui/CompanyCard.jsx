@@ -50,7 +50,7 @@ const CompanyCard = ({ company, onSelect }) => {
 
               {/* KisteKlar Zertifikat */}
               {company.isKisteKlarCertified && (
-                <div className={`${styles.badge} ${styles.badgeGreen}`}>
+                <div>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -83,9 +83,7 @@ const CompanyCard = ({ company, onSelect }) => {
         </div>
 
         {/* Zusätzliche Informationen (Ausklappbar) */}
-        <div
-          className={`${styles.companyDetails} ${expanded ? styles.expanded : styles.collapsed}`}
-        >
+        <div>
           {expanded && (
             <>
               <div>
@@ -113,19 +111,11 @@ const CompanyCard = ({ company, onSelect }) => {
 
         {/* Aktionsbuttons */}
         <div>
-          <button
-            type="button"
-            onClick={toggleExpand}
-            className={`${styles.btn} ${styles.btnOutline}`}
-          >
+          <button type="button" onClick={toggleExpand}>
             {expanded ? "Weniger anzeigen" : "Mehr anzeigen"}
           </button>
 
-          <button
-            type="button"
-            onClick={() => onSelect(company)}
-            className={`${styles.btn} ${styles.btnPrimary}`}
-          >
+          <button type="button" onClick={() => onSelect(company)}>
             Auswählen
           </button>
         </div>

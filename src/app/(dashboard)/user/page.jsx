@@ -146,7 +146,7 @@ export default function UserDashboard() {
     }
 
     return (
-      <span className={`${styles.statusBadge} ${colorClass}`}>{text}</span>
+      <span </span>
     );
   };
 
@@ -161,20 +161,20 @@ export default function UserDashboard() {
 
         {/* Quick Access */}
         <div>
-          <div className={`${styles.quickAccessHeader} ${styles.bgGray50}`}>
+          <div >
             <h2>Quick Access</h2>
           </div>
           <div>
             <Link
               href="/"
-              className={`${styles.quickAccessCard} ${styles.bgBlue50}`}
+              
             >
               <div
-                className={`${styles.quickAccessIconContainer} ${styles.bgBlue100}`}
+                
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`${styles.quickAccessIcon} ${styles.textBlue600}`}
+                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -195,14 +195,14 @@ export default function UserDashboard() {
 
             <Link
               href="/user/orders"
-              className={`${styles.quickAccessCard} ${styles.bgPurple50}`}
+              
             >
               <div
-                className={`${styles.quickAccessIconContainer} ${styles.bgPurple100}`}
+                
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`${styles.quickAccessIcon} ${styles.textPurple600}`}
+                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -223,14 +223,14 @@ export default function UserDashboard() {
 
             <Link
               href="/user/profile"
-              className={`${styles.quickAccessCard} ${styles.bgGreen50}`}
+              
             >
               <div
-                className={`${styles.quickAccessIconContainer} ${styles.bgGreen100}`}
+                
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`${styles.quickAccessIcon} ${styles.textGreen600}`}
+                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -252,7 +252,7 @@ export default function UserDashboard() {
         </div>
 
         {error && (
-          <div className={`${styles.errorMessage} ${styles.bgRed50}`}>
+          <div >
             <div>
               <div>
                 <svg
@@ -280,7 +280,7 @@ export default function UserDashboard() {
 
         {/* Upcoming Orders */}
         <div>
-          <div className={`${styles.ordersHeader} ${styles.bgGray50}`}>
+          <div >
             <h2>Upcoming Moves</h2>
             <Link href="/user/orders">View All</Link>
           </div>
@@ -351,7 +351,7 @@ export default function UserDashboard() {
                     <div>
                       <Link
                         href={`/order/${order._id}`}
-                        className={`${styles.detailLink} ${styles.bgBlue100}`}
+                        
                       >
                         View Details
                       </Link>
@@ -374,13 +374,13 @@ export default function UserDashboard() {
                     d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                   />
                 </svg>
-                <h3 className={`${styles.emptyTitle} ${styles.textGray900}`}>
+                <h3 >
                   No Upcoming Moves
                 </h3>
                 <p>You currently have no planned moves.</p>
                 <Link
                   href="/"
-                  className={`${styles.primaryButton} ${styles.bgBlue600}`}
+                  
                 >
                   Plan a Move Now
                 </Link>
@@ -391,7 +391,7 @@ export default function UserDashboard() {
 
         {/* Recent Activities */}
         <div>
-          <div className={`${styles.ordersHeader} ${styles.bgGray50}`}>
+          <div >
             <h2>Recent Activities</h2>
           </div>
           <div>
@@ -475,15 +475,15 @@ export default function UserDashboard() {
 
         {/* Tips & Help */}
         <div>
-          <div className={`${styles.ordersHeader} ${styles.bgGray50}`}>
+          <div >
             <h2>Tips & Help</h2>
           </div>
           <div>
             <Link href="/tips">
-              <div className={`${styles.tipCard} ${styles.bgYellow50}`}>
+              <div >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`${styles.tipIcon} ${styles.textYellow600}`}
+                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -501,10 +501,10 @@ export default function UserDashboard() {
             </Link>
 
             <Link href="/guide">
-              <div className={`${styles.tipCard} ${styles.bgGreen50}`}>
+              <div >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`${styles.tipIcon} ${styles.textGreen600}`}
+                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -522,10 +522,10 @@ export default function UserDashboard() {
             </Link>
 
             <Link href="/contact">
-              <div className={`${styles.tipCard} ${styles.bgBlue50}`}>
+              <div >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`${styles.tipIcon} ${styles.textBlue600}`}
+                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

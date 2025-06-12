@@ -233,7 +233,7 @@ export default function CompanyDashboard() {
   if (error) {
     return (
       <div>
-        <div className={`${styles.errorMessage} ${styles.bgRed50}`}>
+        <div>
           <div>
             <div>
               <svg
@@ -264,12 +264,7 @@ export default function CompanyDashboard() {
         <div>
           <h3>Company Profile Not Found</h3>
           <p>You need to set up your company profile first.</p>
-          <Link
-            href="/company/setup"
-            className={`${styles.primaryButton} ${styles.bgBlue600}`}
-          >
-            Set Up Company Profile
-          </Link>
+          <Link href="/company/setup">Set Up Company Profile</Link>
         </div>
       </div>
     );
@@ -285,7 +280,7 @@ export default function CompanyDashboard() {
 
       {/* Verification Status */}
       {!company.isVerified && (
-        <div className={`${styles.errorMessage} ${styles.bgYellow50}`}>
+        <div>
           <div>
             <div>
               <svg
@@ -435,11 +430,7 @@ export default function CompanyDashboard() {
               <div>
                 <span>Hourly Rate: €{company.hourlyRate} per helper</span>
                 {company.isKisteKlarCertified && (
-                  <span
-                    className={`${styles.statusBadge} ${styles.statuskisteklar}`}
-                  >
-                    KisteKlar Certified
-                  </span>
+                  <span>KisteKlar Certified</span>
                 )}
               </div>
             </div>
@@ -457,17 +448,9 @@ export default function CompanyDashboard() {
               <span>Status:</span>
               <span>
                 {company.isVerified ? (
-                  <span
-                    className={`${styles.statusBadge} ${styles.statusverified}`}
-                  >
-                    Verified
-                  </span>
+                  <span>Verified</span>
                 ) : (
-                  <span
-                    className={`${styles.statusBadge} ${styles.statuspending}`}
-                  >
-                    Verification Pending
-                  </span>
+                  <span>Verification Pending</span>
                 )}
               </span>
             </div>
@@ -571,10 +554,9 @@ export default function CompanyDashboard() {
 
         <div>
           <Link href="/placeholder">
-            <div className={`${styles.tipCard} ${styles.bgBlue50}`}>
+            <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={`${styles.tipIcon} ${styles.textBlue600}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -592,10 +574,9 @@ export default function CompanyDashboard() {
           </Link>
 
           <Link href="/placeholder">
-            <div className={`${styles.tipCard} ${styles.bgGreen50}`}>
+            <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={`${styles.tipIcon} ${styles.textGreen600}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -615,10 +596,9 @@ export default function CompanyDashboard() {
           </Link>
 
           <Link href="/placeholder">
-            <div className={`${styles.tipCard} ${styles.bgYellow50}`}>
+            <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={`${styles.tipIcon} ${styles.textYellow600}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

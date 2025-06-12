@@ -113,7 +113,7 @@ const RegisterForm = () => {
       <p>Erstellen Sie ein Konto, um Pack & Go zu verwenden.</p>
 
       {registerError && (
-        <div className={`${styles.alert} ${styles.alertDanger}`}>
+        <div>
           <div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -186,7 +186,6 @@ const RegisterForm = () => {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.password ? styles.formInputError : ""}`}
             placeholder="Mindestens 6 Zeichen"
             disabled={isSubmitting}
           />
@@ -201,7 +200,6 @@ const RegisterForm = () => {
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.confirmPassword ? styles.formInputError : ""}`}
             placeholder="Passwort wiederholen"
             disabled={isSubmitting}
           />

@@ -54,11 +54,7 @@ const OrderList = () => {
       text: status,
     };
 
-    return (
-      <span className={`${styles.badge} ${statusInfo.class}`}>
-        {statusInfo.text}
-      </span>
-    );
+    return <span>{statusInfo.text}</span>;
   };
 
   const filteredOrders = () => {
@@ -84,7 +80,7 @@ const OrderList = () => {
 
   if (error) {
     return (
-      <div className={`${styles.alert} ${styles.alertDanger}`}>
+      <div>
         <h3>Error</h3>
         <p>{error}</p>
       </div>
@@ -117,23 +113,13 @@ const OrderList = () => {
           <div>📦</div>
           <h3>No Orders Yet</h3>
           <p>You haven't placed any moving orders yet.</p>
-          <button
-            className={`${styles.btn} ${styles.btnPrimary}`}
-            onClick={() => router.push("/")}
-          >
-            Plan Your Move
-          </button>
+          <button onClick={() => router.push("/")}>Plan Your Move</button>
         </div>
       ) : filteredOrders().length === 0 ? (
         <div>
           <h3>No {filter} Orders</h3>
           <p>You don't have any orders with status "{filter}".</p>
-          <button
-            className={`${styles.btn} ${styles.btnSecondary}`}
-            onClick={() => setFilter("all")}
-          >
-            Show All Orders
-          </button>
+          <button onClick={() => setFilter("all")}>Show All Orders</button>
         </div>
       ) : (
         <div>
@@ -183,16 +169,12 @@ const OrderList = () => {
               </div>
 
               <div>
-                <button
-                  className={`${styles.btn} ${styles.btnPrimary}`}
-                  onClick={() => handleViewOrder(order._id)}
-                >
+                <button onClick={() => handleViewOrder(order._id)}>
                   View Details
                 </button>
 
                 {order.status === "completed" && !order.review && (
                   <button
-                    className={`${styles.btn} ${styles.btnSecondary}`}
                     onClick={() =>
                       router.push(`/user/orders/${order._id}/review`)
                     }
@@ -207,12 +189,7 @@ const OrderList = () => {
       )}
 
       <div>
-        <button
-          className={`${styles.btn} ${styles.btnPrimary} ${styles.btnLarge}`}
-          onClick={() => router.push("/")}
-        >
-          Plan a New Move
-        </button>
+        <button onClick={() => router.push("/")}>Plan a New Move</button>
       </div>
     </div>
   );

@@ -110,7 +110,7 @@ const AdminLoginContent = () => {
       </p>
 
       {loginError && (
-        <div className={`${styles.alert} ${styles.alertDanger}`}>
+        <div>
           <div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -155,7 +155,6 @@ const AdminLoginContent = () => {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.password ? styles.formInputError : ""}`}
             placeholder="Your admin password"
             disabled={isSubmitting}
           />

@@ -136,17 +136,9 @@ const ProfileForm = () => {
         </div>
 
         <div>
-          {success && (
-            <div className={`${styles.alert} ${styles.alertSuccess}`}>
-              Your profile has been updated successfully.
-            </div>
-          )}
+          {success && <div>Your profile has been updated successfully.</div>}
 
-          {error && (
-            <div className={`${styles.alert} ${styles.alertDanger}`}>
-              {error}
-            </div>
-          )}
+          {error && <div>{error}</div>}
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <div>
@@ -157,7 +149,6 @@ const ProfileForm = () => {
                 <input
                   id="name"
                   type="text"
-                  className={`${styles.input} ${errors.name ? styles.inputError : ""}`}
                   {...register("name", { required: "Name is required" })}
                 />
                 {errors.name && <span>{errors.name.message}</span>}
@@ -179,7 +170,6 @@ const ProfileForm = () => {
                 <input
                   id="phone"
                   type="tel"
-                  className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
                   {...register("phone", {
                     required: "Phone number is required",
                     pattern: {
@@ -201,7 +191,6 @@ const ProfileForm = () => {
                   <input
                     id="currentPassword"
                     type={passwordType}
-                    className={`${styles.input} ${errors.currentPassword ? styles.inputError : ""}`}
                     {...register("currentPassword", {
                       validate: (value) =>
                         (!value &&
@@ -227,7 +216,6 @@ const ProfileForm = () => {
                 <input
                   id="newPassword"
                   type={passwordType}
-                  className={`${styles.input} ${errors.newPassword ? styles.inputError : ""}`}
                   {...register("newPassword", {
                     validate: (value) =>
                       (!value &&
@@ -246,7 +234,6 @@ const ProfileForm = () => {
                 <input
                   id="confirmPassword"
                   type={passwordType}
-                  className={`${styles.input} ${errors.confirmPassword ? styles.inputError : ""}`}
                   {...register("confirmPassword", {
                     validate: (value) =>
                       (!value &&
@@ -262,11 +249,7 @@ const ProfileForm = () => {
             </div>
 
             <div>
-              <button
-                type="submit"
-                className={`${styles.btn} ${styles.btnPrimary}`}
-                disabled={loading}
-              >
+              <button type="submit" disabled={loading}>
                 {loading ? "Saving..." : "Save Changes"}
               </button>
             </div>
@@ -280,11 +263,7 @@ const ProfileForm = () => {
               Once you delete your account, there is no going back. All of your
               data will be permanently removed.
             </p>
-            <button
-              type="button"
-              className={`${styles.btn} ${styles.btnDanger}`}
-              onClick={() => setShowDeleteModal(true)}
-            >
+            <button type="button" onClick={() => setShowDeleteModal(true)}>
               Delete Account
             </button>
           </div>
@@ -306,17 +285,8 @@ const ProfileForm = () => {
               </p>
             </div>
             <div>
-              <button
-                className={`${styles.btn} ${styles.btnSecondary}`}
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className={`${styles.btn} ${styles.btnDanger}`}
-                onClick={handleDeleteAccount}
-                disabled={loading}
-              >
+              <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
+              <button onClick={handleDeleteAccount} disabled={loading}>
                 {loading ? "Deleting..." : "Delete Account"}
               </button>
             </div>

@@ -112,7 +112,7 @@ const RegisterContent = () => {
       <p>Sign up to use Pack & Go for your next move.</p>
 
       {registerError && (
-        <div className={`${styles.alert} ${styles.alertDanger}`}>
+        <div>
           <div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -185,7 +185,6 @@ const RegisterContent = () => {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.password ? styles.formInputError : ""}`}
             placeholder="Minimum 6 characters"
             disabled={isSubmitting}
           />
@@ -200,7 +199,6 @@ const RegisterContent = () => {
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.confirmPassword ? styles.formInputError : ""}`}
             placeholder="Repeat password"
             disabled={isSubmitting}
           />

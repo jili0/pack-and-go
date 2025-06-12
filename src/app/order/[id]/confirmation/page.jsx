@@ -73,15 +73,10 @@ export default function OrderConfirmation() {
   if (error) {
     return (
       <div>
-        <div className={`${styles.alert} ${styles.alertDanger}`}>
+        <div>
           <h3>Error</h3>
           <p>{error}</p>
-          <Link
-            href="/user/orders"
-            className={`${styles.btn} ${styles.btnPrimary}`}
-          >
-            View My Orders
-          </Link>
+          <Link href="/user/orders">View My Orders</Link>
         </div>
       </div>
     );
@@ -90,15 +85,10 @@ export default function OrderConfirmation() {
   if (!order || !company) {
     return (
       <div>
-        <div className={`${styles.alert} ${styles.alertDanger}`}>
+        <div>
           <h3>Order Not Found</h3>
           <p>The requested order could not be found.</p>
-          <Link
-            href="/user/orders"
-            className={`${styles.btn} ${styles.btnPrimary}`}
-          >
-            View My Orders
-          </Link>
+          <Link href="/user/orders">View My Orders</Link>
         </div>
       </div>
     );
@@ -144,9 +134,7 @@ export default function OrderConfirmation() {
 
               <div>
                 <span>Order Status:</span>
-                <span className={`${styles.badge} ${styles.badgeYellow}`}>
-                  Request Sent
-                </span>
+                <span>Request Sent</span>
               </div>
             </div>
 
@@ -191,9 +179,7 @@ export default function OrderConfirmation() {
                     </span>
                   </div>
                   {company.isKisteKlarCertified && (
-                    <div className={`${styles.badge} ${styles.badgeGreen}`}>
-                      KisteKlar Certified
-                    </div>
+                    <div>KisteKlar Certified</div>
                   )}
                 </div>
               </div>
@@ -240,11 +226,7 @@ export default function OrderConfirmation() {
 
                 <div>
                   <span>Total Price:</span>
-                  <span
-                    className={`${styles.detailValue} ${styles.priceValue}`}
-                  >
-                    {order.totalPrice} €
-                  </span>
+                  <span>{order.totalPrice} €</span>
                 </div>
               </div>
 
@@ -328,23 +310,11 @@ export default function OrderConfirmation() {
 
         {/* Action Buttons */}
         <div>
-          <Link
-            href={`/user/orders/${order._id}`}
-            className={`${styles.btn} ${styles.btnPrimary}`}
-          >
-            View Order Details
-          </Link>
+          <Link href={`/user/orders/${order._id}`}>View Order Details</Link>
 
-          <Link
-            href="/user/orders"
-            className={`${styles.btn} ${styles.btnSecondary}`}
-          >
-            View All Orders
-          </Link>
+          <Link href="/user/orders">View All Orders</Link>
 
-          <Link href="/" className={`${styles.btn} ${styles.btnOutline}`}>
-            Back to Home
-          </Link>
+          <Link href="/">Back to Home</Link>
         </div>
       </div>
     </div>
