@@ -141,7 +141,6 @@ const AdminLoginContent = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.email ? styles.formInputError : ""}`}
             placeholder="admin@pack-and-go.com"
             disabled={isSubmitting}
           />

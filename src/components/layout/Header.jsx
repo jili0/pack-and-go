@@ -20,9 +20,9 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav>
-          <a href="#home">Home</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#contact">Contact</a>
+          <a href="/#home">Home</a>
+          <a href="/#pricing">Pricing</a>
+          <a href="/#contact">Contact</a>
         </nav>
 
         {/* User Menu */}

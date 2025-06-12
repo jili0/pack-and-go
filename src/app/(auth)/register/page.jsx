@@ -143,7 +143,6 @@ const RegisterContent = () => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.name ? styles.formInputError : ""}`}
             placeholder="First and Last Name"
             disabled={isSubmitting}
           />
@@ -158,7 +157,6 @@ const RegisterContent = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.email ? styles.formInputError : ""}`}
             placeholder="example@email.com"
             disabled={isSubmitting}
           />
@@ -173,7 +171,6 @@ const RegisterContent = () => {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.phone ? styles.formInputError : ""}`}
             placeholder="+1 123 456 7890"
             disabled={isSubmitting}
           />

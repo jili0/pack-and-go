@@ -119,7 +119,6 @@ const LoginContent = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.email ? styles.formInputError : ""}`}
             placeholder="example@email.com"
             disabled={isSubmitting}
           />
