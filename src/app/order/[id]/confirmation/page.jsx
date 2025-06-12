@@ -6,7 +6,6 @@ import { useParams, useRouter } from 'next/navigation'; // Add useParams import
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import Image from '@/components/ui/Image';
-// import styles from '@/app/styles/Components.module.css';
 import styles from '@/app/styles/OrderConfirmation.module.css';
 
 export default function OrderConfirmation() { // Remove { params } from props

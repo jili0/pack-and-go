@@ -27,8 +27,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Error Alert */
@@ -108,7 +112,9 @@
   border: 1px solid #e2e8f0;
   text-decoration: none;
   display: block;
-  transition: border-color 0.2s, transform 0.2s;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
 }
 
 .statCard:hover {
@@ -247,6 +253,24 @@
   border: 1px solid #e2e8f0;
   border-radius: 6px;
   background-color: #fafafa;
+  transition: all 0.2s ease;
+}
+
+/* Clickable Row Styles for Orders */
+.clickableRow {
+  margin-top: 0.5rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.clickableRow:hover {
+  background-color: #f1f5f9;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.clickableRow:active {
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
 }
 
 /* User Info */
@@ -371,10 +395,12 @@
 .routeFrom,
 .routeTo {
   font-weight: 500;
+  color: #1e293b;
 }
 
 .routeArrow {
   color: #3b82f6;
+  font-weight: bold;
 }
 
 .orderDetails {
@@ -382,6 +408,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 0.25rem;
+  position: relative;
 }
 
 .priceValue {
@@ -453,11 +480,11 @@
   .dashboardContainer {
     padding: 2rem;
   }
-  
+
   .statsGrid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .userMeta,
   .orderDetails {
     flex-direction: row;
@@ -477,48 +504,48 @@
   .dashboardHeader {
     padding: 1.5rem;
   }
-  
+
   .dashboardTitle {
     font-size: 1.5rem;
   }
-  
+
   .sectionHeader {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .searchContainer {
     flex-direction: column;
     max-width: 100%;
   }
-  
+
   .searchInput {
     border-radius: 8px;
     margin-bottom: 0.5rem;
   }
-  
+
   .searchButton {
     border-radius: 8px;
   }
-  
+
   .dataRow {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
   }
-  
+
   .userInfo {
     width: 100%;
   }
-  
+
   .userMeta,
   .orderDetails {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .actionButtons {
     margin-top: 0.5rem;
   }
