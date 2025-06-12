@@ -94,6 +94,10 @@ export default function AdminDashboard() {
     router.push(`/admin/users/${userId}/edit`);
   };
 
+  const handleViewOrder = (orderId) => {
+    router.push(`/admin/orders/${orderId}`);
+  };
+
   const getFilteredUsers = (role) => {
     let filtered = users.filter(u => u.role === role);
     
@@ -212,7 +216,6 @@ export default function AdminDashboard() {
 
   return (
     <div className={styles.dashboardContainer}>
-
 
       {/* Error Alert */}
       {error && (
@@ -495,9 +498,9 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Manage Orders */}
+        {/* Recent Orders Preview */}
         <div className={styles.dataSection}>
-          <h3 className={styles.dataTitle}>Manage Orders</h3>
+          <h3 className={styles.dataTitle}>Recent Orders</h3>
           {recentOrders.length === 0 ? (
             <div className={styles.emptyState}>
               <p>No orders found</p>
@@ -505,7 +508,11 @@ export default function AdminDashboard() {
           ) : (
             <div className={styles.dataTable}>
               {recentOrders.map((order) => (
-                <div key={order._id} className={styles.dataRow}>
+                <div 
+                  key={order._id} 
+                  className={`${styles.dataRow} ${styles.clickableRow}`}
+                  onClick={() => handleViewOrder(order._id)}
+                >
                   <div className={styles.orderInfo}>
                     <div className={styles.orderMeta}>
                       <span className={styles.orderId}>
@@ -533,6 +540,7 @@ export default function AdminDashboard() {
                     <span className={styles.dateText}>
                       {formatDate(order.createdAt)}
                     </span>
+                    <span className={styles.viewIcon}>→</span>
                   </div>
                 </div>
               ))}
