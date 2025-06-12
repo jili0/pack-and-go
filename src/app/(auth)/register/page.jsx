@@ -5,6 +5,7 @@ import { useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import "@/app/styles/styles.css"
 
 // Component for the content of the register form
 const RegisterContent = () => {

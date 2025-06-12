@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import "@/app/styles/styles.css";
 
 // Component for the content of the login form
 const LoginContent = () => {
@@ -67,11 +68,6 @@ const LoginContent = () => {
 
       if (result.success) {
         router.push(`/${result.user.role}`);
-
-        // Redirect to dashboard after login
-        // const fromUrl = searchParams.get('redirect');
-        // console.log('redirect URL:', fromUrl);
-        //     router.push(fromUrl || '/dashboard');
       } else {
         setLoginError(result.message || "Login failed");
       }
@@ -110,7 +106,7 @@ const LoginContent = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="login-form">
         <div>
           <label htmlFor="email">Email Address</label>
           <input
