@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -29,27 +29,7 @@ export default function OrderDetail() {
     confirmedDate: "",
   });
 
-  useEffect(() => {
-    if (orderId) {
-      fetchOrder();
-    }
-  }, [orderId]);
-
-  useEffect(() => {
-    if (order) {
-      setEditForm({
-        status: order.status || "",
-        notes: order.notes || "",
-        helpersCount: order.helpersCount || "",
-        estimatedHours: order.estimatedHours || "",
-        totalPrice: order.totalPrice || "",
-        confirmedDate: order.confirmedDate ? 
-          new Date(order.confirmedDate).toISOString().split('T')[0] : "",
-      });
-    }
-  }, [order]);
-
-  const fetchOrder = async () => {
+  const fetchOrder = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/admin/orders/${orderId}`);
@@ -66,7 +46,27 @@ export default function OrderDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
+
+  useEffect(() => {
+    if (orderId) {
+      fetchOrder();
+    }
+  }, [orderId, fetchOrder]);
+
+  useEffect(() => {
+    if (order) {
+      setEditForm({
+        status: order.status || "",
+        notes: order.notes || "",
+        helpersCount: order.helpersCount || "",
+        estimatedHours: order.estimatedHours || "",
+        totalPrice: order.totalPrice || "",
+        confirmedDate: order.confirmedDate ? 
+          new Date(order.confirmedDate).toISOString().split('T')[0] : "",
+      });
+    }
+  }, [order]);
 
   const handleSave = async () => {
     try {
@@ -223,7 +223,7 @@ export default function OrderDetail() {
     return (
       <div className={styles.errorContainer}>
         <h1>Order Not Found</h1>
-        <p>The order you're looking for doesn't exist or has been removed.</p>
+        <p>The order you&apos;re looking for doesn&apos;t exist or has been removed.</p>
         <Link href="/admin" className={styles.backLink}>
           ← Back to Dashboard
         </Link>
