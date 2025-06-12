@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "@/app/styles/CompanySetup.module.css";
 
 export default function CompanySetup() {
   const router = useRouter();
@@ -26,7 +25,10 @@ export default function CompanySetup() {
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   }
 
   function handleServiceAreaChange(index, field, value) {
@@ -63,7 +65,10 @@ export default function CompanySetup() {
     data.append("city", formData.city);
     data.append("postalCode", formData.postalCode);
     data.append("country", formData.country);
-    data.append("isKisteKlarCertified", formData.isKisteKlarCertified ? "true" : "false");
+    data.append(
+      "isKisteKlarCertified",
+      formData.isKisteKlarCertified ? "true" : "false"
+    );
     data.append("businessLicense", formData.businessLicense);
     data.append("serviceAreas", JSON.stringify(formData.serviceAreas));
 
@@ -90,7 +95,12 @@ export default function CompanySetup() {
       } else {
         setSubmitMessage(result.message || "Error creating profile.");
         if (result.errors) {
-          setErrors(result.errors.reduce((acc, err) => ({ ...acc, [err.field]: err.message }), {}));
+          setErrors(
+            result.errors.reduce(
+              (acc, err) => ({ ...acc, [err.field]: err.message }),
+              {}
+            )
+          );
         }
       }
     } catch (error) {
@@ -99,125 +109,127 @@ export default function CompanySetup() {
   }
 
   return (
-    <div className={styles.companySetupContainer}>
-      <div className={styles.companySetupHeader}>
+    <div>
+      <div>
         <h1>Create Your Company Profile</h1>
-        <p>Join Pack & Go as a verified moving company and connect with customers looking for professional moving services.</p>
+        <p>
+          Join Pack & Go as a verified moving company and connect with customers
+          looking for professional moving services.
+        </p>
       </div>
-      
-      <form onSubmit={handleSubmit} className={styles.companySetupForm} encType="multipart/form-data">
-        <div className={styles.formSection}>
+
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <div>
           <h2>Company Information</h2>
-          
-          <div className={styles.formGroup}>
+
+          <div>
             <label>
               Company Name*
-              <input 
-                type="text" 
-                name="companyName" 
-                value={formData.companyName} 
-                onChange={handleChange} 
-                required 
+              <input
+                type="text"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleChange}
+                required
                 placeholder="Enter your company name"
               />
-              {errors.companyName && <div className={styles.error}>{errors.companyName}</div>}
+              {errors.companyName && <div>{errors.companyName}</div>}
             </label>
           </div>
 
-          <div className={styles.formGroup}>
+          <div>
             <label>
               Tax ID Number*
-              <input 
-                type="text" 
-                name="taxId" 
-                value={formData.taxId} 
-                onChange={handleChange} 
-                required 
+              <input
+                type="text"
+                name="taxId"
+                value={formData.taxId}
+                onChange={handleChange}
+                required
                 placeholder="Enter your tax identification number"
               />
-              {errors.taxId && <div className={styles.error}>{errors.taxId}</div>}
+              {errors.taxId && <div>{errors.taxId}</div>}
             </label>
           </div>
 
-          <div className={styles.formGroup}>
+          <div>
             <label>
               Company Description
-              <textarea 
-                name="description" 
-                value={formData.description} 
-                onChange={handleChange} 
-                maxLength={500} 
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                maxLength={500}
                 rows={4}
                 placeholder="Describe your moving services, experience, and what makes your company special..."
               />
               <small>{formData.description.length}/500 characters</small>
-              {errors.description && <div className={styles.error}>{errors.description}</div>}
+              {errors.description && <div>{errors.description}</div>}
             </label>
           </div>
 
-          <div className={styles.formGroup}>
-          </div>
+          <div></div>
         </div>
 
-        <div className={styles.formSection}>
+        <div>
           <h2>Business Address</h2>
-          
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
+
+          <div>
+            <div>
               <label>
                 Street Address*
-                <input 
-                  type="text" 
-                  name="street" 
-                  value={formData.street} 
-                  onChange={handleChange} 
-                  required 
+                <input
+                  type="text"
+                  name="street"
+                  value={formData.street}
+                  onChange={handleChange}
+                  required
                   placeholder="Street and house number"
                 />
-                {errors.street && <div className={styles.error}>{errors.street}</div>}
+                {errors.street && <div>{errors.street}</div>}
               </label>
             </div>
           </div>
 
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
+          <div>
+            <div>
               <label>
                 City*
-                <input 
-                  type="text" 
-                  name="city" 
-                  value={formData.city} 
-                  onChange={handleChange} 
-                  required 
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  required
                   placeholder="City name"
                 />
-                {errors.city && <div className={styles.error}>{errors.city}</div>}
+                {errors.city && <div>{errors.city}</div>}
               </label>
             </div>
 
-            <div className={styles.formGroup}>
+            <div>
               <label>
                 Postal Code*
-                <input 
-                  type="text" 
-                  name="postalCode" 
-                  value={formData.postalCode} 
-                  onChange={handleChange} 
-                  required 
+                <input
+                  type="text"
+                  name="postalCode"
+                  value={formData.postalCode}
+                  onChange={handleChange}
+                  required
                   placeholder="12345"
                 />
-                {errors.postalCode && <div className={styles.error}>{errors.postalCode}</div>}
+                {errors.postalCode && <div>{errors.postalCode}</div>}
               </label>
             </div>
           </div>
 
-          <div className={styles.formGroup}>
+          <div>
             <label>
               Country
-              <input 
-                type="text" 
-                name="country" 
-                value={formData.country} 
+              <input
+                type="text"
+                name="country"
+                value={formData.country}
                 onChange={handleChange}
                 placeholder="Germany"
               />
@@ -225,113 +237,121 @@ export default function CompanySetup() {
           </div>
         </div>
 
-        <div className={styles.formSection}>
+        <div>
           <h2>Certification</h2>
-          
+
           <div className={`${styles.formGroup} ${styles.checkboxGroup}`}>
-            <label className={styles.checkboxLabel}>
-              <input 
-                type="checkbox" 
-                name="isKisteKlarCertified" 
-                checked={formData.isKisteKlarCertified} 
-                onChange={handleChange} 
+            <label>
+              <input
+                type="checkbox"
+                name="isKisteKlarCertified"
+                checked={formData.isKisteKlarCertified}
+                onChange={handleChange}
               />
-              <span className={styles.checkmark}></span>
+              <span></span>
               KisteKlar Certified Company
-              <small>KisteKlar certification guarantees the highest quality standards and builds customer trust.</small>
+              <small>
+                KisteKlar certification guarantees the highest quality standards
+                and builds customer trust.
+              </small>
             </label>
           </div>
         </div>
 
-        <div className={styles.formSection}>
+        <div>
           <h2>Service Areas</h2>
-          <p className={styles.sectionDescription}>Define the areas where you provide moving services.</p>
-          
+          <p>Define the areas where you provide moving services.</p>
+
           {formData.serviceAreas.map((area, index) => (
-            <div key={index} className={styles.serviceArea}>
-              <div className={styles.serviceAreaInputs}>
-                <div className={styles.formGroup}>
+            <div key={index}>
+              <div>
+                <div>
                   <label>
                     From
-                    <input 
-                      type="text" 
-                      value={area.from} 
-                      onChange={(e) => handleServiceAreaChange(index, "from", e.target.value)}
+                    <input
+                      type="text"
+                      value={area.from}
+                      onChange={(e) =>
+                        handleServiceAreaChange(index, "from", e.target.value)
+                      }
                       placeholder="Starting location"
                     />
                   </label>
                 </div>
-                <div className={styles.formGroup}>
+                <div>
                   <label>
                     To
-                    <input 
-                      type="text" 
-                      value={area.to} 
-                      onChange={(e) => handleServiceAreaChange(index, "to", e.target.value)}
+                    <input
+                      type="text"
+                      value={area.to}
+                      onChange={(e) =>
+                        handleServiceAreaChange(index, "to", e.target.value)
+                      }
                       placeholder="Destination area"
                     />
                   </label>
                 </div>
               </div>
               {formData.serviceAreas.length > 1 && (
-                <button 
-                  type="button" 
-                  onClick={() => removeServiceArea(index)} 
-                  className={styles.removeBtn}
-                >
+                <button type="button" onClick={() => removeServiceArea(index)}>
                   Remove
                 </button>
               )}
             </div>
           ))}
-          
-          <button type="button" onClick={addServiceArea} className={styles.addBtn}>
+
+          <button type="button" onClick={addServiceArea}>
             + Add Service Area
           </button>
         </div>
 
-        <div className={styles.formSection}>
+        <div>
           <h2>Required Documents</h2>
-          
-          <div className={styles.formGroup}>
+
+          <div>
             <label>
               Business License*
-              <input 
-                type="file" 
-                name="businessLicense" 
-                accept=".pdf,.jpg,.jpeg,.png" 
-                onChange={handleFileChange} 
-                required 
+              <input
+                type="file"
+                name="businessLicense"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={handleFileChange}
+                required
               />
-              <small>Upload your business license or trade registration (PDF, JPG, PNG)</small>
-              {errors.businessLicense && <div className={styles.error}>{errors.businessLicense}</div>}
+              <small>
+                Upload your business license or trade registration (PDF, JPG,
+                PNG)
+              </small>
+              {errors.businessLicense && <div>{errors.businessLicense}</div>}
             </label>
           </div>
 
           {formData.isKisteKlarCertified && (
-            <div className={styles.formGroup}>
+            <div>
               <label>
                 KisteKlar Certificate*
-                <input 
-                  type="file" 
-                  name="kisteKlarCertificate" 
-                  accept=".pdf,.jpg,.jpeg,.png" 
-                  onChange={handleFileChange} 
-                  required 
+                <input
+                  type="file"
+                  name="kisteKlarCertificate"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={handleFileChange}
+                  required
                 />
                 <small>Upload your KisteKlar certification document</small>
-                {errors.kisteKlarCertificate && <div className={styles.error}>{errors.kisteKlarCertificate}</div>}
+                {errors.kisteKlarCertificate && (
+                  <div>{errors.kisteKlarCertificate}</div>
+                )}
               </label>
             </div>
           )}
         </div>
 
-        <div className={styles.formActions}>
-          <button type="submit" className={styles.submitBtn}>
-            Create Company Profile
-          </button>
+        <div>
+          <button type="submit">Create Company Profile</button>
           {submitMessage && (
-            <div className={`${styles.submitMessage} ${submitMessage.includes('success') ? styles.success : styles.error}`}>
+            <div
+              className={`${styles.submitMessage} ${submitMessage.includes("success") ? styles.success : styles.error}`}
+            >
               {submitMessage}
             </div>
           )}

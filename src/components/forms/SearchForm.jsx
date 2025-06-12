@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "@/app/styles/SearchForm.module.css";
 
 export default function SearchForm() {
   const [fromLocation, setFromLocation] = useState("");
@@ -12,7 +11,7 @@ export default function SearchForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!fromLocation.trim() || !toLocation.trim()) {
       alert("Please enter both locations");
       return;
@@ -26,29 +25,29 @@ export default function SearchForm() {
         fromAddress: {
           city: fromLocation.trim(),
           postalCode: "00000", // Default postal code
-          street: "Address not specified"
+          street: "Address not specified",
         },
         toAddress: {
           city: toLocation.trim(),
           postalCode: "00000", // Default postal code
-          street: "Address not specified"
+          street: "Address not specified",
         },
         moveDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
         estimatedHours: 4, // Default 4 hours
         helpersCount: 2, // Default 2 helpers
-        additionalServices: [] // Empty by default
+        additionalServices: [], // Empty by default
       };
 
       // Search for companies based on locations
-      const response = await fetch('/api/search-companies', {
-        method: 'POST',
+      const response = await fetch("/api/search-companies", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           fromCity: fromLocation.trim(),
-          toCity: toLocation.trim()
-        })
+          toCity: toLocation.trim(),
+        }),
       });
 
       if (!response.ok) {
@@ -58,41 +57,37 @@ export default function SearchForm() {
       const companies = await response.json();
 
       // Save to session storage
-      sessionStorage.setItem('movingFormData', JSON.stringify(formData));
-      sessionStorage.setItem('searchResults', JSON.stringify(companies));
+      sessionStorage.setItem("movingFormData", JSON.stringify(formData));
+      sessionStorage.setItem("searchResults", JSON.stringify(companies));
 
       // Navigate to search results
-      router.push('/search-results');
-
+      router.push("/search-results");
     } catch (error) {
-      console.error('Search failed:', error);
-      alert('Search failed. Please try again.');
+      console.error("Search failed:", error);
+      alert("Search failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className={styles.searchFormWrapper}>
-      <form onSubmit={handleSubmit} className={styles.searchForm}>
-        <div className={styles.inputGroup}>
-          <div className={styles.inputWrapper}>
-            <label htmlFor="fromLocation" className={styles.inputLabel}>
-              Moving from
-            </label>
+    <div>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <div>
+            <label htmlFor="fromLocation">Moving from</label>
             <input
               type="text"
               id="fromLocation"
               value={fromLocation}
               onChange={(e) => setFromLocation(e.target.value)}
               placeholder="Enter your current city"
-              className={styles.searchInput}
               required
               disabled={loading}
             />
           </div>
-          
-          <div className={styles.arrowWrapper}>
+
+          <div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -103,39 +98,34 @@ export default function SearchForm() {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className={styles.arrowIcon}
             >
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />
             </svg>
           </div>
-          
-          <div className={styles.inputWrapper}>
-            <label htmlFor="toLocation" className={styles.inputLabel}>
-              Moving to
-            </label>
+
+          <div>
+            <label htmlFor="toLocation">Moving to</label>
             <input
               type="text"
               id="toLocation"
               value={toLocation}
               onChange={(e) => setToLocation(e.target.value)}
               placeholder="Enter your destination city"
-              className={styles.searchInput}
               required
               disabled={loading}
             />
           </div>
         </div>
-        
-        <button type="submit" className={styles.submitButton} disabled={loading}>
-          {loading ? 'Searching...' : 'Find companies'}
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Searching..." : "Find companies"}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
             height="20"
             viewBox="0 0 20 20"
             fill="currentColor"
-            className={styles.submitIcon}
           >
             <path
               fillRule="evenodd"

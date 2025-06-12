@@ -1,85 +1,87 @@
 // src/components/dashboard/OrderList.jsx
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import styles from '@/app/styles/OrderList.module.css';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const OrderList = () => {
   const router = useRouter();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filter, setFilter] = useState('all');
-  
+  const [filter, setFilter] = useState("all");
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch('/api/user/orders');
+        const response = await fetch("/api/user/orders");
         const data = await response.json();
-        
+
         if (data.success) {
           setOrders(data.orders);
         } else {
-          setError(data.message || 'Failed to load orders.');
+          setError(data.message || "Failed to load orders.");
         }
       } catch (error) {
-        console.error('Error fetching orders:', error);
-        setError('An error occurred. Please try again later.');
+        console.error("Error fetching orders:", error);
+        setError("An error occurred. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchOrders();
   }, []);
-  
+
   const formatDate = (dateString) => {
-    if (!dateString) return 'No date specified';
-    
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
+    if (!dateString) return "No date specified";
+
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString("en-US", options);
   };
-  
+
   const getStatusBadge = (status) => {
     const statusMap = {
-      pending: { class: styles.badgeYellow, text: 'Request Sent' },
-      confirmed: { class: styles.badgeGreen, text: 'Confirmed' },
-      declined: { class: styles.badgeRed, text: 'Declined' },
-      completed: { class: styles.badgeBlue, text: 'Completed' },
-      cancelled: { class: styles.badgeGray, text: 'Cancelled' }
+      pending: { class: styles.badgeYellow, text: "Request Sent" },
+      confirmed: { class: styles.badgeGreen, text: "Confirmed" },
+      declined: { class: styles.badgeRed, text: "Declined" },
+      completed: { class: styles.badgeBlue, text: "Completed" },
+      cancelled: { class: styles.badgeGray, text: "Cancelled" },
     };
-    
-    const statusInfo = statusMap[status] || { class: styles.badgeGray, text: status };
-    
+
+    const statusInfo = statusMap[status] || {
+      class: styles.badgeGray,
+      text: status,
+    };
+
     return (
       <span className={`${styles.badge} ${statusInfo.class}`}>
         {statusInfo.text}
       </span>
     );
   };
-  
+
   const filteredOrders = () => {
-    if (filter === 'all') {
+    if (filter === "all") {
       return orders;
     }
-    
-    return orders.filter(order => order.status === filter);
+
+    return orders.filter((order) => order.status === filter);
   };
-  
+
   const handleViewOrder = (orderId) => {
     router.push(`/user/orders/${orderId}`);
   };
-  
+
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
+      <div>
+        <div></div>
         <p>Loading orders...</p>
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className={`${styles.alert} ${styles.alertDanger}`}>
@@ -88,18 +90,15 @@ const OrderList = () => {
       </div>
     );
   }
-  
+
   return (
-    <div className={styles.orderList}>
-      <div className={styles.orderListHeader}>
+    <div>
+      <div>
         <h2>My Orders</h2>
-        <div className={styles.filterContainer}>
-          <label htmlFor="statusFilter" className={styles.filterLabel}>
-            Filter by status:
-          </label>
+        <div>
+          <label htmlFor="statusFilter">Filter by status:</label>
           <select
             id="statusFilter"
-            className={styles.filterSelect}
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           >
@@ -112,88 +111,91 @@ const OrderList = () => {
           </select>
         </div>
       </div>
-      
+
       {orders.length === 0 ? (
-        <div className={styles.emptyState}>
-          <div className={styles.emptyStateIcon}>📦</div>
+        <div>
+          <div>📦</div>
           <h3>No Orders Yet</h3>
           <p>You haven't placed any moving orders yet.</p>
-          <button 
+          <button
             className={`${styles.btn} ${styles.btnPrimary}`}
-            onClick={() => router.push('/')}
+            onClick={() => router.push("/")}
           >
             Plan Your Move
           </button>
         </div>
       ) : filteredOrders().length === 0 ? (
-        <div className={styles.emptyState}>
+        <div>
           <h3>No {filter} Orders</h3>
           <p>You don't have any orders with status "{filter}".</p>
-          <button 
+          <button
             className={`${styles.btn} ${styles.btnSecondary}`}
-            onClick={() => setFilter('all')}
+            onClick={() => setFilter("all")}
           >
             Show All Orders
           </button>
         </div>
       ) : (
-        <div className={styles.orderCards}>
+        <div>
           {filteredOrders().map((order) => (
-            <div key={order._id} className={styles.orderCard}>
-              <div className={styles.orderCardHeader}>
-                <div className={styles.orderInfo}>
-                  <span className={styles.orderDate}>{formatDate(order.createdAt)}</span>
+            <div key={order._id}>
+              <div>
+                <div>
+                  <span>{formatDate(order.createdAt)}</span>
                   {getStatusBadge(order.status)}
                 </div>
-                <div className={styles.orderPrice}>{order.totalPrice} €</div>
+                <div>{order.totalPrice} €</div>
               </div>
-              
-              <div className={styles.orderCardBody}>
-                <div className={styles.routeInfo}>
-                  <div className={styles.locationFrom}>
-                    <span className={styles.locationLabel}>From:</span>
-                    <span className={styles.locationCity}>{order.fromAddress.city}</span>
+
+              <div>
+                <div>
+                  <div>
+                    <span>From:</span>
+                    <span>{order.fromAddress.city}</span>
                   </div>
-                  <div className={styles.routeArrow}>→</div>
-                  <div className={styles.locationTo}>
-                    <span className={styles.locationLabel}>To:</span>
-                    <span className={styles.locationCity}>{order.toAddress.city}</span>
+                  <div>→</div>
+                  <div>
+                    <span>To:</span>
+                    <span>{order.toAddress.city}</span>
                   </div>
                 </div>
-                
-                <div className={styles.companyInfo}>
-                  <span className={styles.companyLabel}>Company:</span>
-                  <span className={styles.companyName}>{order.companyName}</span>
+
+                <div>
+                  <span>Company:</span>
+                  <span>{order.companyName}</span>
                 </div>
-                
-                <div className={styles.dateInfo}>
-                  <span className={styles.dateLabel}>
-                    {order.status === 'pending' ? 'Preferred Date:' : 'Moving Date:'}
+
+                <div>
+                  <span>
+                    {order.status === "pending"
+                      ? "Preferred Date:"
+                      : "Moving Date:"}
                   </span>
-                  <span className={styles.dateValue}>
-                    {order.confirmedDate 
+                  <span>
+                    {order.confirmedDate
                       ? formatDate(order.confirmedDate)
-                      : formatDate(order.preferredDates[0])
-                    }
-                    {order.status === 'pending' && (
-                      <span className={styles.pendingNote}>(waiting for confirmation)</span>
+                      : formatDate(order.preferredDates[0])}
+                    {order.status === "pending" && (
+                      <span>(waiting for confirmation)</span>
                     )}
                   </span>
                 </div>
               </div>
-              
-              <div className={styles.orderCardFooter}>
-                <button 
+
+              <div>
+                <button
                   className={`${styles.btn} ${styles.btnPrimary}`}
                   onClick={() => handleViewOrder(order._id)}
                 >
                   View Details
                 </button>
-                
-                {order.status === 'completed' && !order.review && (
-                  <button 
+
+                {order.status === "completed" && !order.review && (
+                  <button
                     className={`${styles.btn} ${styles.btnSecondary}`}
-                    onClick={() => router.push(`/user/orders/${order._id}/review`)}
+                    onClick={() =>
+                      router.push(`/user/orders/${order._id}/review`)
+                    }
                   >
                     Leave Review
                   </button>
@@ -203,11 +205,11 @@ const OrderList = () => {
           ))}
         </div>
       )}
-      
-      <div className={styles.newOrderButtonContainer}>
-        <button 
+
+      <div>
+        <button
           className={`${styles.btn} ${styles.btnPrimary} ${styles.btnLarge}`}
-          onClick={() => router.push('/')}
+          onClick={() => router.push("/")}
         >
           Plan a New Move
         </button>

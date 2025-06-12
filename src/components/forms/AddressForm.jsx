@@ -1,29 +1,28 @@
 // src/components/forms/AddressForm.jsx
 "use client";
 
-import { useState } from 'react';
-import styles from '@/app/styles/Components.module.css';
+import { useState } from "react";
 
-const AddressForm = ({ 
-  label, 
-  initialValues = {}, 
-  onChange, 
+const AddressForm = ({
+  label,
+  initialValues = {},
+  onChange,
   error,
-  className = '' 
+  className = "",
 }) => {
   const [address, setAddress] = useState({
-    street: initialValues.street || '',
-    city: initialValues.city || '',
-    postalCode: initialValues.postalCode || '',
-    country: initialValues.country || 'Germany',
-    ...initialValues
+    street: initialValues.street || "",
+    city: initialValues.city || "",
+    postalCode: initialValues.postalCode || "",
+    country: initialValues.country || "Germany",
+    ...initialValues,
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updatedAddress = { ...address, [name]: value };
     setAddress(updatedAddress);
-    
+
     if (onChange) {
       onChange(updatedAddress);
     }
@@ -31,66 +30,57 @@ const AddressForm = ({
 
   return (
     <div className={`${styles.addressForm} ${className}`}>
-      {label && <h3 className={styles.addressFormTitle}>{label}</h3>}
-      
-      <div className={styles.addressFormFields}>
-        <div className={styles.formGroup}>
-          <label htmlFor={`street-${label}`} className={styles.label}>
-            Street and Number
-          </label>
+      {label && <h3>{label}</h3>}
+
+      <div>
+        <div>
+          <label htmlFor={`street-${label}`}>Street and Number</label>
           <input
             type="text"
             id={`street-${label}`}
             name="street"
             value={address.street}
             onChange={handleChange}
-            className={`${styles.input} ${error ? styles.inputError : ''}`}
+            className={`${styles.input} ${error ? styles.inputError : ""}`}
             placeholder="Example Street 123"
           />
         </div>
-        
-        <div className={styles.addressGrid}>
-          <div className={styles.formGroup}>
-            <label htmlFor={`postalCode-${label}`} className={styles.label}>
-              Postal Code
-            </label>
+
+        <div>
+          <div>
+            <label htmlFor={`postalCode-${label}`}>Postal Code</label>
             <input
               type="text"
               id={`postalCode-${label}`}
               name="postalCode"
               value={address.postalCode}
               onChange={handleChange}
-              className={`${styles.input} ${error ? styles.inputError : ''}`}
+              className={`${styles.input} ${error ? styles.inputError : ""}`}
               placeholder="12345"
             />
           </div>
-          
-          <div className={styles.formGroup}>
-            <label htmlFor={`city-${label}`} className={styles.label}>
-              City
-            </label>
+
+          <div>
+            <label htmlFor={`city-${label}`}>City</label>
             <input
               type="text"
               id={`city-${label}`}
               name="city"
               value={address.city}
               onChange={handleChange}
-              className={`${styles.input} ${error ? styles.inputError : ''}`}
+              className={`${styles.input} ${error ? styles.inputError : ""}`}
               placeholder="Berlin"
             />
           </div>
         </div>
-        
-        <div className={styles.formGroup}>
-          <label htmlFor={`country-${label}`} className={styles.label}>
-            Country
-          </label>
+
+        <div>
+          <label htmlFor={`country-${label}`}>Country</label>
           <select
             id={`country-${label}`}
             name="country"
             value={address.country}
             onChange={handleChange}
-            className={styles.select}
           >
             <option value="Germany">Germany</option>
             <option value="Austria">Austria</option>
@@ -109,8 +99,8 @@ const AddressForm = ({
           </select>
         </div>
       </div>
-      
-      {error && <p className={styles.errorMessage}>{error}</p>}
+
+      {error && <p>{error}</p>}
     </div>
   );
 };

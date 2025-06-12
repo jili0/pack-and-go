@@ -1,6 +1,5 @@
 // src/app/layout.js
 import { Inter } from 'next/font/google';
-import './styles/globals.css';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { AuthProvider } from '@/context/AuthContext';

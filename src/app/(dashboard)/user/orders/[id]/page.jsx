@@ -1,11 +1,10 @@
 "use client";
 
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
-import styles from '@/app/styles/UserDashboard.module.css';
-import OrderDetails from '@/components/dashboard/OrderDetails';
-import { useEffect, useState } from 'react';
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import OrderDetails from "@/components/dashboard/OrderDetails";
+import { useEffect, useState } from "react";
 
 export default function UserDashboard() {
   const params = useParams();
@@ -22,8 +21,8 @@ export default function UserDashboard() {
 
   if (isLoading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
+      <div>
+        <div></div>
         <p>Loading order data...</p>
       </div>
     );
@@ -31,30 +30,29 @@ export default function UserDashboard() {
 
   if (!orderId) {
     return (
-      <div className={styles.errorContainer}>
+      <div>
         <h2>Invalid Order ID</h2>
-        <p>Unable to find the specified order. Please check the URL or return to homepage.</p>
-        <Link href="/" className={styles.homeLink}>
-          Return to Homepage
-        </Link>
+        <p>
+          Unable to find the specified order. Please check the URL or return to
+          homepage.
+        </p>
+        <Link href="/">Return to Homepage</Link>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className={styles.errorContainer}>
+      <div>
         <h2>Login Required</h2>
         <p>Please log in to view your orders.</p>
-        <Link href="/login" className={styles.loginLink}>
-          Go to Login
-        </Link>
+        <Link href="/login">Go to Login</Link>
       </div>
     );
   }
 
   return (
-    <div className={styles.userDashboard}>
+    <div>
       <OrderDetails orderId={orderId} />
     </div>
   );

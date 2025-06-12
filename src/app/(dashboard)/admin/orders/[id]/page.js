@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import styles from "@/app/styles/OrderDetail.module.css";
 
 export default function OrderDetail() {
   const router = useRouter();
@@ -62,8 +61,9 @@ export default function OrderDetail() {
         helpersCount: order.helpersCount || "",
         estimatedHours: order.estimatedHours || "",
         totalPrice: order.totalPrice || "",
-        confirmedDate: order.confirmedDate ? 
-          new Date(order.confirmedDate).toISOString().split('T')[0] : "",
+        confirmedDate: order.confirmedDate
+          ? new Date(order.confirmedDate).toISOString().split("T")[0]
+          : "",
       });
     }
   }, [order]);
@@ -109,7 +109,11 @@ export default function OrderDetail() {
   };
 
   const handleStatusUpdate = async (newStatus) => {
-    if (!window.confirm(`Are you sure you want to change the status to ${newStatus}?`)) {
+    if (
+      !window.confirm(
+        `Are you sure you want to change the status to ${newStatus}?`
+      )
+    ) {
       return;
     }
 
@@ -141,7 +145,11 @@ export default function OrderDetail() {
   };
 
   const handleDeleteOrder = async () => {
-    if (!window.confirm("Are you sure you want to delete this order? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this order? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
@@ -212,8 +220,8 @@ export default function OrderDetail() {
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
+      <div>
+        <div></div>
         <p>Loading order details...</p>
       </div>
     );
@@ -221,12 +229,13 @@ export default function OrderDetail() {
 
   if (!order) {
     return (
-      <div className={styles.errorContainer}>
+      <div>
         <h1>Order Not Found</h1>
-        <p>The order you&apos;re looking for doesn&apos;t exist or has been removed.</p>
-        <Link href="/admin" className={styles.backLink}>
-          ← Back to Dashboard
-        </Link>
+        <p>
+          The order you&apos;re looking for doesn&apos;t exist or has been
+          removed.
+        </p>
+        <Link href="/admin">← Back to Dashboard</Link>
       </div>
     );
   }
@@ -234,111 +243,99 @@ export default function OrderDetail() {
   const statusInfo = getStatusBadge(order.status);
 
   return (
-    <div className={styles.container}>
+    <div>
       {/* Header */}
-      <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.headerMain}>
-            <h1 className={styles.title}>Order #{order._id.slice(-8)}</h1>
+      <div>
+        <div>
+          <div>
+            <h1>Order #{order._id.slice(-8)}</h1>
             <span className={statusInfo.class}>{statusInfo.text}</span>
           </div>
-          <div className={styles.headerActions}>
-            <Link href="/admin/orders" className={styles.backLink}>
-              ← Back to Orders
-            </Link>
+          <div>
+            <Link href="/admin/orders">← Back to Orders</Link>
           </div>
         </div>
       </div>
 
       {/* Success/Error Messages */}
       {success && (
-        <div className={styles.successAlert}>
-          <div className={styles.successIcon}>✓</div>
-          <div className={styles.successText}>{success}</div>
-          <button onClick={() => setSuccess(null)} className={styles.closeAlert}>×</button>
+        <div>
+          <div>✓</div>
+          <div>{success}</div>
+          <button onClick={() => setSuccess(null)}>×</button>
         </div>
       )}
 
       {error && (
-        <div className={styles.errorAlert}>
-          <div className={styles.errorIcon}>⚠</div>
-          <div className={styles.errorText}>{error}</div>
-          <button onClick={() => setError(null)} className={styles.closeAlert}>×</button>
+        <div>
+          <div>⚠</div>
+          <div>{error}</div>
+          <button onClick={() => setError(null)}>×</button>
         </div>
       )}
 
       {/* Quick Actions */}
-      <div className={styles.quickActions}>
+      <div>
         <h3>Quick Actions</h3>
-        <div className={styles.actionButtons}>
+        <div>
           {order.status === "pending" && (
             <>
               <button
                 onClick={() => handleStatusUpdate("confirmed")}
-                className={styles.confirmButton}
                 disabled={saving}
               >
                 Confirm Order
               </button>
               <button
                 onClick={() => handleStatusUpdate("declined")}
-                className={styles.declineButton}
                 disabled={saving}
               >
                 Decline Order
               </button>
             </>
           )}
-          
+
           {order.status === "confirmed" && (
             <button
               onClick={() => handleStatusUpdate("completed")}
-              className={styles.completeButton}
               disabled={saving}
             >
               Mark as Completed
             </button>
           )}
 
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            className={styles.editButton}
-            disabled={saving}
-          >
+          <button onClick={() => setIsEditing(!isEditing)} disabled={saving}>
             {isEditing ? "Cancel Edit" : "Edit Order"}
           </button>
 
-          <button
-            onClick={handleDeleteOrder}
-            className={styles.deleteButton}
-            disabled={saving}
-          >
+          <button onClick={handleDeleteOrder} disabled={saving}>
             Delete Order
           </button>
         </div>
       </div>
 
       {/* Order Details */}
-      <div className={styles.contentGrid}>
+      <div>
         {/* Basic Information */}
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Basic Information</h3>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoItem}>
+        <div>
+          <h3>Basic Information</h3>
+          <div>
+            <div>
               <label>Order ID</label>
               <span>#{order._id}</span>
             </div>
-            <div className={styles.infoItem}>
+            <div>
               <label>Customer</label>
               <span>{order.customerName || "Unknown Customer"}</span>
             </div>
-            <div className={styles.infoItem}>
+            <div>
               <label>Status</label>
               {isEditing ? (
                 <select
                   value={editForm.status}
-                  onChange={(e) => setEditForm({...editForm, status: e.target.value})}
-                  className={styles.editInput}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, status: e.target.value })
+                  }
                 >
                   <option value="pending">Pending</option>
                   <option value="confirmed">Confirmed</option>
@@ -350,22 +347,23 @@ export default function OrderDetail() {
                 <span className={statusInfo.class}>{statusInfo.text}</span>
               )}
             </div>
-            <div className={styles.infoItem}>
+            <div>
               <label>Created</label>
               <span>{formatDate(order.createdAt)}</span>
             </div>
-            <div className={styles.infoItem}>
+            <div>
               <label>Last Updated</label>
               <span>{formatDate(order.updatedAt)}</span>
             </div>
-            <div className={styles.infoItem}>
+            <div>
               <label>Confirmed Date</label>
               {isEditing ? (
                 <input
                   type="date"
                   value={editForm.confirmedDate}
-                  onChange={(e) => setEditForm({...editForm, confirmedDate: e.target.value})}
-                  className={styles.editInput}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, confirmedDate: e.target.value })
+                  }
                 />
               ) : (
                 <span>{formatDate(order.confirmedDate)}</span>
@@ -375,22 +373,26 @@ export default function OrderDetail() {
         </div>
 
         {/* Address Information */}
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Address Information</h3>
-          <div className={styles.addressGrid}>
-            <div className={styles.addressCard}>
+        <div>
+          <h3>Address Information</h3>
+          <div>
+            <div>
               <h4>From Address</h4>
-              <div className={styles.address}>
+              <div>
                 <p>{order.fromAddress?.street}</p>
-                <p>{order.fromAddress?.postalCode} {order.fromAddress?.city}</p>
+                <p>
+                  {order.fromAddress?.postalCode} {order.fromAddress?.city}
+                </p>
                 <p>{order.fromAddress?.country}</p>
               </div>
             </div>
-            <div className={styles.addressCard}>
+            <div>
               <h4>To Address</h4>
-              <div className={styles.address}>
+              <div>
                 <p>{order.toAddress?.street}</p>
-                <p>{order.toAddress?.postalCode} {order.toAddress?.city}</p>
+                <p>
+                  {order.toAddress?.postalCode} {order.toAddress?.city}
+                </p>
                 <p>{order.toAddress?.country}</p>
               </div>
             </div>
@@ -398,38 +400,40 @@ export default function OrderDetail() {
         </div>
 
         {/* Service Details */}
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Service Details</h3>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoItem}>
+        <div>
+          <h3>Service Details</h3>
+          <div>
+            <div>
               <label>Number of Helpers</label>
               {isEditing ? (
                 <input
                   type="number"
                   min="1"
                   value={editForm.helpersCount}
-                  onChange={(e) => setEditForm({...editForm, helpersCount: e.target.value})}
-                  className={styles.editInput}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, helpersCount: e.target.value })
+                  }
                 />
               ) : (
                 <span>{order.helpersCount}</span>
               )}
             </div>
-            <div className={styles.infoItem}>
+            <div>
               <label>Estimated Hours</label>
               {isEditing ? (
                 <input
                   type="number"
                   min="1"
                   value={editForm.estimatedHours}
-                  onChange={(e) => setEditForm({...editForm, estimatedHours: e.target.value})}
-                  className={styles.editInput}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, estimatedHours: e.target.value })
+                  }
                 />
               ) : (
                 <span>{order.estimatedHours}</span>
               )}
             </div>
-            <div className={styles.infoItem}>
+            <div>
               <label>Total Price</label>
               {isEditing ? (
                 <input
@@ -437,50 +441,46 @@ export default function OrderDetail() {
                   step="0.01"
                   min="0"
                   value={editForm.totalPrice}
-                  onChange={(e) => setEditForm({...editForm, totalPrice: e.target.value})}
-                  className={styles.editInput}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, totalPrice: e.target.value })
+                  }
                 />
               ) : (
-                <span className={styles.priceValue}>{formatCurrency(order.totalPrice)}</span>
+                <span>{formatCurrency(order.totalPrice)}</span>
               )}
             </div>
           </div>
         </div>
 
         {/* Preferred Dates */}
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Preferred Dates</h3>
-          <div className={styles.datesList}>
+        <div>
+          <h3>Preferred Dates</h3>
+          <div>
             {order.preferredDates && order.preferredDates.length > 0 ? (
               order.preferredDates.map((date, index) => (
-                <div key={index} className={styles.dateItem}>
-                  {formatDate(date)}
-                </div>
+                <div key={index}>{formatDate(date)}</div>
               ))
             ) : (
-              <p className={styles.noData}>No preferred dates specified</p>
+              <p>No preferred dates specified</p>
             )}
           </div>
         </div>
 
         {/* Notes */}
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Notes</h3>
+        <div>
+          <h3>Notes</h3>
           {isEditing ? (
             <textarea
               value={editForm.notes}
-              onChange={(e) => setEditForm({...editForm, notes: e.target.value})}
-              className={styles.editTextarea}
+              onChange={(e) =>
+                setEditForm({ ...editForm, notes: e.target.value })
+              }
               placeholder="Add notes about this order..."
               maxLength={500}
             />
           ) : (
-            <div className={styles.notesContent}>
-              {order.notes ? (
-                <p>{order.notes}</p>
-              ) : (
-                <p className={styles.noData}>No notes added</p>
-              )}
+            <div>
+              {order.notes ? <p>{order.notes}</p> : <p>No notes added</p>}
             </div>
           )}
         </div>
@@ -488,19 +488,11 @@ export default function OrderDetail() {
 
       {/* Save Changes Button */}
       {isEditing && (
-        <div className={styles.saveSection}>
-          <button
-            onClick={handleSave}
-            className={styles.saveButton}
-            disabled={saving}
-          >
+        <div>
+          <button onClick={handleSave} disabled={saving}>
             {saving ? "Saving..." : "Save Changes"}
           </button>
-          <button
-            onClick={() => setIsEditing(false)}
-            className={styles.cancelButton}
-            disabled={saving}
-          >
+          <button onClick={() => setIsEditing(false)} disabled={saving}>
             Cancel
           </button>
         </div>
