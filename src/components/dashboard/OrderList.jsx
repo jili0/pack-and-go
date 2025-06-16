@@ -42,15 +42,15 @@ const OrderList = () => {
 
   const getStatusBadge = (status) => {
     const statusMap = {
-      pending: { class: styles.badgeYellow, text: "Request Sent" },
-      confirmed: { class: styles.badgeGreen, text: "Confirmed" },
-      declined: { class: styles.badgeRed, text: "Declined" },
-      completed: { class: styles.badgeBlue, text: "Completed" },
-      cancelled: { class: styles.badgeGray, text: "Cancelled" },
+      pending: { class: null, text: "Request Sent" },
+      confirmed: { class: null, text: "Confirmed" },
+      declined: { class: null, text: "Declined" },
+      completed: { class: null, text: "Completed" },
+      cancelled: { class: null, text: "Cancelled" },
     };
 
     const statusInfo = statusMap[status] || {
-      class: styles.badgeGray,
+      class: null,
       text: status,
     };
 

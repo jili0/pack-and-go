@@ -22,12 +22,12 @@ const StarRating = ({
   const getStarSizeClass = () => {
     switch (size) {
       case "large":
-        return styles.starLarge;
+        return null;
       case "medium":
-        return styles.starMedium;
+        return null;
       case "small":
       default:
-        return styles.starSmall;
+        return null;
     }
   };
 
@@ -54,8 +54,8 @@ const StarRating = ({
           tabIndex={interactive ? 0 : undefined}
           className={`
             ${getStarSizeClass()} 
-            ${interactive ? styles.starInteractive : ""}
-            ${star.isHalfFilled ? styles.starHalf : star.isFilled ? styles.starFilled : styles.starEmpty}
+            ${interactive ? null : ""}
+            ${star.isHalfFilled ? null : star.isFilled ? null : null}
           `}
           aria-label={`${star.value} star${star.value !== 1 ? "s" : ""}`}
         >

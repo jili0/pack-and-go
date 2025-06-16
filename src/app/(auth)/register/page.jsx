@@ -268,7 +268,7 @@ const RegisterSkeleton = () => (
 // Main component with Suspense boundary
 const RegisterPage = () => {
   return (
-    <div className="container py-8">
+    <div>
       <Suspense fallback={<RegisterSkeleton />}>
         <RegisterContent />
       </Suspense>

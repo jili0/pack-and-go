@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import "@/app/styles/styles.css";
 
 export default function SearchForm() {
   const [fromLocation, setFromLocation] = useState("");
@@ -71,10 +72,10 @@ export default function SearchForm() {
   };
 
   return (
-    <div>
+    <div className="search-form">
       <form onSubmit={handleSubmit}>
-        <div>
-          <div>
+        <div className="search-inputs">
+          <div className="input-field">
             <label htmlFor="fromLocation">Moving from</label>
             <input
               type="text"
@@ -87,7 +88,7 @@ export default function SearchForm() {
             />
           </div>
 
-          <div>
+          <div className="arrow-icon">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -104,7 +105,7 @@ export default function SearchForm() {
             </svg>
           </div>
 
-          <div>
+          <div className="input-field">
             <label htmlFor="toLocation">Moving to</label>
             <input
               type="text"
@@ -118,7 +119,7 @@ export default function SearchForm() {
           </div>
         </div>
 
-        <button type="submit" disabled={loading}>
+        <button type="submit" disabled={loading} className="search-button">
           {loading ? "Searching..." : "Find companies"}
           <svg
             xmlns="http://www.w3.org/2000/svg"

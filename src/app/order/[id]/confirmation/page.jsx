@@ -164,9 +164,7 @@ export default function OrderConfirmation() {
                         <span
                           key={i}
                           className={
-                            i < Math.round(company.averageRating)
-                              ? styles.starFilled
-                              : styles.starEmpty
+                            i < Math.round(company.averageRating) ? null : null
                           }
                         >
                           ★

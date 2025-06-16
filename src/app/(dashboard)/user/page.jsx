@@ -121,27 +121,27 @@ export default function UserDashboard() {
 
     switch (status) {
       case "pending":
-        colorClass = `${styles.bgYellow100} ${styles.textYellow800}`;
+        colorClass = `${null} ${null}`;
         text = "Request Sent";
         break;
       case "confirmed":
-        colorClass = `${styles.bgGreen100} ${styles.textGreen800}`;
+        colorClass = `${null} ${null}`;
         text = "Confirmed";
         break;
       case "declined":
-        colorClass = `${styles.bgRed100} ${styles.textRed800}`;
+        colorClass = `${null} ${null}`;
         text = "Declined";
         break;
       case "completed":
-        colorClass = `${styles.bgBlue100} ${styles.textBlue800}`;
+        colorClass = `${null} ${null}`;
         text = "Completed";
         break;
       case "cancelled":
-        colorClass = `${styles.bgGray100} ${styles.textGray800}`;
+        colorClass = `${null} ${null}`;
         text = "Cancelled";
         break;
       default:
-        colorClass = `${styles.bgGray100} ${styles.textGray800}`;
+        colorClass = `${null} ${null}`;
         text = status;
     }
 

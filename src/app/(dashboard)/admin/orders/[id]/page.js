@@ -195,27 +195,27 @@ export default function OrderDetail() {
   const getStatusBadge = (status) => {
     const statusMap = {
       pending: {
-        class: `${styles.statusBadge} ${styles.statusPending}`,
+        class: `${null} ${null}`,
         text: "Pending",
       },
       confirmed: {
-        class: `${styles.statusBadge} ${styles.statusConfirmed}`,
+        class: `${null} ${null}`,
         text: "Confirmed",
       },
       declined: {
-        class: `${styles.statusBadge} ${styles.statusDeclined}`,
+        class: `${null} ${null}`,
         text: "Declined",
       },
       completed: {
-        class: `${styles.statusBadge} ${styles.statusCompleted}`,
+        class: `${null} ${null}`,
         text: "Completed",
       },
       cancelled: {
-        class: `${styles.statusBadge} ${styles.statusCancelled}`,
+        class: `${null} ${null}`,
         text: "Cancelled",
       },
     };
-    return statusMap[status] || { class: styles.statusBadge, text: status };
+    return statusMap[status] || { class: null, text: status };
   };
 
   if (loading) {

@@ -134,47 +134,47 @@ export default function AdminDashboard() {
   const getRoleBadge = (role) => {
     const roleMap = {
       user: {
-        class: `${styles.roleBadge} ${styles.roleUser}`,
+        class: `${null} ${null}`,
         text: "Customer",
       },
       company: {
-        class: `${styles.roleBadge} ${styles.roleCompany}`,
+        class: `${null} ${null}`,
         text: "Company",
       },
       admin: {
-        class: `${styles.roleBadge} ${styles.roleAdmin}`,
+        class: `${null} ${null}`,
         text: "Admin",
       },
     };
-    const roleInfo = roleMap[role] || { class: styles.roleBadge, text: role };
+    const roleInfo = roleMap[role] || { class: null, text: role };
     return <span className={roleInfo.class}>{roleInfo.text}</span>;
   };
 
   const getStatusBadge = (status) => {
     const statusMap = {
       pending: {
-        class: `${styles.statusBadge} ${styles.statusPending}`,
+        class: `${null} ${null}`,
         text: "Pending",
       },
       confirmed: {
-        class: `${styles.statusBadge} ${styles.statusConfirmed}`,
+        class: `${null} ${null}`,
         text: "Confirmed",
       },
       declined: {
-        class: `${styles.statusBadge} ${styles.statusDeclined}`,
+        class: `${null} ${null}`,
         text: "Declined",
       },
       completed: {
-        class: `${styles.statusBadge} ${styles.statusCompleted}`,
+        class: `${null} ${null}`,
         text: "Completed",
       },
       cancelled: {
-        class: `${styles.statusBadge} ${styles.statusCancelled}`,
+        class: `${null} ${null}`,
         text: "Cancelled",
       },
     };
     const statusInfo = statusMap[status] || {
-      class: styles.statusBadge,
+      class: null,
       text: status,
     };
     return <span className={statusInfo.class}>{statusInfo.text}</span>;

@@ -170,8 +170,8 @@ export default function SearchResults() {
                             key={i}
                             className={
                               i < Math.round(company.averageRating)
-                                ? styles.starFilled
-                                : styles.starEmpty
+                                ? null
+                                : null
                             }
                           >
                             ★

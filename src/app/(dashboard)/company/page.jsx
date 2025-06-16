@@ -192,29 +192,29 @@ export default function CompanyDashboard() {
   const getStatusBadge = (status) => {
     const statusMap = {
       pending: {
-        class: styles.statusBadge + " " + styles.statuspending,
+        class: null + " " + null,
         text: "Request Received",
       },
       confirmed: {
-        class: styles.statusBadge + " " + styles.statusconfirmed,
+        class: null + " " + null,
         text: "Confirmed",
       },
       declined: {
-        class: styles.statusBadge + " " + styles.statusdeclined,
+        class: null + " " + null,
         text: "Declined",
       },
       completed: {
-        class: styles.statusBadge + " " + styles.statuscompleted,
+        class: null + " " + null,
         text: "Completed",
       },
       cancelled: {
-        class: styles.statusBadge + " " + styles.statuscancelled,
+        class: null + " " + null,
         text: "Cancelled",
       },
     };
 
     const statusInfo = statusMap[status] || {
-      class: styles.statusBadge,
+      class: null,
       text: status,
     };
 

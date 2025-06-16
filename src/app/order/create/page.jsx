@@ -293,8 +293,8 @@ export default function CreateOrder() {
                           key={i}
                           className={
                             i < Math.round(selectedCompany.averageRating || 0)
-                              ? styles.starFilled
-                              : styles.starEmpty
+                              ? null
+                              : null
                           }
                         >
                           ★
