@@ -72,7 +72,7 @@ export default function SearchForm() {
   };
 
   return (
-    <div className="search-form">
+    <div className="form-container">
       <form onSubmit={handleSubmit}>
         <div className="search-inputs">
           <div className="input-field">
@@ -119,7 +119,7 @@ export default function SearchForm() {
           </div>
         </div>
 
-        <button type="submit" disabled={loading} className="search-button">
+        <button type="submit" disabled={loading} className="btn-primary">
           {loading ? "Searching..." : "Find companies"}
           <svg
             xmlns="http://www.w3.org/2000/svg"

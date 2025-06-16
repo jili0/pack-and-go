@@ -29,10 +29,10 @@ const AddressForm = ({
   };
 
   return (
-    <div>
+    <div className="form-container">
       {label && <h3>{label}</h3>}
 
-      <div>
+      <form>
         <div>
           <label htmlFor={`street-${label}`}>Street and Number</label>
           <input
@@ -95,7 +95,7 @@ const AddressForm = ({
             <option value="United Kingdom">United Kingdom</option>
           </select>
         </div>
-      </div>
+      </form>
 
       {error && <p>{error}</p>}
     </div>

@@ -79,7 +79,7 @@ const LoginContent = () => {
   };
 
   return (
-    <div className="login-page">
+    <div className="form-container">
       {loginError && (
         <div>
           <div>
@@ -103,11 +103,13 @@ const LoginContent = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="login-form">
+      <form onSubmit={handleSubmit}>
         <h1>Welcome Back</h1>
         <p>Sign in to plan or manage your move.</p>
         <div>
-          <label htmlFor="email">Email Address</label>
+          <label htmlFor="email" className="no-visible">
+            Email Address
+          </label>
           <input
             type="email"
             id="email"
@@ -121,7 +123,9 @@ const LoginContent = () => {
         </div>
 
         <div>
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password" className="no-visible">
+            Password
+          </label>
           <input
             type="password"
             id="password"
@@ -134,12 +138,12 @@ const LoginContent = () => {
           {errors.password && <p>{errors.password}</p>}
         </div>
 
-        <button type="submit" disabled={isSubmitting}>
+        <button type="submit" disabled={isSubmitting} className="btn-primary">
           {isSubmitting ? "Signing in..." : "Sign in"}
         </button>
       </form>
 
-      <div>
+      <div className="form-footer">
         <p>
           Don&apos;t have an account yet?
           <Link href="/register"> Register now</Link>

@@ -23,7 +23,8 @@ const AdminLoginContent = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Email is invalid";
     if (!formData.password) newErrors.password = "Password is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -56,21 +57,23 @@ const AdminLoginContent = () => {
   };
 
   return (
-    <div className="admin-login">
-      <div className="admin-badge">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-        </svg>
-        <span>Administrator Access</span>
-      </div>
-
+    <div className="form-container">
       <h1>Admin Login</h1>
-      <p>Please sign in with your administrator credentials to access the admin dashboard.</p>
+      <p>
+        Please sign in with your administrator credentials to access the admin
+        dashboard.
+      </p>
 
       {loginError && (
-        <div className="error-message">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <div className="error">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="8" x2="12" y2="12"></line>
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -79,43 +82,46 @@ const AdminLoginContent = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="admin-form">
-        <div className="form-group">
-          <label htmlFor="email">Admin Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="admin@pack-and-go.com"
-            disabled={isSubmitting}
-          />
-          {errors.email && <span className="error">{errors.email}</span>}
-        </div>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="email" className="no-visible">
+          Admin Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="admin@pack-and-go.com"
+          disabled={isSubmitting}
+        />
+        {errors.email && <span className="error">{errors.email}</span>}
 
-        <div className="form-group">
-          <label htmlFor="password">Admin Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Your admin password"
-            disabled={isSubmitting}
-          />
-          {errors.password && <span className="error">{errors.password}</span>}
-        </div>
+        <label htmlFor="password" className="no-visible">
+          Admin Password
+        </label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          placeholder="Your admin password"
+          disabled={isSubmitting}
+        />
+        {errors.password && <span className="error">{errors.password}</span>}
 
-        <button type="submit" className="admin-submit" disabled={isSubmitting}>
+        <button type="submit" className="btn-primary" disabled={isSubmitting}>
           {isSubmitting ? "Signing in..." : "Access Admin Dashboard"}
         </button>
       </form>
 
-      <div className="admin-footer">
-        <Link href="/">← Back to Homepage</Link>
-        <p>This is a restricted area. Only authorized administrators can access this section.</p>
+      <div className="form-footer">
+        <Link href="/">Back to Homepage</Link>
+        <p>
+          This is a restricted area. Only authorized administrators can access
+          this section.
+        </p>
       </div>
     </div>
   );
@@ -123,8 +129,14 @@ const AdminLoginContent = () => {
 
 const AdminLoginPage = () => {
   return (
-    <div className="container admin-page">
-      <Suspense fallback={<div className="admin-login"><h1>Loading...</h1></div>}>
+    <div className="form-container">
+      <Suspense
+        fallback={
+          <div className="admin-login">
+            <h1>Loading...</h1>
+          </div>
+        }
+      >
         <AdminLoginContent />
       </Suspense>
     </div>
