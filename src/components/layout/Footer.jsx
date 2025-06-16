@@ -6,26 +6,22 @@ const Footer = () => {
 
   return (
     <footer>
-      <div>
+      <div className="container">
         {/* Logo and short description */}
-        <div>
-          <div>
-            <Link href="/">
-              <div>
-                <Image
-                  src="/images/logo-transparent.png"
-                  alt="Pack & Go Logo"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            </Link>
-          </div>
+        <div className="footer-description">
+          <Link href="/" className="footer-logo">
+            <Image
+              src="/images/logo-transparent.png"
+              alt="Pack & Go Logo"
+              fill
+              className="object-contain"
+            />
+          </Link>
           <p>
             Pack & Go offers a simple and transparent solution for moving
             services with clear pricing and verified quality.
           </p>
-          <div>
+          <div className="footer-social">
             <a href="#" aria-label="Facebook">
               <svg
                 width="24"
@@ -70,8 +66,8 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Links */}
-        <div>
+        {/* Service */}
+        <div className="footer-service">
           <h3>Service</h3>
           <ul>
             <li>
@@ -90,7 +86,7 @@ const Footer = () => {
         </div>
 
         {/* Company */}
-        <div>
+        <div className="footer-company">
           <h3>Company</h3>
           <ul>
             <li>
@@ -113,7 +109,7 @@ const Footer = () => {
       </div>
 
       {/* Copyright */}
-      <div>
+      <div className="footer-copyright">
         <p>&copy; {currentYear} Pack & Go. All Rights Reserved.</p>
       </div>
     </footer>

@@ -7,15 +7,17 @@ export default function Home() {
     <main>
       {/* Hero Section */}
       <section id="home" className="hero">
-        <div className="hero-content">
-          <h1>Easy moving with transparent prices</h1>
-          <p>Find certified moving helpers at fair prices.</p>
-          <a href="#pricing" className="btn-primary">
-            Calculate price
-          </a>
-        </div>
-        <div className="hero-image">
-          <img src="/images/moving-planning.jpg" alt="Moving Planning" />
+        <div className="container">
+          <div className="hero-content">
+            <h1>Easy moving with transparent prices</h1>
+            <p>Find certified moving helpers at fair prices.</p>
+            <a href="#pricing" className="btn-primary">
+              Calculate price
+            </a>
+          </div>
+          <div className="hero-image">
+            <img src="/images/moving-planning.jpg" alt="Moving Planning" />
+          </div>
         </div>
       </section>
 
@@ -28,7 +30,7 @@ export default function Home() {
       </section>
 
       {/* Search Section */}
-      <section id="find-companies">
+      <section id="companies">
         <div>
           <div>
             <h2>Find moving companies</h2>

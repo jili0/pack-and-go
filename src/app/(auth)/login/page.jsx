@@ -79,10 +79,7 @@ const LoginContent = () => {
   };
 
   return (
-    <div>
-      <h1>Welcome Back</h1>
-      <p>Sign in to plan or manage your move.</p>
-
+    <div className="login-page">
       {loginError && (
         <div>
           <div>
@@ -107,6 +104,8 @@ const LoginContent = () => {
       )}
 
       <form onSubmit={handleSubmit} className="login-form">
+        <h1>Welcome Back</h1>
+        <p>Sign in to plan or manage your move.</p>
         <div>
           <label htmlFor="email">Email Address</label>
           <input
