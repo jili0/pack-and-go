@@ -280,12 +280,7 @@ section {
 }
 
 .checkbox-field input {
-  margin-top: 0.25rem;
   width: auto;
-}
-
-.checkbox-field label {
-  font-weight: normal;
 }
 
 /* Search Form */
@@ -439,6 +434,12 @@ footer a {
 }
 
 footer a:hover {
+  color: #007bff;
+}
+
+/* Placeholder Page */
+
+.placeholder-icon {
   color: #007bff;
 }
 
