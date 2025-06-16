@@ -4,9 +4,9 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div>
-      <div>
-        <div>
+    <section className="not-found">
+      <div className="container">
+        <div className="not-found-icon">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -23,35 +23,16 @@ export default function NotFound() {
         </div>
 
         <h1>Page Not Found</h1>
-        <div></div>
-
         <p>Oops! Looks like you've ventured into uncharted territory.</p>
-
         <p>
           The page you're looking for might have been moved or doesn't exist.
           But don't worry, we can help you find your way back.
         </p>
 
-        <div>
-          <h3>Here's where you might want to go:</h3>
-          <ul>
-            <li>
-              Start planning your move on our <Link href="/">homepage</Link>
-            </li>
-            <li>
-              Check out our service <Link href="/pricing">pricing</Link>
-            </li>
-            <li>
-              Get helpful <Link href="/tips">moving tips</Link> for a smooth
-              relocation
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <Link href="/">Back to Homepage</Link>
-        </div>
+        <Link href="/" className="btn-primary">
+          Back to Homepage
+        </Link>
       </div>
-    </div>
+    </section>
   );
 }
