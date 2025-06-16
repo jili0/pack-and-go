@@ -14,7 +14,7 @@ const Header = () => {
     <header>
       <div className="header-container">
         {/* Logo */}
-        <a href="/">
+        <a href="/" className="header-logo">
           <img src="/images/logo.png" alt="Pack & Go Logo" />
         </a>
 

@@ -40,8 +40,13 @@ p {
 }
 
 a {
-  color: #007bff;
+  cursor: pointer;
   text-decoration: none;
+  color: #333;
+}
+
+a:hover {
+  color: #007bff;
 }
 
 button {
@@ -54,6 +59,7 @@ button {
   justify-content: center;
   gap: 0.5rem;
   padding: clamp(7px, 1vw, 10px) 24px;
+  margin-top: clamp(14px, 2vw, 20px);
   border-radius: 6px;
   text-decoration: none;
   border: none;
@@ -78,11 +84,11 @@ button,
 input,
 select {
   width: 100%;
-  padding: 4px 10px;
+  padding: 5px 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 1rem;
-  margin-bottom: 0.8rem;
+  margin-block: 0.4rem;
 }
 
 input:focus,
@@ -107,6 +113,11 @@ form {
 
 .no-visible {
   display: none;
+}
+
+.form-container {
+  background: #f8f9fa;
+  padding: 2rem 20px;
 }
 
 .form-footer {
@@ -140,6 +151,8 @@ header {
 }
 
 .header-container {
+  max-width: 800px;
+  margin: 4px auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -147,19 +160,14 @@ header {
   padding-inline: 4px;
 }
 
-.header-container > a {
-  display: block;
-  width: 100%;
+.header-logo {
   height: 100%;
 }
 
-header img {
-  display: block;
-  max-width: 100%;
+.header-logo img {
   max-height: 100%;
   width: auto;
   height: auto;
-  flex-shrink: 0;
 }
 
 nav {
@@ -168,15 +176,7 @@ nav {
   justify-content: flex-end;
   align-items: flex-end;
   gap: clamp(2px, 2vw, 20px);
-}
-
-nav a {
-  text-decoration: none;
-  color: #333;
-}
-
-nav a:hover {
-  color: #007bff;
+  transform: translateY(8px);
 }
 
 .mobile-hide {
@@ -185,7 +185,7 @@ nav a:hover {
 
 .admin-icon {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
 }
 
 /* Home */
@@ -195,11 +195,13 @@ main {
 
 section {
   padding-top: clamp(20px, 15vw, 100px);
+  padding-bottom: 1rem;
 }
 
 .hero {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  padding-bottom: clamp(20px, 15vw, 100px);
 }
 
 .hero > .container {
@@ -212,6 +214,74 @@ section {
 .hero img {
   width: 100%;
   border-radius: 1rem;
+}
+
+/* Price Calculator */
+.calculator-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+.calculator-row label {
+  font-weight: 600;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.input-group button {
+  width: 35px;
+  height: 35px;
+  border: 1px solid #ddd;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.total {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin: 1.5rem 0;
+}
+
+.total-price {
+  color: #007bff;
+}
+/* Register Page */
+.checkbox-field {
+  display: flex;
+  align-items: center;
+}
+/* Search Form */
+.search-inputs {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.input-field {
+  flex: 1;
+}
+
+.input-field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.arrow-icon {
+  color: #666;
+  margin-top: 1.5rem;
 }
 
 .contact-info {
@@ -277,79 +347,6 @@ section {
 
 .social-icons a:hover {
   background: #0056b3;
-}
-
-/* Price Calculator */
-.calculator-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 1.5rem 0;
-}
-
-.calculator-row label {
-  font-weight: 600;
-}
-
-.input-group {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.input-group button {
-  width: 35px;
-  height: 35px;
-  border: 1px solid #ddd;
-  background: #f8f9fa;
-  border-radius: 4px;
-}
-
-.total {
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 6px;
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  margin: 1.5rem 0;
-}
-
-.total-price {
-  color: #007bff;
-}
-
-.form-container {
-  background: #f8f9fa;
-  padding: 2rem 20px;
-}
-
-.checkbox-field {
-  display: flex;
-  align-items: center;
-}
-/* Search Form */
-.search-inputs {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.input-field {
-  flex: 1;
-}
-
-.input-field label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  text-align: left;
-}
-
-.arrow-icon {
-  color: #666;
-  margin-top: 1.5rem;
 }
 
 /* Footer */

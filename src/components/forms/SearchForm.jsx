@@ -82,7 +82,7 @@ export default function SearchForm() {
               id="fromLocation"
               value={fromLocation}
               onChange={(e) => setFromLocation(e.target.value)}
-              placeholder="Enter your current city"
+              placeholder="Your current city"
               required
               disabled={loading}
             />
@@ -112,7 +112,7 @@ export default function SearchForm() {
               id="toLocation"
               value={toLocation}
               onChange={(e) => setToLocation(e.target.value)}
-              placeholder="Enter your destination city"
+              placeholder="Your destination city"
               required
               disabled={loading}
             />

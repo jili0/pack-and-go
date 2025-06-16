@@ -23,24 +23,20 @@ export default function Home() {
 
       {/* Price Calculator */}
       <section id="pricing">
-        <div className="container">
-          <h2>Calculate your moving price</h2>
-          <MovingCalculator />
-        </div>
+        <h2>Calculate your moving price</h2>
+        <MovingCalculator />
       </section>
 
       {/* Search Section */}
       <section id="companies">
         <div>
-          <div>
-            <h2>Find moving companies</h2>
-            <p>
-              Enter your moving route to discover the best moving companies in
-              your area
-            </p>
-          </div>
-          <SearchForm />
+          <h2>Find moving companies</h2>
+          <p>
+            Enter your moving route to discover the best moving companies in
+            your area
+          </p>
         </div>
+        <SearchForm />
       </section>
 
       {/* Contact Info */}

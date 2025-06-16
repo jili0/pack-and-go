@@ -19,7 +19,10 @@ const PriceCalculator = () => {
         <div className="calculator-row">
           <label>Helpers</label>
           <div className="input-group">
-            <button onClick={() => helpers > 1 && setHelpers(helpers - 1)}>
+            <button
+              type="button"
+              onClick={() => helpers > 1 && setHelpers(helpers - 1)}
+            >
               -
             </button>
             <input
@@ -30,14 +33,21 @@ const PriceCalculator = () => {
               }
               min="1"
             />
-            <button onClick={() => setHelpers(helpers + 1)}>+</button>
+            <button type="button" onClick={() => setHelpers(helpers + 1)}>
+              +
+            </button>
           </div>
         </div>
 
         <div className="calculator-row">
           <label>Hours</label>
           <div className="input-group">
-            <button onClick={() => hours > 1 && setHours(hours - 1)}>-</button>
+            <button
+              type="button"
+              onClick={() => hours > 1 && setHours(hours - 1)}
+            >
+              -
+            </button>
             <input
               type="number"
               value={hours}
@@ -46,7 +56,9 @@ const PriceCalculator = () => {
               }
               min="1"
             />
-            <button onClick={() => setHours(hours + 1)}>+</button>
+            <button type="button" onClick={() => setHours(hours + 1)}>
+              +
+            </button>
           </div>
         </div>
 
