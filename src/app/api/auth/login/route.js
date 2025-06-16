@@ -1,4 +1,3 @@
-// src/app/api/auth/login/route.js
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import User from '@/models/User';
@@ -10,33 +9,33 @@ export async function POST(request) {
     
     const { email, password } = await request.json();
     
-    // Benutzer mit Passwort suchen
+    // Find user with password
     const user = await User.findOne({ email }).select('+password');
     
     if (!user) {
       return NextResponse.json(
-        { success: false, message: 'Ungültige Anmeldedaten' },
+        { success: false, message: 'Invalid credentials' },
         { status: 401 }
       );
     }
     
-    // Passwort überprüfen
+    // Verify password
     const isMatch = await user.matchPassword(password);
     
     if (!isMatch) {
       return NextResponse.json(
-        { success: false, message: 'Ungültige Anmeldedaten' },
+        { success: false, message: 'Invalid credentials' },
         { status: 401 }
       );
     }
     
-    // JWT-Token erstellen
+    // Create JWT token
     const token = createToken(user._id, user.role);
     
-    // Erfolgreiche Antwort mit Token als Cookie
+    // Successful response with token as cookie
     const response = NextResponse.json({
       success: true,
-      message: 'Anmeldung erfolgreich',
+      message: 'Login successful',
       user: {
         id: user._id,
         name: user.name,
@@ -45,24 +44,24 @@ export async function POST(request) {
       }
     });
     
-    // Cookie setzen
+    // Set cookie
     response.cookies.set({
       name: 'token',
       value: token,
       httpOnly: true,
       path: '/',
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 7 Tage
+      maxAge: 60 * 60 * 24 * 7, // 7 days
       sameSite: 'strict'
     });
     
     return response;
     
   } catch (error) {
-    console.error('Anmeldefehler:', error);
+    console.error('Login error:', error);
     
     return NextResponse.json(
-      { success: false, message: 'Serverfehler bei der Anmeldung' },
+      { success: false, message: 'Server error during login' },
       { status: 500 }
     );
   }
