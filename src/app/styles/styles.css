@@ -255,11 +255,39 @@ section {
 .total-price {
   color: #007bff;
 }
+
 /* Register Page */
+.register-form .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.register-form .form-field label {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .checkbox-field {
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
+
+.checkbox-field input {
+  margin-top: 0.25rem;
+  width: auto;
+}
+
+.checkbox-field label {
+  font-weight: normal;
+}
+
 /* Search Form */
 .search-inputs {
   display: flex;
