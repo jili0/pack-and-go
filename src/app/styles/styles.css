@@ -484,6 +484,100 @@ section {
   background: #0056b3;
 }
 
+/* AdminLogin */
+.admin-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+}
+
+.admin-login {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.admin-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #007bff;
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.admin-login h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+.admin-login p { color: #666; margin-bottom: 1.5rem; font-size: 0.9rem; }
+
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #fee;
+    color: #c33;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.admin-form { text-align: left; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-group input:disabled { background: #f8f9fa; cursor: not-allowed; }
+.error { display: block; color: #c33; font-size: 0.85rem; margin-top: 0.25rem; }
+
+.admin-submit {
+    width: 100%;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.875rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.admin-submit:hover:not(:disabled) { background: #0056b3; }
+.admin-submit:disabled { background: #ccc; cursor: not-allowed; }
+
+.admin-footer {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.admin-footer a { color: #007bff; text-decoration: none; font-weight: 500; }
+.admin-footer a:hover { text-decoration: underline; }
+.admin-footer p { margin-top: 0.5rem; font-size: 0.8rem; color: #888; }
+
 /* Footer */
 footer {
   background: #333;
