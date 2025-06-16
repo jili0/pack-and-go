@@ -28,7 +28,7 @@ export default function Home() {
       </section>
 
       {/* Search Section */}
-      <section id="searchCompanies">
+      <section id="find-companies">
         <div>
           <div>
             <h2>Find moving companies</h2>

@@ -22,6 +22,7 @@ const Header = () => {
         <nav>
           <a href="/">Home</a>
           <a href="/#pricing">Pricing</a>
+          <a href="/#find-companies">Find Companies</a>
           <a href="/#contact">Contact</a>
         </nav>
 
