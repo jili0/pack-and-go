@@ -3,93 +3,17 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
-
-// User management configuration
-const USER_ROLES = {
-  user: { label: "Customers", searchEmpty: "No customers" },
-  company: { label: "Companies", searchEmpty: "No companies" },
-  admin: { label: "Admins", searchEmpty: "No administrators" }
-};
-
-// Reusable UserSection component
-const UserSection = ({ 
-  role, 
-  users, 
-  searchTerm, 
-  onEditUser, 
-  onDeleteUser 
-}) => {
-  const config = USER_ROLES[role];
-  const filteredUsers = users.filter(user => {
-    if (user.role !== role) return false;
-    if (!searchTerm) return true;
-    
-    const searchLower = searchTerm.toLowerCase();
-    return user.name.toLowerCase().includes(searchLower) || 
-           user.email.toLowerCase().includes(searchLower);
-  });
-
-  return (
-    <div>
-      <div>
-        <h3>Manage {config.label} ({filteredUsers.length})</h3>
-      </div>
-      {filteredUsers.length === 0 ? (
-        <div>
-          <p>
-            {searchTerm
-              ? `${config.searchEmpty} match your search`
-              : `${config.searchEmpty} found`}
-          </p>
-        </div>
-      ) : (
-        <div>
-          {filteredUsers.map((userData) => (
-            <div key={userData._id}>
-              <h4>{userData.name}</h4>
-              <p>{userData.email}</p>
-              <button
-                className="btn-primary"
-                onClick={() => onEditUser(userData._id)}
-              >
-                Edit
-              </button>
-              <button
-                className="btn-primary"
-                onClick={() => onDeleteUser(userData._id)}
-              >
-                Delete
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Reusable OrderCard component
-const OrderCard = ({ order, onViewOrder, formatCurrency, formatDate }) => (
-  <div key={order._id} onClick={() => onViewOrder(order._id)}>
-    <p>OrderID: #{order._id}</p>
-    <p>CustomerName: {order.customerName || "Unknown"}</p>
-    <p>From: {order.fromAddress?.city}</p>
-    <p>To: {order.toAddress?.city}</p>
-    <p>TotalPrice: {formatCurrency(order.totalPrice)}</p>
-    <p>CreatedAt: {formatDate(order.createdAt)}</p>
-  </div>
-);
+import "@/app/styles/styles.css";
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const { user } = useAuth();
   const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const USER_ROLES = ["user", "company", "admin"];
 
   useEffect(() => {
     fetchDashboardData();
@@ -99,7 +23,7 @@ export default function AdminDashboard() {
     try {
       const [usersRes, ordersRes] = await Promise.all([
         fetch("/api/admin/users"),
-        fetch("/api/orders")
+        fetch("/api/orders"),
       ]);
 
       if (usersRes.ok) {
@@ -118,53 +42,123 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleUserAction = async (userId, action) => {
-    if (action === "delete") {
-      const confirmed = window.confirm(
-        "Are you sure you want to delete this user? This action cannot be undone."
-      );
-      if (!confirmed) return;
-    }
+  // Reusable UserSection component
+  const UserSection = ({ role }) => {
+    // Search and filter
+    const filteredUsers = users.filter((user) => {
+      const searchLower = searchTerm?.toLowerCase();
+      const matchesSearch =
+        !searchTerm ||
+        user.name.toLowerCase().includes(searchLower) ||
+        user.email.toLowerCase().includes(searchLower);
 
-    try {
-      setActionLoading(true);
+      const matchesRole = user.role === role;
 
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: action === "delete" ? "DELETE" : "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: action === "delete" ? undefined : JSON.stringify({ action }),
-      });
+      return matchesSearch && matchesRole;
+    });
 
-      const data = await response.json();
+    return (
+      <div>
+        <h3>
+          Manage {role == "company" ? "companie" : role}s (
+          {filteredUsers.length})
+        </h3>
 
-      if (data.success) {
-        if (action === "delete") {
-          setUsers(users.filter((user) => user._id !== userId));
-        } else {
-          setUsers(
-            users.map((user) =>
-              user._id === userId ? { ...user, ...data.user } : user
-            )
-          );
-        }
-      } else {
-        setError(data.message || `Error performing ${action} action`);
-      }
-    } catch (error) {
-      setError("An error occurred. Please try again later.");
-    } finally {
-      setActionLoading(false);
-    }
+        {filteredUsers.length === 0 ? (
+          <p>
+            {searchTerm
+              ? `No ${role == "company" ? "companie" : role}s match your search`
+              : `No ${role == "company" ? "companie" : role}s found`}
+          </p>
+        ) : (
+          <div>
+            {filteredUsers.map((userData) => (
+              <div key={userData._id} className="user-card">
+                <div>
+                  <h4>{userData.name}</h4>
+                  <p>{userData.email}</p>
+                </div>
+                <div>
+                  <button
+                    className="btn-primary"
+                    onClick={() => handleEditUser(userData._id)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn-primary"
+                    onClick={() => handleDeleteUser(userData._id)}
+                    disabled={actionLoading}
+                  >
+                    {actionLoading ? "Deleting..." : "Delete"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Reusable OrderCard component
+  const OrderCard = ({ order, onViewOrder, formatCurrency, formatDate }) => {
+    return (
+      <div
+        key={order._id}
+        className="order-card"
+        onClick={() => onViewOrder(order._id)}
+      >
+        <p>
+          <b>OrderID:</b> #{order._id}
+        </p>
+        <p>
+          <b>CustomerName:</b> {order.customerName || "Unknown"}
+        </p>
+        <p>
+          <b>From:</b> {order.fromAddress?.city} <b>To: </b>
+          {order.toAddress?.city}
+        </p>
+        <p>
+          <b>TotalPrice:</b> {formatCurrency(order.totalPrice)}
+        </p>
+        <p>
+          <b>CreatedAt: </b>
+          {formatDate(order.createdAt)}
+        </p>
+      </div>
+    );
   };
 
   const handleEditUser = (userId) => {
     router.push(`/admin/users/${userId}/edit`);
   };
 
-  const handleDeleteUser = (userId) => {
-    handleUserAction(userId, "delete");
+  const handleDeleteUser = async (userId) => {
+    // confirm delete
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this user? This action cannot be undone."
+    );
+    if (!confirmed) return;
+
+    try {
+      setActionLoading(true);
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setUsers(users.filter((user) => user._id !== userId));
+      } else {
+        setError(data.message || "Error deleting user");
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again later.");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const handleViewOrder = (orderId) => {
@@ -185,13 +179,6 @@ export default function AdminDashboard() {
       style: "currency",
       currency: "EUR",
     }).format(amount);
-  };
-
-  const getUserStats = () => {
-    const customers = users.filter((u) => u.role === "user").length;
-    const companies = users.filter((u) => u.role === "company").length;
-    const admins = users.filter((u) => u.role === "admin").length;
-    return { total: users.length, customers, companies, admins };
   };
 
   const getOrderStats = () => {
@@ -218,78 +205,73 @@ export default function AdminDashboard() {
     return <p>Loading dashboard...</p>;
   }
 
-  const userStats = getUserStats();
+  // Calculate user statistics directly
+  const totalUsers = users.length;
+  const customerCount = users.filter((u) => u.role === "user").length;
+  const companyCount = users.filter((u) => u.role === "company").length;
+  const adminCount = users.filter((u) => u.role === "admin").length;
+
   const orderStats = getOrderStats();
   const recentOrders = orders.slice(0, 15);
 
   return (
-    <div>
+    <div className="container">
       {error && <p className="error">{error}</p>}
-      
-      {/* User Statistics */}
+
       <div>
-        <div>
-          <p>Total Accounts: {userStats.total}</p>
-          <p>Customers: {userStats.customers}</p>
-          <p>Companies: {userStats.companies}</p>
-          <p>Admins: {userStats.admins}</p>
+        <div className="admin-stats">
+          <p>Total Accounts: {totalUsers}</p>
+          <p>Customers: {customerCount}</p>
+          <p>Companies: {companyCount}</p>
+          <p>Admins: {adminCount}</p>
         </div>
 
-        {/* Search Input */}
-        <div>
+        <div className="admin-search">
           <input
             type="text"
             placeholder="Search accounts by name or email"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          {searchTerm && <button onClick={() => setSearchTerm("")}>×</button>}
+          {searchTerm && (
+            <button onClick={() => setSearchTerm("")}>Clear</button>
+          )}
         </div>
 
         {/* User Management Sections */}
-        {Object.keys(USER_ROLES).map(role => (
-          <UserSection
-            key={role}
-            role={role}
-            users={users}
-            searchTerm={searchTerm}
-            onEditUser={handleEditUser}
-            onDeleteUser={handleDeleteUser}
-          />
+        {USER_ROLES.map((role) => (
+          <UserSection key={role} role={role} />
         ))}
       </div>
 
       {/* Order Management Section */}
       <div>
         <h2>Order Management</h2>
-        <div>
+        <div className="order-stats">
           <p>Total Orders: {orderStats.total}</p>
           <p>Pending: {orderStats.pending}</p>
           <p>Active: {orderStats.confirmed}</p>
           <p>Completed: {orderStats.completed}</p>
-          <Link href="/admin/orders">Manage All Orders</Link>
         </div>
 
-        <div>
-          <h3>Recent Orders</h3>
-          {recentOrders.length === 0 ? (
-            <div>
-              <p>No orders found</p>
-            </div>
-          ) : (
-            <div>
-              {recentOrders.map((order) => (
-                <OrderCard
-                  key={order._id}
-                  order={order}
-                  onViewOrder={handleViewOrder}
-                  formatCurrency={formatCurrency}
-                  formatDate={formatDate}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        <Link href="/admin/orders">Manage All Orders</Link>
+
+        <h3>Recent Orders</h3>
+        {recentOrders.length === 0 ? (
+          <p>No orders found</p>
+        ) : (
+          <div>
+            {recentOrders.map((order) => (
+              <OrderCard
+                key={order._id}
+                order={order}
+                onViewOrder={handleViewOrder}
+                formatCurrency={formatCurrency}
+                formatDate={formatDate}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

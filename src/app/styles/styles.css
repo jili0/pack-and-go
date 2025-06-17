@@ -458,6 +458,51 @@ footer a:hover {
   height: 100%;
 }
 
+/* Admin Dashboard Styles */
+.admin-stats,
+.order-stats,
+.order-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.admin-search {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem;
+}
+
+.admin-search input {
+  flex: 1;
+  margin: 0;
+}
+
+.user-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.order-card {
+  cursor: pointer;
+  text-align: left;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.order-card:hover {
+  cursor: pointer;
+  border-color: #007bff;
+}
+
 /* Media Queries */
 @media (min-width: 640px) {
   .mobile-hide {
