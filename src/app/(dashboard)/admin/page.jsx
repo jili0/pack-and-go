@@ -131,7 +131,7 @@ export default function AdminDashboard() {
   };
 
   const handleEditUser = (userId) => {
-    router.push(`/admin/users/${userId}/edit`);
+    router.push(`/admin/accounts/${userId}`);
   };
 
   const handleDeleteUser = async (userId) => {
