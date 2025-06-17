@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/context/AuthContext';
-import styles from '@/app/styles/Components.module.css';
+import styles from '@/app/styles/UserProfile.module.css';
 
 const ProfileForm = () => {
   const { user, loading: authLoading } = useAuth();
