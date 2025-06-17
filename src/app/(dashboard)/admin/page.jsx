@@ -5,6 +5,82 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
+// User management configuration
+const USER_ROLES = {
+  user: { label: "Customers", searchEmpty: "No customers" },
+  company: { label: "Companies", searchEmpty: "No companies" },
+  admin: { label: "Admins", searchEmpty: "No administrators" }
+};
+
+// Reusable UserSection component
+const UserSection = ({ 
+  role, 
+  users, 
+  searchTerm, 
+  onEditUser, 
+  onDeleteUser 
+}) => {
+  const config = USER_ROLES[role];
+  const filteredUsers = users.filter(user => {
+    if (user.role !== role) return false;
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return user.name.toLowerCase().includes(searchLower) || 
+           user.email.toLowerCase().includes(searchLower);
+  });
+
+  return (
+    <div>
+      <div>
+        <h3>Manage {config.label} ({filteredUsers.length})</h3>
+      </div>
+      {filteredUsers.length === 0 ? (
+        <div>
+          <p>
+            {searchTerm
+              ? `${config.searchEmpty} match your search`
+              : `${config.searchEmpty} found`}
+          </p>
+        </div>
+      ) : (
+        <div>
+          {filteredUsers.map((userData) => (
+            <div key={userData._id}>
+              <h4>{userData.name}</h4>
+              <p>{userData.email}</p>
+              <button
+                className="btn-primary"
+                onClick={() => onEditUser(userData._id)}
+              >
+                Edit
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => onDeleteUser(userData._id)}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Reusable OrderCard component
+const OrderCard = ({ order, onViewOrder, formatCurrency, formatDate }) => (
+  <div key={order._id} onClick={() => onViewOrder(order._id)}>
+    <p>OrderID: #{order._id}</p>
+    <p>CustomerName: {order.customerName || "Unknown"}</p>
+    <p>From: {order.fromAddress?.city}</p>
+    <p>To: {order.toAddress?.city}</p>
+    <p>TotalPrice: {formatCurrency(order.totalPrice)}</p>
+    <p>CreatedAt: {formatDate(order.createdAt)}</p>
+  </div>
+);
+
 export default function AdminDashboard() {
   const router = useRouter();
   const { user } = useAuth();
@@ -21,25 +97,21 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      // Fetch users
-      const usersRes = await fetch("/api/admin/users");
+      const [usersRes, ordersRes] = await Promise.all([
+        fetch("/api/admin/users"),
+        fetch("/api/orders")
+      ]);
+
       if (usersRes.ok) {
         const usersData = await usersRes.json();
-        if (usersData.success) {
-          setUsers(usersData.users);
-        }
+        usersData.success && setUsers(usersData.users);
       }
 
-      // Fetch orders
-      const ordersRes = await fetch("/api/orders");
       if (ordersRes.ok) {
         const ordersData = await ordersRes.json();
-        if (ordersData.success) {
-          setOrders(ordersData.orders);
-        }
+        ordersData.success && setOrders(ordersData.orders);
       }
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
       setError("Failed to load dashboard data");
     } finally {
       setLoading(false);
@@ -48,13 +120,10 @@ export default function AdminDashboard() {
 
   const handleUserAction = async (userId, action) => {
     if (action === "delete") {
-      if (
-        !window.confirm(
-          "Are you sure you want to delete this user? This action cannot be undone."
-        )
-      ) {
-        return;
-      }
+      const confirmed = window.confirm(
+        "Are you sure you want to delete this user? This action cannot be undone."
+      );
+      if (!confirmed) return;
     }
 
     try {
@@ -65,17 +134,15 @@ export default function AdminDashboard() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: action !== "delete" ? JSON.stringify({ action }) : undefined,
+        body: action === "delete" ? undefined : JSON.stringify({ action }),
       });
 
       const data = await response.json();
 
       if (data.success) {
         if (action === "delete") {
-          // Remove user from the list
           setUsers(users.filter((user) => user._id !== userId));
         } else {
-          // Update user in the list
           setUsers(
             users.map((user) =>
               user._id === userId ? { ...user, ...data.user } : user
@@ -86,7 +153,6 @@ export default function AdminDashboard() {
         setError(data.message || `Error performing ${action} action`);
       }
     } catch (error) {
-      console.error("Error with user action:", error);
       setError("An error occurred. Please try again later.");
     } finally {
       setActionLoading(false);
@@ -97,87 +163,28 @@ export default function AdminDashboard() {
     router.push(`/admin/users/${userId}/edit`);
   };
 
+  const handleDeleteUser = (userId) => {
+    handleUserAction(userId, "delete");
+  };
+
   const handleViewOrder = (orderId) => {
     router.push(`/admin/orders/${orderId}`);
   };
 
-  const getFilteredUsers = (role) => {
-    let filtered = users.filter((u) => u.role === role);
-
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (user) =>
-          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    return filtered.slice(0, 5); // Show max 5 items
-  };
-
   const formatDate = (dateString) => {
     if (!dateString) return "Not available";
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("de-DE", {
       year: "numeric",
-      month: "short",
+      month: "numeric",
       day: "numeric",
     });
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("de-DE", {
       style: "currency",
       currency: "EUR",
     }).format(amount);
-  };
-
-  const getRoleBadge = (role) => {
-    const roleMap = {
-      user: {
-        class: `${null} ${null}`,
-        text: "Customer",
-      },
-      company: {
-        class: `${null} ${null}`,
-        text: "Company",
-      },
-      admin: {
-        class: `${null} ${null}`,
-        text: "Admin",
-      },
-    };
-    const roleInfo = roleMap[role] || { class: null, text: role };
-    return <span className={roleInfo.class}>{roleInfo.text}</span>;
-  };
-
-  const getStatusBadge = (status) => {
-    const statusMap = {
-      pending: {
-        class: `${null} ${null}`,
-        text: "Pending",
-      },
-      confirmed: {
-        class: `${null} ${null}`,
-        text: "Confirmed",
-      },
-      declined: {
-        class: `${null} ${null}`,
-        text: "Declined",
-      },
-      completed: {
-        class: `${null} ${null}`,
-        text: "Completed",
-      },
-      cancelled: {
-        class: `${null} ${null}`,
-        text: "Cancelled",
-      },
-    };
-    const statusInfo = statusMap[status] || {
-      class: null,
-      text: status,
-    };
-    return <span className={statusInfo.class}>{statusInfo.text}</span>;
   };
 
   const getUserStats = () => {
@@ -188,317 +195,81 @@ export default function AdminDashboard() {
   };
 
   const getOrderStats = () => {
-    const pending = orders.filter((o) => o.status === "pending").length;
-    const confirmed = orders.filter((o) => o.status === "confirmed").length;
-    const completed = orders.filter((o) => o.status === "completed").length;
-    const cancelled = orders.filter((o) => o.status === "cancelled").length;
+    const statusCounts = orders.reduce((acc, order) => {
+      acc[order.status] = (acc[order.status] || 0) + 1;
+      return acc;
+    }, {});
+
     const totalRevenue = orders
       .filter((o) => o.status === "completed")
       .reduce((sum, o) => sum + (o.totalPrice || 0), 0);
+
     return {
       total: orders.length,
-      pending,
-      confirmed,
-      completed,
-      cancelled,
+      pending: statusCounts.pending || 0,
+      confirmed: statusCounts.confirmed || 0,
+      completed: statusCounts.completed || 0,
+      cancelled: statusCounts.cancelled || 0,
       totalRevenue,
     };
   };
 
+  if (loading) {
+    return <p>Loading dashboard...</p>;
+  }
+
   const userStats = getUserStats();
   const orderStats = getOrderStats();
-  const recentOrders = orders.slice(0, 5);
-
-  if (loading) {
-    return (
-      <div>
-        <div></div>
-        <p>Loading dashboard...</p>
-      </div>
-    );
-  }
+  const recentOrders = orders.slice(0, 15);
 
   return (
     <div>
-      {/* Error Alert */}
-      {error && (
-        <div>
-          <div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <div>
-            <h3>Error</h3>
-            <p>{error}</p>
-          </div>
-        </div>
-      )}
-
-      {/* User Management Section */}
+      {error && <p className="error">{error}</p>}
+      
+      {/* User Statistics */}
       <div>
         <div>
-          <h2>User & Account Management</h2>
+          <p>Total Accounts: {userStats.total}</p>
+          <p>Customers: {userStats.customers}</p>
+          <p>Companies: {userStats.companies}</p>
+          <p>Admins: {userStats.admins}</p>
         </div>
 
-        {/* User Statistics */}
+        {/* Search Input */}
         <div>
-          <div>
-            <h3>Total Users</h3>
-            <p>{userStats.total}</p>
-            <p>All registered accounts</p>
-          </div>
-          <div>
-            <h3>Customers</h3>
-            <p>{userStats.customers}</p>
-            <p>Regular users</p>
-          </div>
-          <div>
-            <h3>Companies</h3>
-            <p>{userStats.companies}</p>
-            <p>Business accounts</p>
-          </div>
-          <div>
-            <h3>Admins</h3>
-            <p>{userStats.admins}</p>
-            <p>Administrator accounts</p>
-          </div>
+          <input
+            type="text"
+            placeholder="Search accounts by name or email"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm && <button onClick={() => setSearchTerm("")}>×</button>}
         </div>
 
-        {/* Search Function */}
-        <div>
-          <div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
-            </svg>
-            <input
-              type="text"
-              placeholder="Search accounts by name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) =>
-                e.key === "Enter" && setSearchTerm(e.target.value)
-              }
-            />
-            {searchTerm && <button onClick={() => setSearchTerm("")}>×</button>}
-            <button
-              onClick={() => {
-                /* Search is live, but this provides visual feedback */
-              }}
-            >
-              Search
-            </button>
-          </div>
-        </div>
-
-        {/* Manage Customers */}
-        <div>
-          <div>
-            <h3>Manage Customers ({getFilteredUsers("user").length})</h3>
-          </div>
-          {getFilteredUsers("user").length === 0 ? (
-            <div>
-              <p>
-                {searchTerm
-                  ? "No customers match your search"
-                  : "No customers found"}
-              </p>
-            </div>
-          ) : (
-            <div>
-              {getFilteredUsers("user").map((userData) => (
-                <div key={userData._id}>
-                  <div>
-                    <div>
-                      <span>{userData.name.charAt(0)}</span>
-                    </div>
-                    <div>
-                      <h4>{userData.name}</h4>
-                      <p>{userData.email}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      {getRoleBadge(userData.role)}
-                      <span>{formatDate(userData.createdAt)}</span>
-                    </div>
-                    <div>
-                      <button
-                        onClick={() => handleEditUser(userData._id)}
-                        disabled={actionLoading}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleUserAction(userData._id, "delete")}
-                        disabled={actionLoading}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Manage Companies */}
-        <div>
-          <div>
-            <h3>Manage Companies ({getFilteredUsers("company").length})</h3>
-          </div>
-          {getFilteredUsers("company").length === 0 ? (
-            <div>
-              <p>
-                {searchTerm
-                  ? "No companies match your search"
-                  : "No companies found"}
-              </p>
-            </div>
-          ) : (
-            <div>
-              {getFilteredUsers("company").map((userData) => (
-                <div key={userData._id}>
-                  <div>
-                    <div>
-                      <span>{userData.name.charAt(0)}</span>
-                    </div>
-                    <div>
-                      <h4>{userData.name}</h4>
-                      <p>{userData.email}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      {getRoleBadge(userData.role)}
-                      <span>{formatDate(userData.createdAt)}</span>
-                    </div>
-                    <div>
-                      <button
-                        onClick={() => handleEditUser(userData._id)}
-                        disabled={actionLoading}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleUserAction(userData._id, "delete")}
-                        disabled={actionLoading}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Manage Admins */}
-        <div>
-          <div>
-            <h3>Manage Admins ({getFilteredUsers("admin").length})</h3>
-          </div>
-          {getFilteredUsers("admin").length === 0 ? (
-            <div>
-              <p>
-                {searchTerm
-                  ? "No administrators match your search"
-                  : "No administrators found"}
-              </p>
-            </div>
-          ) : (
-            <div>
-              {getFilteredUsers("admin").map((userData) => (
-                <div key={userData._id}>
-                  <div>
-                    <div>
-                      <span>{userData.name.charAt(0)}</span>
-                    </div>
-                    <div>
-                      <h4>{userData.name}</h4>
-                      <p>{userData.email}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      {getRoleBadge(userData.role)}
-                      <span>{formatDate(userData.createdAt)}</span>
-                    </div>
-                    <div>
-                      <button
-                        onClick={() => handleEditUser(userData._id)}
-                        disabled={actionLoading}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleUserAction(userData._id, "delete")}
-                        disabled={actionLoading}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* User Management Sections */}
+        {Object.keys(USER_ROLES).map(role => (
+          <UserSection
+            key={role}
+            role={role}
+            users={users}
+            searchTerm={searchTerm}
+            onEditUser={handleEditUser}
+            onDeleteUser={handleDeleteUser}
+          />
+        ))}
       </div>
 
       {/* Order Management Section */}
       <div>
+        <h2>Order Management</h2>
         <div>
-          <h2>Order Management</h2>
-          <Link href="/admin/orders">Manage All Orders →</Link>
+          <p>Total Orders: {orderStats.total}</p>
+          <p>Pending: {orderStats.pending}</p>
+          <p>Active: {orderStats.confirmed}</p>
+          <p>Completed: {orderStats.completed}</p>
+          <Link href="/admin/orders">Manage All Orders</Link>
         </div>
 
-        {/* Order Statistics */}
-        <div>
-          <div>
-            <h3>Total Orders</h3>
-            <p>{orderStats.total}</p>
-            <p>All platform orders</p>
-          </div>
-          <div>
-            <h3>Pending</h3>
-            <p>{orderStats.pending}</p>
-            <p>Awaiting response</p>
-          </div>
-          <div>
-            <h3>Active</h3>
-            <p>{orderStats.confirmed}</p>
-            <p>Confirmed orders</p>
-          </div>
-          <div>
-            <h3>Completed</h3>
-            <p>{orderStats.completed}</p>
-            <p>Finished moves</p>
-          </div>
-        </div>
-
-        {/* Recent Orders Preview */}
         <div>
           <h3>Recent Orders</h3>
           {recentOrders.length === 0 ? (
@@ -508,25 +279,13 @@ export default function AdminDashboard() {
           ) : (
             <div>
               {recentOrders.map((order) => (
-                <div key={order._id} onClick={() => handleViewOrder(order._id)}>
-                  <div>
-                    <div>
-                      <span>#{order._id.slice(-8)}</span>
-                      <span>{order.customerName || "Unknown"}</span>
-                    </div>
-                    <div>
-                      <span>{order.fromAddress?.city}</span>
-                      <span>→</span>
-                      <span>{order.toAddress?.city}</span>
-                    </div>
-                  </div>
-                  <div>
-                    {getStatusBadge(order.status)}
-                    <span>{formatCurrency(order.totalPrice)}</span>
-                    <span>{formatDate(order.createdAt)}</span>
-                    <span>→</span>
-                  </div>
-                </div>
+                <OrderCard
+                  key={order._id}
+                  order={order}
+                  onViewOrder={handleViewOrder}
+                  formatCurrency={formatCurrency}
+                  formatDate={formatDate}
+                />
               ))}
             </div>
           )}

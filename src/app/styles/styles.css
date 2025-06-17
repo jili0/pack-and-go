@@ -60,6 +60,7 @@ button {
   gap: 0.5rem;
   padding: clamp(7px, 1vw, 10px) 24px;
   margin-top: clamp(14px, 2vw, 20px);
+  margin-inline: 2px;
   border-radius: 6px;
   text-decoration: none;
   border: none;
