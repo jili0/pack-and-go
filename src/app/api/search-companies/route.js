@@ -14,8 +14,6 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-
-<<<<<<< HEAD
     // Clean input data
     const cleanFromCity = fromCity.trim();
     const cleanToCity = toCity.trim();
@@ -224,7 +222,6 @@ export async function POST(request) {
       if (companyObj.averageRating >= 4.5) {
         matchScore += 0.3;
       }
-=======
     // Search for companies that serve the route or are in the area
     // This is a flexible search that looks for companies:
     // 1. With service areas that match the route
@@ -262,7 +259,6 @@ export async function POST(request) {
         address: 1,
         description: 1,
         serviceAreas: 1,
-        hourlyRate: 1,
         isVerified: 1,
         isKisteKlarCertified: 1,
         documents: 1,
@@ -277,66 +273,14 @@ export async function POST(request) {
     // Add default values for any missing required fields
     const processedCompanies = companies.map((company) => {
       const companyObj = company.toObject();
->>>>>>> b1e3a5c4024733f6bb29564364a9bad7bdb1f76f
 
       return {
         ...companyObj,
         // Ensure required fields have default values
         averageRating: companyObj.averageRating || 0,
         reviewsCount: companyObj.reviewsCount || 0,
-        hourlyRate: companyObj.hourlyRate || 25,
-        isVerified: companyObj.isVerified !== false, // Default true unless explicitly false
+        isVerified: companyObj.isVerified || false,
         isKisteKlarCertified: companyObj.isKisteKlarCertified || false,
-<<<<<<< HEAD
-        description: companyObj.description || 'No detailed description available',
-        serviceAreas: companyObj.serviceAreas || [],
-        documents: companyObj.documents || {
-          businessLicense: { verified: false },
-          kisteKlarCertificate: { verified: false }
-        },
-        // Add matching info (for debugging, can be displayed in frontend)
-        matchScore,
-        matchType: matchType || 'General match'
-      };
-    });
-
-    // Re-sort by match score
-    processedCompanies.sort((a, b) => {
-      if (a.matchScore !== b.matchScore) {
-        return b.matchScore - a.matchScore;
-      }
-      // If match scores are equal, sort by rating
-      return b.averageRating - a.averageRating;
-    });
-
-    // Limit number of returned results
-    const limitedCompanies = processedCompanies.slice(0, 20);
-
-    console.log(`Returning ${limitedCompanies.length} companies`);
-    
-    // Add search summary information
-    const searchSummary = {
-      searchType: isSameCity ? 'same-city' : 'cross-city',
-      fromCity: cleanFromCity,
-      toCity: cleanToCity,
-      totalFound: limitedCompanies.length,
-      hasExactMatches: limitedCompanies.some(c => c.matchScore >= 2),
-      hasKisteKlarCertified: limitedCompanies.some(c => c.isKisteKlarCertified)
-    };
-
-    return Response.json({
-      companies: limitedCompanies,
-      searchSummary,
-      success: true
-    });
-
-  } catch (error) {
-    console.error('Error searching for companies:', error);
-    return Response.json(
-      { error: 'Internal server error', message: error.message },
-      { status: 500 }
-    );
-=======
         description: companyObj.description || "No description available",
         serviceAreas: companyObj.serviceAreas || [],
         documents: companyObj.documents || {
@@ -354,6 +298,5 @@ export async function POST(request) {
   } catch (error) {
     console.error("Error searching companies:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
->>>>>>> b1e3a5c4024733f6bb29564364a9bad7bdb1f76f
   }
 }

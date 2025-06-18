@@ -478,11 +478,16 @@ export default function SearchResults() {
                   )}
                 </div>
               </div>
-              <div className={styles.modalPriceCard}>
-                <div className={styles.modalPriceHeader}>
-                  <span className={styles.modalPriceLabel}>Estimated Price: </span>
-                  <span className={styles.modalPriceValue}>
-                    €{formData ? (selectedCompany.hourlyRate * formData.helpersCount * formData.estimatedHours) : 0}
+              <div>
+                <div>
+                  <span>Estimated Price:</span>
+                  <span>
+                    {formData
+                      ? 50 *
+                        formData.helpersCount *
+                        formData.estimatedHours
+                      : 0}{" "}
+                    €
                   </span>
                 </div>
                 <p className={styles.modalPriceNote}>

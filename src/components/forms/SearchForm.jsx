@@ -8,20 +8,23 @@ export default function SearchForm() {
   const [fromLocation, setFromLocation] = useState("");
   const [toLocation, setToLocation] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+<<<<<<< HEAD
+=======
+
+>>>>>>> user-dashboard
     if (!fromLocation.trim() || !toLocation.trim()) {
-      setError("Please enter both departure and destination locations");
+      alert("Please enter both locations");
       return;
     }
 
     setLoading(true);
 
     try {
-      // Create form data (with default values)
+      // Create form data with default values
       const formData = {
         fromAddress: {
           city: fromLocation.trim(),
@@ -52,13 +55,10 @@ export default function SearchForm() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || errorData.message || `HTTP error! Status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
-      
-      console.log('Search results:', result);
+      const companies = await response.json();
 
       // Save to session storage
       sessionStorage.setItem("movingFormData", JSON.stringify(formData));
@@ -71,14 +71,6 @@ export default function SearchForm() {
       alert("Search failed. Please try again.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleInputChange = (setter) => (e) => {
-    setter(e.target.value);
-    // Clear error message when user starts typing
-    if (error) {
-      setError("");
     }
   };
 
@@ -129,8 +121,12 @@ export default function SearchForm() {
             />
           </div>
         </div>
+<<<<<<< HEAD
 
         <button type="submit" disabled={loading} className="btn-primary">
+=======
+<button type="submit" disabled={loading} className="btn-primary">
+>>>>>>> user-dashboard
           {loading ? "Searching..." : "Find companies"}
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -147,16 +143,6 @@ export default function SearchForm() {
           </svg>
         </button>
       </form>
-      
-      {/* Search tips */}
-      <div className={styles.searchHints}>
-        <p className={styles.hintText}>
-          💡 Tip: Enter city names only, e.g. "Berlin", "Frankfurt", "Munich"
-        </p>
-        <p className={styles.hintText}>
-          🚚 Supports both local and long-distance moving services
-        </p>
-      </div>
     </div>
   );
 }

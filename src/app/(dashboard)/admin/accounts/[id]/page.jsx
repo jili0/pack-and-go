@@ -29,7 +29,6 @@ export default function EditPage() {
     address: { street: "", city: "", postalCode: "", country: "" },
     taxId: "",
     description: "",
-    hourlyRate: 0,
     isVerified: false,
     isKisteKlarCertified: false,
   });
@@ -79,7 +78,6 @@ export default function EditPage() {
           },
           taxId: companyDetails.taxId || "",
           description: companyDetails.description || "",
-          hourlyRate: companyDetails.hourlyRate || 0,
           isVerified: companyDetails.isVerified || false,
           isKisteKlarCertified: companyDetails.isKisteKlarCertified || false,
         });
@@ -480,17 +478,6 @@ export default function EditPage() {
                 name="taxId"
                 value={companyFormData.taxId}
                 onChange={handleCompanyInputChange}
-              />
-            </div>
-
-            <div className="form-field">
-              <label>Hourly Rate (€)</label>
-              <input
-                type="number"
-                name="hourlyRate"
-                value={companyFormData.hourlyRate}
-                onChange={handleCompanyInputChange}
-                min="0"
               />
             </div>
 

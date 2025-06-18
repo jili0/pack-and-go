@@ -126,6 +126,7 @@ const RegisterPage = () => {
         )}
 
         <form onSubmit={handleSubmit} className="register-form">
+<<<<<<< HEAD
           <div className="form-field">
             <label htmlFor="name">Full Name</label>
             <input
@@ -200,6 +201,61 @@ const RegisterPage = () => {
             />
             {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
           </div>
+=======
+          <InputField
+            formData={formData}
+            handleChange={handleChange}
+            errors={errors}
+            isSubmitting={isSubmitting}
+            label="Full Name"
+            name="name"
+            placeholder="First and Last Name"
+          />
+
+          <InputField
+            formData={formData}
+            handleChange={handleChange}
+            errors={errors}
+            isSubmitting={isSubmitting}
+            label="Email Address"
+            name="email"
+            type="email"
+            placeholder="example@email.com"
+          />
+
+          <InputField
+            formData={formData}
+            handleChange={handleChange}
+            errors={errors}
+            isSubmitting={isSubmitting}
+            label="Phone Number"
+            name="phone"
+            type="tel"
+            placeholder="+1 123 456 7890"
+          />
+
+          <InputField
+            formData={formData}
+            handleChange={handleChange}
+            errors={errors}
+            isSubmitting={isSubmitting}
+            label="Password"
+            name="password"
+            type="password"
+            placeholder="Minimum 6 characters"
+          />
+
+          <InputField
+            formData={formData}
+            handleChange={handleChange}
+            errors={errors}
+            isSubmitting={isSubmitting}
+            label="Confirm Password"
+            name="confirmPassword"
+            type="password"
+            placeholder="Repeat password"
+          />
+>>>>>>> user-dashboard
 
           <div className="form-field">
             <label htmlFor="role">

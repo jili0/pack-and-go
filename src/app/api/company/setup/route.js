@@ -58,7 +58,6 @@ export async function POST(request) {
       }
     }
 
-    // Validate required fields (removed hourlyRate)
     if (!companyName || !taxId || !street || !city || !postalCode) {
       return NextResponse.json(
         {
