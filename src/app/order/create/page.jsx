@@ -67,11 +67,6 @@ export default function CreateOrder() {
           notes: parsedFormData.notes || "",
         });
 
-        // // Calculate total price
-        // const hourlyRate = parsedCompany.hourlyRate || 50;
-        // const price = hourlyRate * parsedFormData.helpersCount * parsedFormData.estimatedHours;
-        // setTotalPrice(price);
-
         setLoading(false);
       } catch (error) {
         console.error("Error loading order data:", error);
@@ -160,7 +155,7 @@ export default function CreateOrder() {
 
   const totalPrice =
     selectedCompany && formData.helpersCount && formData.estimatedHours
-      ? (selectedCompany.hourlyRate || 50) *
+      ? 50 *
         formData.helpersCount *
         formData.estimatedHours
       : 0;
@@ -176,9 +171,8 @@ export default function CreateOrder() {
     setError(null);
 
     try {
-      const hourlyRate = selectedCompany.hourlyRate || 50;
       const calculatedPrice =
-        hourlyRate * formData.helpersCount * formData.estimatedHours;
+        50 * formData.helpersCount * formData.estimatedHours;
       // Prepare order data
       const orderData = {
         companyId: selectedCompany._id,
@@ -463,7 +457,7 @@ export default function CreateOrder() {
               <div>
                 <div>
                   <span>Hourly Rate per Helper</span>
-                  <span>{selectedCompany.hourlyRate || 50} €</span>
+                  <span>50 €</span>
                 </div>
                 <div>
                   <span>Number of Helpers</span>

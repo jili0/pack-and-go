@@ -262,7 +262,6 @@ export async function POST(request) {
         address: 1,
         description: 1,
         serviceAreas: 1,
-        hourlyRate: 1,
         isVerified: 1,
         isKisteKlarCertified: 1,
         documents: 1,
@@ -284,8 +283,12 @@ export async function POST(request) {
         // Ensure required fields have default values
         averageRating: companyObj.averageRating || 0,
         reviewsCount: companyObj.reviewsCount || 0,
+<<<<<<< HEAD
         hourlyRate: companyObj.hourlyRate || 25,
         isVerified: companyObj.isVerified !== false, // Default true unless explicitly false
+=======
+        isVerified: companyObj.isVerified || false,
+>>>>>>> e751a7790bffd52ca12e9d017f9905c79a00adfb
         isKisteKlarCertified: companyObj.isKisteKlarCertified || false,
 <<<<<<< HEAD
         description: companyObj.description || 'No detailed description available',

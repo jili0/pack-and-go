@@ -81,7 +81,6 @@ export async function PUT(request) {
     const allowedFields = [
       "companyName",
       "description",
-      "hourlyRate",
       "address",
       "serviceAreas",
     ];

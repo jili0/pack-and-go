@@ -40,7 +40,7 @@ export async function GET(request) {
     // Find companies based on the query
     const companies = await Company.find(query)
       .select(
-        "companyName hourlyRate isKisteKlarCertified averageRating reviewsCount serviceAreas logo"
+        "companyName isKisteKlarCertified averageRating reviewsCount serviceAreas logo"
       )
       .sort({ averageRating: -1 }); // Sort by rating in descending order
 
@@ -89,12 +89,11 @@ export async function POST(request) {
       taxId,
       description,
       serviceAreas,
-      hourlyRate,
       isKisteKlarCertified,
     } = await request.json();
 
     // Validate required fields
-    if (!companyName || !address || !taxId || !hourlyRate) {
+    if (!companyName || !address || !taxId) {
       return NextResponse.json(
         { success: false, message: "Missing required fields" },
         { status: 400 }
@@ -109,7 +108,6 @@ export async function POST(request) {
       taxId,
       description,
       serviceAreas: serviceAreas || [],
-      hourlyRate: parseFloat(hourlyRate),
       isVerified: false, // Needs to be verified by admin
       isKisteKlarCertified: isKisteKlarCertified || false,
       documents: {
@@ -214,7 +212,6 @@ export async function PATCH(request) {
       "taxId",
       "description",
       "serviceAreas",
-      "hourlyRate",
     ];
 
     // If the account is not an admin, filter the update data
@@ -226,17 +223,6 @@ export async function PATCH(request) {
       });
     }
 
-    // Additional validations
-    if (updateData.hourlyRate) {
-      updateData.hourlyRate = parseFloat(updateData.hourlyRate);
-
-      if (isNaN(updateData.hourlyRate) || updateData.hourlyRate <= 0) {
-        return NextResponse.json(
-          { success: false, message: "Hourly rate must be a positive number" },
-          { status: 400 }
-        );
-      }
-    }
 
     // Update the company
     const updatedCompany = await Company.findByIdAndUpdate(
