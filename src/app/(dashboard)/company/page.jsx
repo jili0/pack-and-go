@@ -70,7 +70,7 @@ import Image from "@/components/ui/Image";
 
 export default function CompanyDashboard() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { account, loading: authLoading } = useAuth();
 
   const [company, setCompany] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -89,15 +89,15 @@ export default function CompanyDashboard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!authLoading && (!user || user.role !== "company")) {
+    if (!authLoading && (!account || account.role !== "company")) {
       router.push("/login");
       return;
     }
 
-    if (!authLoading && user) {
+    if (!authLoading && account) {
       fetchCompanyData();
     }
-  }, [user, authLoading, router]);
+  }, [account, authLoading, router]);
 
   const fetchCompanyData = async () => {
     try {
@@ -501,8 +501,8 @@ export default function CompanyDashboard() {
                   <tr key={order._id}>
                     <td>
                       <div>
-                        <div>{order.userId?.name || "Unknown"}</div>
-                        <div>{order.userId?.email || ""}</div>
+                        <div>{order.accountId?.name || "Unknown"}</div>
+                        <div>{order.accountId?.email || ""}</div>
                       </div>
                     </td>
                     <td>

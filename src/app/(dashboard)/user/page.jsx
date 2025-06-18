@@ -1,4 +1,4 @@
-// // src/app/(dashboard)/user/page.jsx (continuing from previous part)
+// // src/app/(dashboard)/account/page.jsx (continuing from previous part)
 
 "use client";
 
@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
-export default function UserDashboard() {
+export default function AccountDashboard() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { account, loading } = useAuth();
 
   const [orders, setOrders] = useState([]);
   const [upcomingOrders, setUpcomingOrders] = useState([]);
@@ -18,17 +18,17 @@ export default function UserDashboard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !account) {
       router.push("/login?redirect=/user");
     }
-  }, [user, loading, router]);
+  }, [account, loading, router]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!account) return;
 
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/api/user/orders");
+        const response = await fetch("/api/account/orders");
         const data = await response.json();
 
         if (data.success) {
@@ -73,9 +73,9 @@ export default function UserDashboard() {
     };
 
     fetchOrders();
-  }, [user]);
+  }, [account]);
 
-  if (loading || (!user && !loading)) {
+  if (loading || (!account && !loading)) {
     return (
       <div>
         <div>
@@ -155,7 +155,7 @@ export default function UserDashboard() {
       <div>
         {/* Greeting */}
         <div>
-          <h1>Hello, {user.name}</h1>
+          <h1>Hello, {account.name}</h1>
           <p>Welcome to your personal dashboard</p>
         </div>
 
@@ -194,7 +194,7 @@ export default function UserDashboard() {
             </Link>
 
             <Link
-              href="/user/orders"
+              href="/account/orders"
               
             >
               <div
@@ -222,7 +222,7 @@ export default function UserDashboard() {
             </Link>
 
             <Link
-              href="/user/profile"
+              href="/account/profile"
               
             >
               <div
@@ -282,7 +282,7 @@ export default function UserDashboard() {
         <div>
           <div >
             <h2>Upcoming Moves</h2>
-            <Link href="/user/orders">View All</Link>
+            <Link href="/account/orders">View All</Link>
           </div>
           <div>
             {dataLoading ? (

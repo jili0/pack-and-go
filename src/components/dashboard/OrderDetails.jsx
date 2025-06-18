@@ -101,7 +101,7 @@ const OrderDetails = ({ orderId }) => {
       <div>
         <h3>Error</h3>
         <p>{error}</p>
-        <button onClick={() => router.push("/user/orders")}>
+        <button onClick={() => router.push("/account/orders")}>
           Back to Orders
         </button>
       </div>
@@ -113,7 +113,7 @@ const OrderDetails = ({ orderId }) => {
       <div>
         <h3>Order Not Found</h3>
         <p>The requested order could not be found.</p>
-        <button onClick={() => router.push("/user/orders")}>
+        <button onClick={() => router.push("/account/orders")}>
           Back to Orders
         </button>
       </div>
@@ -263,7 +263,7 @@ const OrderDetails = ({ orderId }) => {
 
             {order.status === "completed" && !order.review && (
               <button
-                onClick={() => router.push(`/user/orders/${orderId}/review`)}
+                onClick={() => router.push(`/account/orders/${orderId}/review`)}
               >
                 Leave Review
               </button>

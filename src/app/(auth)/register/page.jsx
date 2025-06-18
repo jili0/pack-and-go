@@ -5,6 +5,33 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
+const InputField = ({
+  label,
+  name,
+  type = "text",
+  placeholder,
+  formData,
+  handleChange,
+  errors,
+  isSubmitting,
+}) => (
+  <div className="form-field">
+    <label htmlFor={name}>
+      {label}
+      <input
+        type={type}
+        id={name}
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+        placeholder={placeholder}
+        disabled={isSubmitting}
+      />
+    </label>
+    {errors[name] && <p className="error">{errors[name]}</p>}
+  </div>
+);
+
 const RegisterPage = () => {
   const router = useRouter();
   const { register } = useAuth();
@@ -69,24 +96,6 @@ const RegisterPage = () => {
     }
   };
 
-  const InputField = ({ label, name, type = "text", placeholder }) => (
-    <div className="form-field">
-      <label htmlFor={name}>
-        {label}
-        <input
-          type={type}
-          id={name}
-          name={name}
-          value={formData[name]}
-          onChange={handleChange}
-          placeholder={placeholder}
-          disabled={isSubmitting}
-        />
-      </label>
-      {errors[name] && <p className="error">{errors[name]}</p>}
-    </div>
-  );
-
   return (
     <div className="register-page">
       <div className="register-container">
@@ -113,12 +122,20 @@ const RegisterPage = () => {
 
         <form onSubmit={handleSubmit} className="register-form">
           <InputField
+            formData={formData}
+            handleChange={handleChange}
+            errors={errors}
+            isSubmitting={isSubmitting}
             label="Full Name"
             name="name"
             placeholder="First and Last Name"
           />
 
           <InputField
+            formData={formData}
+            handleChange={handleChange}
+            errors={errors}
+            isSubmitting={isSubmitting}
             label="Email Address"
             name="email"
             type="email"
@@ -126,6 +143,10 @@ const RegisterPage = () => {
           />
 
           <InputField
+            formData={formData}
+            handleChange={handleChange}
+            errors={errors}
+            isSubmitting={isSubmitting}
             label="Phone Number"
             name="phone"
             type="tel"
@@ -133,6 +154,10 @@ const RegisterPage = () => {
           />
 
           <InputField
+            formData={formData}
+            handleChange={handleChange}
+            errors={errors}
+            isSubmitting={isSubmitting}
             label="Password"
             name="password"
             type="password"
@@ -140,6 +165,10 @@ const RegisterPage = () => {
           />
 
           <InputField
+            formData={formData}
+            handleChange={handleChange}
+            errors={errors}
+            isSubmitting={isSubmitting}
             label="Confirm Password"
             name="confirmPassword"
             type="password"

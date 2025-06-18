@@ -3,10 +3,10 @@
 import { useState } from "react";
 
 const Header = () => {
-  const [user, setUser] = useState(null); // Replace with actual auth logic
+  const [account, setAccount] = useState(null); // Replace with actual auth logic
 
   const handleLogout = () => {
-    setUser(null);
+    setAccount(null);
     // Add logout logic here
   };
 
@@ -30,11 +30,11 @@ const Header = () => {
           <a href="/#contact" className="mobile-hide">
             Contact
           </a>
-          {/* User Menu */}
+          {/* Account Menu */}
 
-          {user ? (
+          {account ? (
             <>
-              <span>{user.name}</span>
+              <span>{account.name}</span>
               <button onClick={handleLogout}>Logout</button>
             </>
           ) : (

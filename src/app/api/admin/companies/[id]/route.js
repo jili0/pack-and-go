@@ -10,7 +10,7 @@ export async function PUT(request, { params }) {
   try {
     const { id } = await params;
 
-    // Check if user is authenticated and is admin
+    // Check if account is authenticated and is admin
     const session = await getSession();
 
     if (!session || session.role !== "admin") {
@@ -25,14 +25,10 @@ export async function PUT(request, { params }) {
     const updateData = await request.json();
 
     // Find and update company
-    const updatedCompany = await Company.findByIdAndUpdate(
-      id,
-      updateData,
-      { 
-        new: true,
-        runValidators: true
-      }
-    );
+    const updatedCompany = await Company.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!updatedCompany) {
       return NextResponse.json(
@@ -44,9 +40,8 @@ export async function PUT(request, { params }) {
     return NextResponse.json({
       success: true,
       message: "Company updated successfully",
-      company: updatedCompany
+      company: updatedCompany,
     });
-
   } catch (error) {
     console.error("Error updating company:", error);
     return NextResponse.json(
@@ -63,7 +58,7 @@ export async function GET(request, { params }) {
   try {
     const { id } = await params;
 
-    // Check if user is authenticated and is admin
+    // Check if account is authenticated and is admin
     const session = await getSession();
 
     if (!session || session.role !== "admin") {
@@ -86,9 +81,8 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({
       success: true,
-      company
+      company,
     });
-
   } catch (error) {
     console.error("Error retrieving company:", error);
     return NextResponse.json(

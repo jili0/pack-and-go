@@ -10,7 +10,7 @@ import AddressForm from "@/components/forms/AddressForm";
 
 export default function CreateOrder() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { account, loading: authLoading } = useAuth();
 
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [formData, setFormData] = useState({
@@ -31,8 +31,8 @@ export default function CreateOrder() {
   useEffect(() => {
     if (authLoading) return; // Wait for auth to complete
 
-    if (!user) {
-      // Redirect to login if user is not logged in
+    if (!account) {
+      // Redirect to login if account is not logged in
       router.push("/login?redirect=order/create");
       return;
     }
@@ -81,7 +81,7 @@ export default function CreateOrder() {
     };
 
     loadSessionData();
-  }, [user, router, authLoading]);
+  }, [account, router, authLoading]);
 
   const handleFromAddressChange = (address) => {
     setFormData((prev) => ({ ...prev, fromAddress: address }));

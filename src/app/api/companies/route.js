@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Company from "@/models/Company";
-import User from "@/models/User";
+import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
 
 /**
@@ -57,7 +57,7 @@ export async function GET(request) {
 
 /**
  * POST handler to create a new company
- * Only authenticated users with 'company' role can create a company
+ * Only authenticated accounts with 'company' role can create a company
  * @returns {Promise<NextResponse>} JSON response with success/failure message
  */
 export async function POST(request) {
@@ -73,12 +73,12 @@ export async function POST(request) {
 
     await connectDB();
 
-    // Check if the user already has a company
-    const existingCompany = await Company.findOne({ userId: session.id });
+    // Check if the account already has a company
+    const existingCompany = await Company.findOne({ accountId: session.id });
 
     if (existingCompany) {
       return NextResponse.json(
-        { success: false, message: "User already has a company profile" },
+        { success: false, message: "Account already has a company profile" },
         { status: 400 }
       );
     }
@@ -103,7 +103,7 @@ export async function POST(request) {
 
     // Create new company
     const newCompany = await Company.create({
-      userId: session.id,
+      accountId: session.id,
       companyName,
       address,
       taxId,
@@ -126,14 +126,14 @@ export async function POST(request) {
       reviewsCount: 0,
     });
 
-    // Get user email for admin notification
-    const user = await User.findById(session.id);
+    // Get account email for admin notification
+    const account = await Account.findById(session.id);
 
     // Send email notification to admin for verification (implement in email.js)
     // await sendCompanyVerificationRequestEmail({
     //   companyName,
-    //   companyEmail: user.email,
-    //   companyPhone: user.phone
+    //   companyEmail: account.email,
+    //   companyPhone: account.phone
     // });
 
     return NextResponse.json(
@@ -194,7 +194,7 @@ export async function PATCH(request) {
     // Verify authorization - must be the company owner or an admin
     if (
       session.role === "company" &&
-      company.userId.toString() !== session.id
+      company.accountId.toString() !== session.id
     ) {
       return NextResponse.json(
         { success: false, message: "Not authorized to update this company" },
@@ -217,7 +217,7 @@ export async function PATCH(request) {
       "hourlyRate",
     ];
 
-    // If the user is not an admin, filter the update data
+    // If the account is not an admin, filter the update data
     if (session.role !== "admin") {
       Object.keys(updateData).forEach((key) => {
         if (!allowedUpdateFields.includes(key)) {
@@ -305,7 +305,7 @@ export async function DELETE(request) {
     // Verify authorization - must be the company owner or an admin
     if (
       session.role === "company" &&
-      company.userId.toString() !== session.id
+      company.accountId.toString() !== session.id
     ) {
       return NextResponse.json(
         { success: false, message: "Not authorized to delete this company" },

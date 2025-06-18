@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
-import User from "@/models/User";
+import Account from "@/models/Account";
 import Company from "@/models/Company";
 import Order from "@/models/Order";
 import Review from "@/models/Review";
 import { getSession } from "@/lib/auth";
 
 /**
- * GET handler to retrieve a specific user by ID
- * @returns {Promise<NextResponse>} JSON response with user data
+ * GET handler to retrieve a specific account by ID
+ * @returns {Promise<NextResponse>} JSON response with account data
  */
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
 
-    // Check if user is authenticated and is admin
+    // Check if account is authenticated and is admin
     const session = await getSession();
 
     if (!session || session.role !== "admin") {
@@ -26,52 +26,52 @@ export async function GET(request, { params }) {
 
     await connectDB();
 
-    // Find user by ID
-    const user = await User.findById(id)
+    // Find account by ID
+    const account = await Account.findById(id)
       .select("-password") // Exclude password field
       .populate("orders")
       .populate("reviews");
 
-    if (!user) {
+    if (!account) {
       return NextResponse.json(
-        { success: false, message: "User not found" },
+        { success: false, message: "Account not found" },
         { status: 404 }
       );
     }
 
-    // If user is a company, get company details
+    // If account is a company, get company details
     let companyDetails = null;
-    if (user.role === "company") {
-      companyDetails = await Company.findOne({ userId: user._id });
+    if (account.role === "company") {
+      companyDetails = await Company.findOne({ accountId: account._id });
     }
 
     return NextResponse.json(
       {
         success: true,
-        user,
+        account,
         companyDetails,
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error retrieving user:", error);
+    console.error("Error retrieving account:", error);
 
     return NextResponse.json(
-      { success: false, message: "Server error while retrieving user" },
+      { success: false, message: "Server error while retrieving account" },
       { status: 500 }
     );
   }
 }
 
 /**
- * PATCH handler to update user role or perform admin actions
+ * PATCH handler to update account role or perform admin actions
  * @returns {Promise<NextResponse>} JSON response with success/failure message
  */
 export async function PATCH(request, { params }) {
   try {
     const { id } = await params;
 
-    // Check if user is authenticated and is admin
+    // Check if account is authenticated and is admin
     const session = await getSession();
 
     if (!session || session.role !== "admin") {
@@ -85,17 +85,17 @@ export async function PATCH(request, { params }) {
 
     const { action, role, ...updateData } = await request.json();
 
-    // Find the user
-    const user = await User.findById(id);
+    // Find the account
+    const account = await Account.findById(id);
 
-    if (!user) {
+    if (!account) {
       return NextResponse.json(
-        { success: false, message: "User not found" },
+        { success: false, message: "Account not found" },
         { status: 404 }
       );
     }
 
-    let updatedUser;
+    let updatedAccount;
 
     switch (action) {
       case "changeRole":
@@ -109,14 +109,14 @@ export async function PATCH(request, { params }) {
         }
 
         // Prevent changing the current admin's role
-        if (user._id.toString() === session.id && role !== "admin") {
+        if (account._id.toString() === session.id && role !== "admin") {
           return NextResponse.json(
             { success: false, message: "Cannot change your own admin role" },
             { status: 400 }
           );
         }
 
-        updatedUser = await User.findByIdAndUpdate(
+        updatedAccount = await Account.findByIdAndUpdate(
           id,
           { role },
           { new: true }
@@ -126,7 +126,7 @@ export async function PATCH(request, { params }) {
 
       case "suspend":
         // Add suspended field or update status
-        updatedUser = await User.findByIdAndUpdate(
+        updatedAccount = await Account.findByIdAndUpdate(
           id,
           { suspended: true, suspendedAt: new Date() },
           { new: true }
@@ -136,7 +136,7 @@ export async function PATCH(request, { params }) {
 
       case "unsuspend":
         // Remove suspended status
-        updatedUser = await User.findByIdAndUpdate(
+        updatedAccount = await Account.findByIdAndUpdate(
           id,
           { $unset: { suspended: 1, suspendedAt: 1 } },
           { new: true }
@@ -145,7 +145,7 @@ export async function PATCH(request, { params }) {
         break;
 
       case "updateProfile":
-        // Update user profile information
+        // Update account profile information
         const allowedFields = ["name", "phone"];
         const filteredData = {};
 
@@ -155,7 +155,7 @@ export async function PATCH(request, { params }) {
           }
         });
 
-        updatedUser = await User.findByIdAndUpdate(id, filteredData, {
+        updatedAccount = await Account.findByIdAndUpdate(id, filteredData, {
           new: true,
         }).select("-password");
 
@@ -178,7 +178,7 @@ export async function PATCH(request, { params }) {
         const saltRounds = 10;
         const hashedPassword = await bcryptjs.hash(newPassword, saltRounds);
 
-        updatedUser = await User.findByIdAndUpdate(
+        updatedAccount = await Account.findByIdAndUpdate(
           id,
           {
             password: hashedPassword,
@@ -200,30 +200,30 @@ export async function PATCH(request, { params }) {
     return NextResponse.json(
       {
         success: true,
-        message: `User ${action} completed successfully`,
-        user: updatedUser,
+        message: `Account ${action} completed successfully`,
+        account: updatedAccount,
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error updating user:", error);
+    console.error("Error updating account:", error);
 
     return NextResponse.json(
-      { success: false, message: "Server error while updating user" },
+      { success: false, message: "Server error while updating account" },
       { status: 500 }
     );
   }
 }
 
 /**
- * DELETE handler to delete a user account
+ * DELETE handler to delete a account
  * @returns {Promise<NextResponse>} JSON response with success/failure message
  */
 export async function DELETE(request, { params }) {
   try {
     const { id } = await params;
 
-    // Check if user is authenticated and is admin
+    // Check if account is authenticated and is admin
     const session = await getSession();
 
     if (!session || session.role !== "admin") {
@@ -235,27 +235,27 @@ export async function DELETE(request, { params }) {
 
     await connectDB();
 
-    // Find the user
-    const user = await User.findById(id);
+    // Find the account
+    const account = await Account.findById(id);
 
-    if (!user) {
+    if (!account) {
       return NextResponse.json(
-        { success: false, message: "User not found" },
+        { success: false, message: "Account not found" },
         { status: 404 }
       );
     }
 
     // Prevent deleting the current admin
-    if (user._id.toString() === session.id) {
+    if (account._id.toString() === session.id) {
       return NextResponse.json(
         { success: false, message: "Cannot delete your own account" },
         { status: 400 }
       );
     }
 
-    // If user is a company, clean up company data
-    if (user.role === "company") {
-      const company = await Company.findOne({ userId: id });
+    // If account is a company, clean up company data
+    if (account.role === "company") {
+      const company = await Company.findOne({ accountId: id });
       if (company) {
         // Update orders to mark company as deleted but keep historical data
         await Order.updateMany(
@@ -268,24 +268,24 @@ export async function DELETE(request, { params }) {
       }
     }
 
-    // Update orders to mark user as deleted but keep historical data
-    await Order.updateMany({ userId: id }, { $set: { userDeleted: true } });
+    // Update orders to mark account as deleted but keep historical data
+    await Order.updateMany({ accountId: id }, { $set: { accountDeleted: true } });
 
-    // Delete the user
-    await User.findByIdAndDelete(id);
+    // Delete the account
+    await Account.findByIdAndDelete(id);
 
     return NextResponse.json(
       {
         success: true,
-        message: "User deleted successfully",
+        message: "Account deleted successfully",
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error deleting user:", error);
+    console.error("Error deleting account:", error);
 
     return NextResponse.json(
-      { success: false, message: "Server error while deleting user" },
+      { success: false, message: "Server error while deleting account" },
       { status: 500 }
     );
   }

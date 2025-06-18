@@ -192,6 +192,7 @@ nav {
 /* Home */
 main {
   margin-top: 80px;
+  min-height: 50vh;
 }
 
 section {
@@ -482,7 +483,7 @@ footer a:hover {
   margin: 0;
 }
 
-.user-card {
+.account-card {
   display: flex;
   justify-content: space-between;
   align-items: center;

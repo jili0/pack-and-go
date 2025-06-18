@@ -10,7 +10,7 @@ export default function EditPage() {
   const accountId = params.id;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [user, setUser] = useState(null);
+  const [account, setAccount] = useState(null);
   const [companyData, setCompanyData] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -44,27 +44,30 @@ export default function EditPage() {
   const fetchAccountData = async () => {
     try {
       setLoading(true);
-      const userResponse = await fetch(`/api/admin/users/${accountId}`);
+      const response = await fetch(`/api/admin/accounts/${accountId}`);
 
-      if (!userResponse.ok) throw new Error("Failed to fetch user data");
+      if (!response.ok) {
+        throw new Error("Failed to fetch account data");
+        return;
+      }
 
-      const responseData = await userResponse.json();
-      const userData = responseData.user || responseData;
-      const companyDetails = responseData.companyDetails;
+      const data = await response.json();
+      const accountData = data.account || data;
+      const companyDetails = data.companyDetails;
 
-      setUser(userData);
+      setAccount(accountData);
 
-      // Set basic user form data
+      // Set basic account form data
       setFormData((prev) => ({
         ...prev,
-        email: userData.email || "",
-        name: userData.name || "",
-        phone: userData.phone || "",
-        role: userData.role || "user",
+        email: accountData.email || "",
+        name: accountData.name || "",
+        phone: accountData.phone || "",
+        role: accountData.role || "user",
       }));
 
-      // Handle company data if user is a company
-      if (userData.role === "company" && companyDetails) {
+      // Handle company data if account is a company
+      if (accountData.role === "company" && companyDetails) {
         setCompanyData(companyDetails);
         setCompanyFormData({
           companyName: companyDetails.companyName || "",
@@ -83,7 +86,7 @@ export default function EditPage() {
         setServiceAreas(companyDetails.serviceAreas || []);
       }
     } catch (err) {
-      setError("Failed to load user data: " + err.message);
+      setError("Failed to load account data: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -152,7 +155,7 @@ export default function EditPage() {
       const data = await response.json();
       if (data.success) {
         setSuccess(
-          `Password reset! Temp password: ${data.tempPassword} (for ${data.userEmail})`
+          `Password reset! Temp password: ${data.tempPassword} (for ${data.accountEmail})`
         );
       } else {
         throw new Error(data.message || "Failed to reset password");
@@ -183,8 +186,8 @@ export default function EditPage() {
         }
       }
 
-      // Update user profile
-      const userResponse = await fetch(`/api/admin/users/${accountId}`, {
+      // Update account profile
+      const response = await fetch(`/api/admin/accounts/${accountId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -194,25 +197,28 @@ export default function EditPage() {
         }),
       });
 
-      if (!userResponse.ok) throw new Error("Failed to update user profile");
+      if (!response.ok) throw new Error("Failed to update account profile");
 
       // Update password if provided
       if (formData.newPassword && formData.newPassword.trim() !== "") {
-        const passwordResponse = await fetch(`/api/admin/users/$accountrId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "changePassword",
-            newPassword: formData.newPassword,
-          }),
-        });
+        const passwordResponse = await fetch(
+          `/api/admin/accounts/$accountrId}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "changePassword",
+              newPassword: formData.newPassword,
+            }),
+          }
+        );
 
         if (!passwordResponse.ok) throw new Error("Failed to update password");
       }
 
       // Update role if changed
-      if (formData.role !== user.role) {
-        const roleResponse = await fetch(`/api/admin/users/$accountrId}`, {
+      if (formData.role !== account.role) {
+        const roleResponse = await fetch(`/api/admin/accounts/$accountrId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -221,7 +227,7 @@ export default function EditPage() {
           }),
         });
 
-        if (!roleResponse.ok) throw new Error("Failed to update user role");
+        if (!roleResponse.ok) throw new Error("Failed to update account role");
       }
 
       // Update company data if applicable
@@ -239,7 +245,7 @@ export default function EditPage() {
           throw new Error("Failed to update company data");
       }
 
-      let successMessage = "User data updated successfully";
+      let successMessage = "Account data updated successfully";
       if (formData.newPassword && formData.newPassword.trim() !== "") {
         successMessage += " (including password change)";
         setFormData((prev) => ({
@@ -252,7 +258,7 @@ export default function EditPage() {
       setSuccess(successMessage);
       await fetchAccountData();
     } catch (err) {
-      setError("Failed to update user: " + err.message);
+      setError("Failed to update account: " + err.message);
     } finally {
       setSaving(false);
     }
@@ -261,13 +267,13 @@ export default function EditPage() {
   if (loading)
     return (
       <div className="container">
-        <p>Loading user data...</p>
+        <p>Loading account data...</p>
       </div>
     );
-  if (!loading && !user)
+  if (!loading && !account)
     return (
       <div className="container">
-        <p>User not found</p>
+        <p>Account not found</p>
       </div>
     );
 
@@ -275,13 +281,13 @@ export default function EditPage() {
     <div className="container">
       <div className="page-header">
         <div>
-          <h1>Edit User</h1>
+          <h1>Edit Account</h1>
           <p>
-            Editing: {user.name} ({user.email}) - {user.role}
+            Editing: {account.name} ({account.email}) - {account.role}
           </p>
         </div>
         <button className="btn-primary" onClick={() => router.push("/admin")}>
-          ← Back to Users
+          ← Back to Accounts
         </button>
       </div>
 
@@ -332,7 +338,7 @@ export default function EditPage() {
               value={formData.role}
               onChange={handleInputChange}
             >
-              <option value="user">User</option>
+              <option value="user">Account</option>
               <option value="company">Company</option>
               <option value="admin">Admin</option>
             </select>
@@ -402,13 +408,13 @@ export default function EditPage() {
           )}
         </section>
 
-        {/* User Statistics */}
-        {user.role === "user" && (
+        {/* Account Statistics */}
+        {account.role === "user" && (
           <section>
-            <h2>User Statistics</h2>
+            <h2>Account Statistics</h2>
             <div className="stats-grid">
-              <div>Reviews: {user.reviews?.length || 0}</div>
-              <div>Orders: {user.orders?.length || 0}</div>
+              <div>Reviews: {account.reviews?.length || 0}</div>
+              <div>Orders: {account.orders?.length || 0}</div>
             </div>
           </section>
         )}

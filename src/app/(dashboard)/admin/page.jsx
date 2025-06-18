@@ -7,7 +7,7 @@ import "@/app/styles/styles.css";
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [users, setUsers] = useState([]);
+  const [accounts, setAccounts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,14 +21,14 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [usersRes, ordersRes] = await Promise.all([
-        fetch("/api/admin/users"),
+      const [accountsRes, ordersRes] = await Promise.all([
+        fetch("/api/admin/accounts"),
         fetch("/api/orders"),
       ]);
 
-      if (usersRes.ok) {
-        const usersData = await usersRes.json();
-        usersData.success && setUsers(usersData.users);
+      if (accountsRes.ok) {
+        const accountsData = await accountsRes.json();
+        accountsData.success && setAccounts(accountsData.accounts);
       }
 
       if (ordersRes.ok) {
@@ -42,17 +42,17 @@ export default function AdminDashboard() {
     }
   };
 
-  // Reusable UserSection component
-  const UserSection = ({ role }) => {
+  // Reusable AccountSection component
+  const AccountSection = ({ role }) => {
     // Search and filter
-    const filteredUsers = users.filter((user) => {
+    const filteredAccounts = accounts.filter((account) => {
       const searchLower = searchTerm?.toLowerCase();
       const matchesSearch =
         !searchTerm ||
-        user.name.toLowerCase().includes(searchLower) ||
-        user.email.toLowerCase().includes(searchLower);
+        account.name.toLowerCase().includes(searchLower) ||
+        account.email.toLowerCase().includes(searchLower);
 
-      const matchesRole = user.role === role;
+      const matchesRole = account.role === role;
 
       return matchesSearch && matchesRole;
     });
@@ -61,10 +61,10 @@ export default function AdminDashboard() {
       <div>
         <h3>
           Manage {role == "company" ? "companie" : role}s (
-          {filteredUsers.length})
+          {filteredAccounts.length})
         </h3>
 
-        {filteredUsers.length === 0 ? (
+        {filteredAccounts.length === 0 ? (
           <p>
             {searchTerm
               ? `No ${role == "company" ? "companie" : role}s match your search`
@@ -72,22 +72,22 @@ export default function AdminDashboard() {
           </p>
         ) : (
           <div>
-            {filteredUsers.map((userData) => (
-              <div key={userData._id} className="user-card">
+            {filteredAccounts.map((accountData) => (
+              <div key={accountData._id} className="account-card">
                 <div>
-                  <h4>{userData.name}</h4>
-                  <p>{userData.email}</p>
+                  <h4>{accountData.name}</h4>
+                  <p>{accountData.email}</p>
                 </div>
                 <div>
                   <button
                     className="btn-primary"
-                    onClick={() => handleEditUser(userData._id)}
+                    onClick={() => handleEditAccount(accountData._id)}
                   >
                     Edit
                   </button>
                   <button
                     className="btn-primary"
-                    onClick={() => handleDeleteUser(userData._id)}
+                    onClick={() => handleDeleteAccount(accountData._id)}
                     disabled={actionLoading}
                   >
                     {actionLoading ? "Deleting..." : "Delete"}
@@ -130,27 +130,27 @@ export default function AdminDashboard() {
     );
   };
 
-  const handleEditUser = (userId) => {
-    router.push(`/admin/accounts/${userId}`);
+  const handleEditAccount = (accountId) => {
+    router.push(`/admin/accounts/${accountId}`);
   };
 
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteAccount = async (accountId) => {
     // confirm delete
     const confirmed = window.confirm(
-      "Are you sure you want to delete this user? This action cannot be undone."
+      "Are you sure you want to delete this account? This action cannot be undone."
     );
     if (!confirmed) return;
 
     try {
       setActionLoading(true);
-      const response = await fetch(`/api/admin/users/${userId}`, {
+      const response = await fetch(`/api/admin/accounts/${accountId}`, {
         method: "DELETE",
       });
 
       const data = await response.json();
 
       if (data.success) {
-        setUsers(users.filter((user) => user._id !== userId));
+        setAccounts(accounts.filter((account) => account._id !== accountId));
       } else {
         setError(data.message || "Error deleting user");
       }
@@ -205,11 +205,11 @@ export default function AdminDashboard() {
     return <p>Loading dashboard...</p>;
   }
 
-  // Calculate user statistics directly
-  const totalUsers = users.length;
-  const customerCount = users.filter((u) => u.role === "user").length;
-  const companyCount = users.filter((u) => u.role === "company").length;
-  const adminCount = users.filter((u) => u.role === "admin").length;
+  // Calculate account statistics directly
+  const totalAccounts = accounts.length;
+  const customerCount = accounts.filter((u) => u.role === "user").length;
+  const companyCount = accounts.filter((u) => u.role === "company").length;
+  const adminCount = accounts.filter((u) => u.role === "admin").length;
 
   const orderStats = getOrderStats();
   const recentOrders = orders.slice(0, 15);
@@ -220,7 +220,7 @@ export default function AdminDashboard() {
 
       <div>
         <div className="admin-stats">
-          <p>Total Accounts: {totalUsers}</p>
+          <p>Total Accounts: {totalAccounts}</p>
           <p>Customers: {customerCount}</p>
           <p>Companies: {companyCount}</p>
           <p>Admins: {adminCount}</p>
@@ -238,9 +238,9 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        {/* User Management Sections */}
+        {/* Account Management Sections */}
         {USER_ROLES.map((role) => (
-          <UserSection key={role} role={role} />
+          <AccountSection key={role} role={role} />
         ))}
       </div>
 

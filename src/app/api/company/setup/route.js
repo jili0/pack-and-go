@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Company from "@/models/Company";
-import User from "@/models/User";
+import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
 import saveUploadedFile from "@/lib/fileUpload";
 
@@ -20,7 +20,7 @@ export async function POST(request) {
     await connectDB();
 
     // Prüfe, ob bereits ein Firmenprofil existiert
-    const existingCompany = await Company.findOne({ userId: session.id });
+    const existingCompany = await Company.findOne({ accountId: session.id });
 
     if (existingCompany) {
       return NextResponse.json(
@@ -118,7 +118,7 @@ export async function POST(request) {
 
     // Erstelle das Firmenprofil
     const newCompany = await Company.create({
-      userId: session.id,
+      accountId: session.id,
       companyName,
       address: {
         street,
@@ -148,14 +148,14 @@ export async function POST(request) {
     });
 
     // Hole die E-Mail-Adresse und Telefonnummer des Benutzers
-    const user = await User.findById(session.id);
+    const account = await Account.findById(session.id);
 
     // Sende E-Mail-Benachrichtigung an den Administrator zur Überprüfung
     // (Implementierung in lib/email.js)
     // await sendCompanyVerificationRequestEmail({
     //   companyName,
-    //   companyEmail: user.email,
-    //   companyPhone: user.phone,
+    //   companyEmail: account.email,
+    //   companyPhone: account.phone,
     //   documentsUrl: [businessLicenseUrl, kisteKlarCertificateUrl].filter(Boolean)
     // });
 

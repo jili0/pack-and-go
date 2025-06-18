@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "@/context/AuthContext";
 
 const ProfileForm = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { account, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
@@ -29,14 +29,14 @@ const ProfileForm = () => {
     },
   });
 
-  // Set form values when user data is available
+  // Set form values when account data is available
   useEffect(() => {
-    if (user) {
-      setValue("name", user.name || "");
-      setValue("email", user.email || "");
-      setValue("phone", user.phone || "");
+    if (account) {
+      setValue("name", account.name || "");
+      setValue("email", account.email || "");
+      setValue("phone", account.phone || "");
     }
-  }, [user, setValue]);
+  }, [account, setValue]);
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -44,7 +44,7 @@ const ProfileForm = () => {
     setError(null);
 
     try {
-      // Only include password fields if the user is trying to change password
+      // Only include password fields if the account is trying to change password
       const payload = {
         name: data.name,
         phone: data.phone,
@@ -62,7 +62,7 @@ const ProfileForm = () => {
         payload.newPassword = data.newPassword;
       }
 
-      const response = await fetch("/api/user/profile", {
+      const response = await fetch("/api/account/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

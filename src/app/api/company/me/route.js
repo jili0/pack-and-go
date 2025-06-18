@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Company from "@/models/Company";
-import User from "@/models/User";
+import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
 
 export async function GET() {
@@ -19,7 +19,7 @@ export async function GET() {
     await connectDB();
 
     // Suche das Unternehmen basierend auf der Benutzer-ID
-    const company = await Company.findOne({ userId: session.id });
+    const company = await Company.findOne({ accountId: session.id });
 
     if (!company) {
       return NextResponse.json(
@@ -29,13 +29,13 @@ export async function GET() {
     }
 
     // Hole auch die Benutzerdaten
-    const user = await User.findById(session.id).select("-password");
+    const account = await Account.findById(session.id).select("-password");
 
     return NextResponse.json(
       {
         success: true,
         company: company.toObject(),
-        user: user.toObject()
+        account: account.toObject(),
       },
       { status: 200 }
     );
@@ -68,7 +68,7 @@ export async function PUT(request) {
     const updateData = await request.json();
 
     // Suche das Unternehmen
-    const company = await Company.findOne({ userId: session.id });
+    const company = await Company.findOne({ accountId: session.id });
 
     if (!company) {
       return NextResponse.json(
@@ -79,16 +79,16 @@ export async function PUT(request) {
 
     // Erlaubte Felder für Updates
     const allowedFields = [
-      'companyName',
-      'description',
-      'hourlyRate',
-      'address',
-      'serviceAreas'
+      "companyName",
+      "description",
+      "hourlyRate",
+      "address",
+      "serviceAreas",
     ];
 
     // Filtere nur erlaubte Felder
     const filteredUpdate = {};
-    Object.keys(updateData).forEach(key => {
+    Object.keys(updateData).forEach((key) => {
       if (allowedFields.includes(key)) {
         filteredUpdate[key] = updateData[key];
       }
@@ -105,7 +105,7 @@ export async function PUT(request) {
       {
         success: true,
         message: "Firmenprofil erfolgreich aktualisiert",
-        company: updatedCompany.toObject()
+        company: updatedCompany.toObject(),
       },
       { status: 200 }
     );
