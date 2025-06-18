@@ -596,7 +596,7 @@ footer a:hover {
   text-align: left;
 }
 
-/* User Dashboard */
+
 /* User Dashboard */
 
 .user-dashboard {
@@ -692,9 +692,6 @@ footer a:hover {
   opacity: 0.85;
   max-width: 220px;
 }
-
-
-
 
 /* Media Queries */
 @media (min-width: 640px) {

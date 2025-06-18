@@ -67,12 +67,6 @@ const Header = () => {
                   >
                     Dashboard
                   </Link>
-                  <Link
-                    href={`/${currentUser.role}/profile`}
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Profile
-                  </Link>
                   <button className="btn-secondary" onClick={handleLogout}>
                     Logout
                   </button>
