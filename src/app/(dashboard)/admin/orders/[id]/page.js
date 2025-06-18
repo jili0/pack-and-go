@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 export default function OrderDetail() {
   const router = useRouter();
   const params = useParams();
-  const { user } = useAuth();
+  const { account } = useAuth();
   const orderId = params.id;
 
   const [order, setOrder] = useState(null);

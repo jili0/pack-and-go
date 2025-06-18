@@ -40,7 +40,7 @@ const AdminLoginContent = () => {
     try {
       const result = await login(formData.email, formData.password);
       if (result.success) {
-        if (result.user.role === "admin") {
+        if (result.account.role === "admin") {
           router.push("/admin");
         } else {
           setLoginError("Access denied. Admin credentials required.");

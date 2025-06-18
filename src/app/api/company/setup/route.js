@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Company from "@/models/Company";
-import User from "@/models/User";
+import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
 import saveUploadedFile from "@/lib/fileUpload";
 
@@ -12,21 +12,21 @@ export async function POST(request) {
 
     if (!session || session.role !== "company") {
       return NextResponse.json(
-        { success: false, message: "Nicht autorisiert" },
+        { success: false, message: "Not authorized" },
         { status: 401 }
       );
     }
 
     await connectDB();
 
-    // Prüfe, ob bereits ein Firmenprofil existiert
-    const existingCompany = await Company.findOne({ userId: session.id });
+    // Check if company profile already exists
+    const existingCompany = await Company.findOne({ accountId: session.id });
 
     if (existingCompany) {
       return NextResponse.json(
         {
           success: false,
-          message: "Es existiert bereits ein Firmenprofil für diesen Benutzer",
+          message: "A company profile already exists for this user",
         },
         { status: 400 }
       );
@@ -34,19 +34,16 @@ export async function POST(request) {
 
     const formData = await request.formData();
 
-    // Extrahiere die Formulardaten
+    // Extract form data
     const companyName = formData.get("companyName");
     const taxId = formData.get("taxId");
-    const description = formData.get("description");
-    const hourlyRate = formData.get("hourlyRate");
     const street = formData.get("street");
     const city = formData.get("city");
     const postalCode = formData.get("postalCode");
-    const country = formData.get("country") || "Deutschland";
-    const isKisteKlarCertified =
-      formData.get("isKisteKlarCertified") === "true";
+    const country = formData.get("country") || "Germany";
+    const isKisteKlarCertified = formData.get("isKisteKlarCertified") === "true";
 
-    // Extrahiere die Servicegebiete
+    // Extract service areas
     const serviceAreasData = formData.get("serviceAreas");
     let serviceAreas = [];
 
@@ -55,31 +52,24 @@ export async function POST(request) {
         serviceAreas = JSON.parse(serviceAreasData);
       } catch (error) {
         return NextResponse.json(
-          { success: false, message: "Ungültiges Format für Servicegebiete" },
+          { success: false, message: "Invalid format for service areas" },
           { status: 400 }
         );
       }
     }
 
-    // Validiere die Eingaben
-    if (
-      !companyName ||
-      !taxId ||
-      !hourlyRate ||
-      !street ||
-      !city ||
-      !postalCode
-    ) {
+    // Validate required fields (removed hourlyRate)
+    if (!companyName || !taxId || !street || !city || !postalCode) {
       return NextResponse.json(
         {
           success: false,
-          message: "Alle Pflichtfelder müssen ausgefüllt sein",
+          message: "All required fields must be filled out",
         },
         { status: 400 }
       );
     }
 
-    // Verarbeite die hochgeladenen Dateien
+    // Process uploaded files
     const businessLicenseFile = formData.get("businessLicense");
     const kisteKlarCertificateFile = formData.get("kisteKlarCertificate");
 
@@ -94,7 +84,7 @@ export async function POST(request) {
       );
     } else {
       return NextResponse.json(
-        { success: false, message: "Betriebsausweis ist erforderlich" },
+        { success: false, message: "Business license is required" },
         { status: 400 }
       );
     }
@@ -110,15 +100,15 @@ export async function POST(request) {
         {
           success: false,
           message:
-            "KisteKlar-Zertifikat ist erforderlich, wenn Sie angeben, zertifiziert zu sein",
+            "KisteKlar certificate is required when claiming to be certified",
         },
         { status: 400 }
       );
     }
 
-    // Erstelle das Firmenprofil
+    // Create company profile
     const newCompany = await Company.create({
-      userId: session.id,
+      accountId: session.id,
       companyName,
       address: {
         street,
@@ -127,9 +117,8 @@ export async function POST(request) {
         country,
       },
       taxId,
-      description,
       serviceAreas,
-      isVerified: false, // Muss von einem Administrator bestätigt werden
+      isVerified: false, // Must be confirmed by an administrator
       isKisteKlarCertified,
       documents: {
         businessLicense: {
@@ -147,34 +136,24 @@ export async function POST(request) {
       },
     });
 
-    // Hole die E-Mail-Adresse und Telefonnummer des Benutzers
-    const user = await User.findById(session.id);
-
-    // Sende E-Mail-Benachrichtigung an den Administrator zur Überprüfung
-    // (Implementierung in lib/email.js)
-    // await sendCompanyVerificationRequestEmail({
-    //   companyName,
-    //   companyEmail: user.email,
-    //   companyPhone: user.phone,
-    //   documentsUrl: [businessLicenseUrl, kisteKlarCertificateUrl].filter(Boolean)
-    // });
+    const account = await Account.findById(session.id);
 
     return NextResponse.json(
       {
         success: true,
         message:
-          "Firmenprofil erfolgreich erstellt und zur Überprüfung eingereicht",
+          "Company profile successfully created and submitted for review",
         company: newCompany,
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Fehler beim Erstellen des Firmenprofils:", error);
+    console.error("Error creating company profile:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Serverfehler beim Erstellen des Firmenprofils",
+        message: "Server error while creating company profile",
       },
       { status: 500 }
     );

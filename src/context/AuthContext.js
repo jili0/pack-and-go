@@ -1,93 +1,94 @@
 // src/context/AuthContext.js
-'use client';
+"use client";
 
-import { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { createContext, useContext, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   const [authInitialized, setAuthInitialized] = useState(false);
 
-useEffect(() => {
-  // 给 AuthContext 一些时间来初始化
-  const timer = setTimeout(() => {
-    setAuthInitialized(true);
-  }, 100);
-  
-  return () => clearTimeout(timer);
-}, []);
+  useEffect(() => {
+    // 给 AuthContext 一些时间来初始化
+    const timer = setTimeout(() => {
+      setAuthInitialized(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Benutzer beim ersten Laden prüfen
   useEffect(() => {
-    checkUserLoggedIn();
+    checkAccountLoggedIn();
   }, []);
 
   // Benutzer-Status überprüfen
-  const checkUserLoggedIn = async () => {
+  const checkAccountLoggedIn = async () => {
     try {
-      const res = await fetch('/api/auth/me');
-      
+      const res = await fetch("/api/auth/me");
+
       if (res.status === 401) {
         // Nicht authentifiziert
-        setUser(null);
+        setAccount(null);
         setLoading(false);
         return;
       }
-      
+
       if (!res.ok) {
-        throw new Error('Fehler beim Abrufen des Benutzers');
+        throw new Error("Fehler beim Abrufen des Benutzers");
       }
 
       const data = await res.json();
 
       if (data.success) {
-        setUser(data.user);
-        return {success: true, user: data.user}
+        setAccount(data.account);
+        return { success: true, account: data.account };
       } else {
-        setUser(null);
+        setAccount(null);
       }
     } catch (error) {
-      console.error('Auth check error:', error);
-      setUser(null);
+      console.error("Auth check error:", error);
+      setAccount(null);
     } finally {
       setLoading(false);
     }
   };
 
   // Registrierung
-  const register = async (userData) => {
+  const register = async (accountData) => {
     setLoading(true);
-    
+
     try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify(accountData),
       });
 
       const data = await res.json();
 
       if (data.success) {
-        setUser(data.user);
+        setAccount(data.account);
         return { success: true };
       } else {
-        return { 
-          success: false, 
-          message: data.message || 'Registrierung fehlgeschlagen' 
+        return {
+          success: false,
+          message: data.message || "Registrierung fehlgeschlagen",
         };
       }
     } catch (error) {
-      console.error('Registration error:', error);
-      return { 
-        success: false, 
-        message: 'Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.' 
+      console.error("Registration error:", error);
+      return {
+        success: false,
+        message:
+          "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
       };
     } finally {
       setLoading(false);
@@ -97,12 +98,12 @@ useEffect(() => {
   // Login
   const login = async (email, password) => {
     setLoading(true);
-    
+
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
@@ -110,19 +111,20 @@ useEffect(() => {
       const data = await res.json();
 
       if (data.success) {
-        setUser(data.user);
-        return { success: true , user: data.user };
+        setAccount(data.account);
+        return { success: true, account: data.account };
       } else {
-        return { 
-          success: false, 
-          message: data.message || 'Anmeldung fehlgeschlagen' 
+        return {
+          success: false,
+          message: data.message || "Anmeldung fehlgeschlagen",
         };
       }
     } catch (error) {
-      console.error('Login error:', error);
-      return { 
-        success: false, 
-        message: 'Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.' 
+      console.error("Login error:", error);
+      return {
+        success: false,
+        message:
+          "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
       };
     } finally {
       setLoading(false);
@@ -132,52 +134,57 @@ useEffect(() => {
   // Logout
   const logout = async () => {
     try {
-      const res = await fetch('/api/auth/logout', {
-        method: 'POST',
+      const res = await fetch("/api/auth/logout", {
+        method: "POST",
       });
 
       const data = await res.json();
 
       if (data.success) {
-        setUser(null);
-        router.push('/');
+        setAccount(null);
+        router.push("/");
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
       // Selbst wenn der Server-Logout fehlschlägt, wollen wir den Client-Zustand zurücksetzen
-      setUser(null);
-      router.push('/');
+      setAccount(null);
+      router.push("/");
     }
   };
 
   // Benutzer löschen
   const deleteAccount = async () => {
-    if (!confirm('Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.')) {
+    if (
+      !confirm(
+        "Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+      )
+    ) {
       return { success: false };
     }
 
     try {
-      const res = await fetch('/api/auth/delete', {
-        method: 'DELETE',
+      const res = await fetch("/api/auth/delete", {
+        method: "DELETE",
       });
 
       const data = await res.json();
 
       if (data.success) {
-        setUser(null);
-        router.push('/');
+        setAccount(null);
+        router.push("/");
         return { success: true };
       } else {
-        return { 
-          success: false, 
-          message: data.message || 'Kontolöschung fehlgeschlagen' 
+        return {
+          success: false,
+          message: data.message || "Kontolöschung fehlgeschlagen",
         };
       }
     } catch (error) {
-      console.error('Account deletion error:', error);
-      return { 
-        success: false, 
-        message: 'Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.' 
+      console.error("Account deletion error:", error);
+      return {
+        success: false,
+        message:
+          "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
       };
     }
   };
@@ -185,12 +192,12 @@ useEffect(() => {
   return (
     <AuthContext.Provider
       value={{
-        user,
+        account,
         loading,
         register,
         login,
         logout,
-        deleteAccount
+        deleteAccount,
       }}
     >
       {children}

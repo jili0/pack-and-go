@@ -14,7 +14,7 @@ const OrderList = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/api/user/orders");
+        const response = await fetch("/api/account/orders");
         const data = await response.json();
 
         if (data.success) {
@@ -66,7 +66,7 @@ const OrderList = () => {
   };
 
   const handleViewOrder = (orderId) => {
-    router.push(`/user/orders/${orderId}`);
+    router.push(`/account/orders/${orderId}`);
   };
 
   if (loading) {
@@ -176,7 +176,7 @@ const OrderList = () => {
                 {order.status === "completed" && !order.review && (
                   <button
                     onClick={() =>
-                      router.push(`/user/orders/${order._id}/review`)
+                      router.push(`/account/orders/${order._id}/review`)
                     }
                   >
                     Leave Review
