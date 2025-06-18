@@ -1,9 +1,16 @@
 // src/components/dashboard/ProfileForm.jsx (continued)
 "use client";
 
+<<<<<<< HEAD
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/context/AuthContext";
+=======
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useAuth } from '@/context/AuthContext';
+import styles from '@/app/styles/UserProfile.module.css';
+>>>>>>> 0eb7fadcdeb49b3106164f1395ae53ab1ee35b84
 
 const ProfileForm = () => {
   const { account, loading: authLoading } = useAuth();

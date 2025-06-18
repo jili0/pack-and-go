@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -49,11 +49,16 @@ const RegisterPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registerError, setRegisterError] = useState(null);
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
-    if (errors[name]) setErrors({ ...errors, [name]: null });
-  };
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: type === "checkbox" ? checked : value 
+    }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
+  }, [errors]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -121,6 +126,7 @@ const RegisterPage = () => {
         )}
 
         <form onSubmit={handleSubmit} className="register-form">
+
           <InputField
             formData={formData}
             handleChange={handleChange}
@@ -174,6 +180,7 @@ const RegisterPage = () => {
             type="password"
             placeholder="Repeat password"
           />
+
 
           <div className="form-field">
             <label htmlFor="role">
