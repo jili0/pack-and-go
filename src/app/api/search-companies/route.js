@@ -15,6 +15,7 @@ export async function POST(request) {
       );
     }
 
+
     // Search for companies that serve the route or are in the area
     // This is a flexible search that looks for companies:
     // 1. With service areas that match the route
@@ -59,6 +60,7 @@ export async function POST(request) {
         averageRating: 1,
         reviewsCount: 1,
         logo: 1,
+
         createdAt: 1,
       })
       .limit(20) // Limit results to prevent overwhelming the account
@@ -68,14 +70,16 @@ export async function POST(request) {
     const processedCompanies = companies.map((company) => {
       const companyObj = company.toObject();
 
+
       return {
         ...companyObj,
         // Ensure required fields have default values
         averageRating: companyObj.averageRating || 0,
         reviewsCount: companyObj.reviewsCount || 0,
-        hourlyRate: companyObj.hourlyRate || 25, // Default hourly rate
-        isVerified: companyObj.isVerified || false,
+        hourlyRate: companyObj.hourlyRate || 25,
+        isVerified: companyObj.isVerified !== false, // Default true unless explicitly false
         isKisteKlarCertified: companyObj.isKisteKlarCertified || false,
+
         description: companyObj.description || "No description available",
         serviceAreas: companyObj.serviceAreas || [],
         documents: companyObj.documents || {
@@ -93,5 +97,6 @@ export async function POST(request) {
   } catch (error) {
     console.error("Error searching companies:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
+
   }
 }
