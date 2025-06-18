@@ -28,7 +28,6 @@ export default function EditPage() {
     companyName: "",
     address: { street: "", city: "", postalCode: "", country: "" },
     taxId: "",
-    description: "",
     isVerified: false,
     isKisteKlarCertified: false,
   });
@@ -47,7 +46,6 @@ export default function EditPage() {
 
       if (!response.ok) {
         throw new Error("Failed to fetch account data");
-        return;
       }
 
       const data = await response.json();
@@ -56,7 +54,6 @@ export default function EditPage() {
 
       setAccount(accountData);
 
-      // Set basic account form data
       setFormData((prev) => ({
         ...prev,
         email: accountData.email || "",
@@ -77,7 +74,6 @@ export default function EditPage() {
             country: companyDetails.address?.country || "",
           },
           taxId: companyDetails.taxId || "",
-          description: companyDetails.description || "",
           isVerified: companyDetails.isVerified || false,
           isKisteKlarCertified: companyDetails.isKisteKlarCertified || false,
         });
@@ -216,7 +212,7 @@ export default function EditPage() {
 
       // Update role if changed
       if (formData.role !== account.role) {
-        const roleResponse = await fetch(`/api/admin/accounts/$accountrId}`, {
+        const roleResponse = await fetch(`/api/admin/accounts/${accountId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -244,6 +240,7 @@ export default function EditPage() {
       }
 
       let successMessage = "Account data updated successfully";
+
       if (formData.newPassword && formData.newPassword.trim() !== "") {
         successMessage += " (including password change)";
         setFormData((prev) => ({
@@ -262,54 +259,30 @@ export default function EditPage() {
     }
   };
 
-  if (loading)
-    return (
-      <div className="container">
-        <p>Loading account data...</p>
-      </div>
-    );
-  if (!loading && !account)
-    return (
-      <div className="container">
-        <p>Account not found</p>
-      </div>
-    );
+  if (loading) return <p>Loading account data...</p>;
+
+  if (!loading && !account) return <p>Account not found</p>;
 
   return (
     <div className="container">
-      <div className="page-header">
-        <div>
-          <h1>Edit Account</h1>
-          <p>
-            Editing: {account.name} ({account.email}) - {account.role}
-          </p>
-        </div>
-        <button className="btn-primary" onClick={() => router.push("/admin")}>
-          ← Back to Accounts
+      <div className="edit-header">
+        <p>
+          Editing {account.role} account: <b>{account.name} </b>({account.email}
+          )
+        </p>
+
+        <button className="btn-secondary" onClick={() => router.push("/admin")}>
+          Back to Accounts
         </button>
       </div>
 
-      {error && <div className="error">{error}</div>}
-      {success && <div className="success">{success}</div>}
+      {error && <p className="error">{error}</p>}
+      {success && <p>{success}</p>}
 
       <form onSubmit={handleSubmit}>
-        {/* Basic Information */}
-        <section>
-          <h2>Basic Information</h2>
-
-          <div className="form-field">
-            <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              disabled
-              title="Email cannot be changed for security reasons"
-            />
-          </div>
-
-          <div className="form-field">
-            <label>Name</label>
+        <div className="form-field">
+          <label>
+            Name
             <input
               type="text"
               name="name"
@@ -317,20 +290,37 @@ export default function EditPage() {
               onChange={handleInputChange}
               required
             />
-          </div>
+          </label>
+        </div>
 
-          <div className="form-field">
-            <label>Phone</label>
+        <div className="form-field">
+          <label>
+            Email
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              disabled
+              title="Email cannot be changed for security reasons"
+            />
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label>
+            Phone
             <input
               type="tel"
               name="phone"
               value={formData.phone}
               onChange={handleInputChange}
             />
-          </div>
+          </label>
+        </div>
 
-          <div className="form-field">
-            <label>Role</label>
+        <div className="form-field">
+          <label>
+            Role
             <select
               name="role"
               value={formData.role}
@@ -340,81 +330,62 @@ export default function EditPage() {
               <option value="company">Company</option>
               <option value="admin">Admin</option>
             </select>
-          </div>
+          </label>
+        </div>
 
-          {/* Password Section */}
-          <div className="form-field">
-            <label>Current Password</label>
-            <div className="password-field">
-              <input type="password" value="••••••••••••" disabled />
-              <button
-                type="button"
-                className="btn-primary"
-                onClick={handleResetPassword}
-                disabled={saving}
-              >
-                Reset Password
-              </button>
-            </div>
-          </div>
+        <div className="form-field">
+          <label>
+            Current Password
+            <input type="password" value="••••••••••••" disabled />
+          </label>
+        </div>
+        <div className="form-field">
+          <label>
+            New Password (Optional)
+            <input
+              type={showPassword ? "text" : "password"}
+              name="newPassword"
+              value={formData.newPassword}
+              onChange={handleInputChange}
+              placeholder="Enter new password to change it"
+              minLength="6"
+            />
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              Toggle
+            </button>
+          </label>
+        </div>
 
+        {formData.newPassword && formData.newPassword.trim() !== "" && (
           <div className="form-field">
-            <label>New Password (Optional)</label>
-            <div className="password-field">
+            <label>
+              Confirm New Password
               <input
                 type={showPassword ? "text" : "password"}
-                name="newPassword"
-                value={formData.newPassword}
+                name="confirmPassword"
+                value={formData.confirmPassword}
                 onChange={handleInputChange}
-                placeholder="Enter new password to change it"
+                placeholder="Confirm new password"
                 minLength="6"
               />
               <button
                 type="button"
-                className="password-toggle"
+                className="btn-secondary"
                 onClick={() => setShowPassword(!showPassword)}
-              ></button>
-            </div>
-            <small>
-              Leave empty to keep current password. Minimum 6 characters.
-            </small>
+              >
+                Toggle
+              </button>
+            </label>
+
+            {formData.confirmPassword &&
+              formData.newPassword !== formData.confirmPassword && (
+                <small className="error">Passwords do not match</small>
+              )}
           </div>
-
-          {formData.newPassword && formData.newPassword.trim() !== "" && (
-            <div className="form-field">
-              <label>Confirm New Password</label>
-              <div className="password-field">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  placeholder="Confirm new password"
-                  minLength="6"
-                />
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                ></button>
-              </div>
-              {formData.confirmPassword &&
-                formData.newPassword !== formData.confirmPassword && (
-                  <small className="error">Passwords do not match</small>
-                )}
-            </div>
-          )}
-        </section>
-
-        {/* Account Statistics */}
-        {account.role === "user" && (
-          <section>
-            <h2>Account Statistics</h2>
-            <div className="stats-grid">
-              <div>Reviews: {account.reviews?.length || 0}</div>
-              <div>Orders: {account.orders?.length || 0}</div>
-            </div>
-          </section>
         )}
 
         {/* Company Information */}
@@ -567,7 +538,6 @@ export default function EditPage() {
             </div>
           </section>
         )}
-
         {/* Form Actions */}
         <div className="form-actions">
           <button

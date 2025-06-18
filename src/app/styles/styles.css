@@ -149,6 +149,32 @@ form {
   color: #888;
 }
 
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.form-field label {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.checkbox-field input {
+  width: auto;
+}
+
 /* Header Styles */
 header {
   background: #fff;
@@ -286,33 +312,6 @@ section {
 
 .total-price {
   color: #007bff;
-}
-
-/* Register Page */
-.register-form .form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.register-form .form-field label {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.checkbox-field {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.checkbox-field input {
-  width: auto;
 }
 
 /* Search Form */
@@ -602,18 +601,6 @@ footer a:hover {
   gap: 0.5rem;
 }
 
-.service-inputs .form-field {
-  flex: 1;
-  margin: 0;
-}
-
-.form-field label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.3rem;
-  text-align: left;
-}
-
 /* Order Details Page */
 .order-detail {
   text-align: left;
@@ -637,6 +624,13 @@ footer a:hover {
   height: 80px;
   margin-left: 0;
   margin-top: 0.5rem;
+}
+
+/* Edit Account Page */
+
+.edit-header {
+  display: flex;
+  justify-content: space-between;
 }
 
 /* Media Queries */
