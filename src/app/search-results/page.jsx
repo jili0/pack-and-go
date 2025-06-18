@@ -326,7 +326,7 @@ export default function SearchResults() {
                   <span>Estimated Price:</span>
                   <span>
                     {formData
-                      ? selectedCompany.hourlyRate *
+                      ? 50 *
                         formData.helpersCount *
                         formData.estimatedHours
                       : 0}{" "}

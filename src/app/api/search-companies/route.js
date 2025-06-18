@@ -52,7 +52,6 @@ export async function POST(request) {
         address: 1,
         description: 1,
         serviceAreas: 1,
-        hourlyRate: 1,
         isVerified: 1,
         isKisteKlarCertified: 1,
         documents: 1,
@@ -73,7 +72,6 @@ export async function POST(request) {
         // Ensure required fields have default values
         averageRating: companyObj.averageRating || 0,
         reviewsCount: companyObj.reviewsCount || 0,
-        hourlyRate: companyObj.hourlyRate || 25, // Default hourly rate
         isVerified: companyObj.isVerified || false,
         isKisteKlarCertified: companyObj.isKisteKlarCertified || false,
         description: companyObj.description || "No description available",
