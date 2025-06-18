@@ -149,27 +149,29 @@ export default function AccountDashboard() {
   };
 
   return (
-    <div>
-      <div>
+    <div className="page-container">
+      <div className="user-dashboard">
         {/* Greeting */}
-        <div>
-          <h1>Hello, {account.name}</h1>
-          <p>Welcome to your personal dashboard</p>
+        <div className="greeting-section">
+          <h1 className="dashboard-title">Hello, {account.name}</h1>
+          <p className="dashboard-subtitle">Welcome to your personal dashboard</p>
         </div>
 
         {/* Quick Access */}
-        <div>
-          <div>
+        <div className="quick-access-section">
+          <div className="section-header">
             <h2>Quick Access</h2>
           </div>
-          <div>
+          <div className="quick-access-links">
             <Link href="/">
-              <div>
+              <div className="quick-access-item">
+                <div className="icon-wrapper">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  className="icon" 
                 >
                   <path
                     strokeLinecap="round"
@@ -178,20 +180,23 @@ export default function AccountDashboard() {
                     d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
                   />
                 </svg>
+                </div>
               </div>
-              <div>
+              <div className="quick-access-text">
                 <h3>Plan a New Move</h3>
                 <p>Receive offers from moving companies</p>
               </div>
             </Link>
 
             <Link href="/account/orders">
-              <div>
+              <div className="quick-access-item">
+              <div className="icon-wrapper">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  className="icon" 
                 >
                   <path
                     strokeLinecap="round"
@@ -200,20 +205,23 @@ export default function AccountDashboard() {
                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
                   />
                 </svg>
+                </div>
               </div>
-              <div>
+              <div className="quick-access-text">
                 <h3>My Orders</h3>
                 <p>View all your moves</p>
               </div>
             </Link>
 
             <Link href="/account/profile">
-              <div>
+              <div className="quick-access-item">
+              <div className="icon-wrapper">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  className="icon"
                 >
                   <path
                     strokeLinecap="round"
@@ -222,8 +230,9 @@ export default function AccountDashboard() {
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   />
                 </svg>
+                </div>
               </div>
-              <div>
+              <div className="quick-access-text">
                 <h3>My Profile</h3>
                 <p>Manage personal data</p>
               </div>
@@ -232,14 +241,15 @@ export default function AccountDashboard() {
         </div>
 
         {error && (
-          <div>
+          <div className="error-message">
             <div>
-              <div>
+              <div className="error-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   aria-hidden="true"
+                  className="icon-error"
                 >
                   <path
                     fillRule="evenodd"
@@ -248,7 +258,7 @@ export default function AccountDashboard() {
                   />
                 </svg>
               </div>
-              <div>
+              <div className="error-text"> 
                 <h3>An error has occurred</h3>
                 <div>
                   <p>{error}</p>
@@ -259,18 +269,19 @@ export default function AccountDashboard() {
         )}
 
         {/* Upcoming Orders */}
-        <div>
-          <div>
+        <div className="upcoming-orders-section">
+          <div className="section-header">
             <h2>Upcoming Moves</h2>
-            <Link href="/account/orders">View All</Link>
+            <Link href="/account/orders" className="view-all-link">View All</Link>
           </div>
-          <div>
+          <div className="upcoming-orders-list">
             {dataLoading ? (
-              <div>
+              <div className="loading-indicator">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
+                  className="loading-spinner"
                 >
                   <circle
                     className="opacity-25"
@@ -289,22 +300,20 @@ export default function AccountDashboard() {
                 <p>Loading orders...</p>
               </div>
             ) : upcomingOrders.length > 0 ? (
-              <div>
-                {upcomingOrders.slice(0, 3).map((order) => (
-                  <div key={order._id}>
-                    <div>
-                      <h3>
-                        Move from {order.fromAddress.city} to{" "}
-                        {order.toAddress.city}
-                      </h3>
-                      <StatusBadge status={order.status} />
-                    </div>
-                    <div>
-                      <div>
+              upcomingOrders.slice(0, 3).map((order) => (
+                <div key={order._id} className="order-card">
+                  <div className="order-summary">
+                    <h3>
+                      Move from {order.fromAddress.city} to {order.toAddress.city}
+                    </h3>
+                    <StatusBadge status={order.status} />
+                  </div>
+                    <div className="order-details">
+                      <div className="order-detail-item">
                         <p>Moving Company</p>
                         <p>{order.companyName}</p>
                       </div>
-                      <div>
+                      <div className="order-detail-item">
                         <p>Moving Date</p>
                         <p>
                           {order.confirmedDate
@@ -316,31 +325,32 @@ export default function AccountDashboard() {
                               : "No date set"}
                         </p>
                       </div>
-                      <div>
+                      <div  className="order-detail-item">
                         <p>Helpers / Hours</p>
                         <p>
                           {order.helpersCount} Helpers / {order.estimatedHours}{" "}
                           Hours
                         </p>
                       </div>
-                      <div>
+                      <div  className="order-detail-item">
                         <p>Price</p>
                         <p>{order.totalPrice} €</p>
                       </div>
                     </div>
-                    <div>
-                      <Link href={`/order/${order._id}`}>View Details</Link>
+                    <div className="order-actions">
+                      <Link href={`/order/${order._id}`}  className="view-details-link">View Details</Link>
                     </div>
                   </div>
-                ))}
-              </div>
+                ))
+              
             ) : (
-              <div>
+              <div className="no-upcoming-orders">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  className="icon-no-data"
                 >
                   <path
                     strokeLinecap="round"
@@ -351,24 +361,26 @@ export default function AccountDashboard() {
                 </svg>
                 <h3>No Upcoming Moves</h3>
                 <p>You currently have no planned moves.</p>
-                <Link href="/">Plan a Move Now</Link>
+                <Link href="/" className="plan-move-link">Plan a Move Now</Link>
               </div>
             )}
           </div>
         </div>
 
         {/* Recent Activities */}
-        <div>
-          <div>
+        <div className="recent-activities-section">
+          <div className="section-header" >
             <h2>Recent Activities</h2>
           </div>
-          <div>
+          <div className="recent-activities-list">
             {dataLoading ? (
-              <div>
+              <div className="loading-indicator">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
+                  className="loading-spinner"
+                  
                 >
                   <circle
                     className="opacity-25"
@@ -388,13 +400,13 @@ export default function AccountDashboard() {
               </div>
             ) : orders.length > 0 ? (
               <div>
-                <ul>
+                <ul className="activities-list">
                   {orders.slice(0, 5).map((order) => (
-                    <li key={order._id}>
-                      <div aria-hidden="true"></div>
-                      <div aria-hidden="true"></div>
-                      <div>
-                        <div>
+                    <li key={order._id} className="activity-item">
+                      <div aria-hidden="true" className="activity-decorator1"></div>
+                      <div aria-hidden="true" className="activity-decorator2"></div>
+                      <div className="activity-content">
+                        <div className="activity-summary">
                           <h3>
                             {order.status === "pending" && "Move request sent"}
                             {order.status === "confirmed" && "Move confirmed"}
@@ -408,10 +420,10 @@ export default function AccountDashboard() {
                             {order.toAddress.city}
                           </p>
                         </div>
-                        <time>{formatDate(order.createdAt)}</time>
+                        <time className="activity-time">{formatDate(order.createdAt)}</time>
                       </div>
                       <div>
-                        <Link href={`/order/${order._id}`}>
+                        <Link href={`/order/${order._id}`} className="activity-view-link">
                           View Order Details
                         </Link>
                       </div>
@@ -420,12 +432,13 @@ export default function AccountDashboard() {
                 </ul>
               </div>
             ) : (
-              <div>
+              <div className="no-activities">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  className="icon-no-data"
                 >
                   <path
                     strokeLinecap="round"
@@ -442,18 +455,19 @@ export default function AccountDashboard() {
         </div>
 
         {/* Tips & Help */}
-        <div>
-          <div>
+        <div className="tips-help-section">
+          <div className="section-header">
             <h2>Tips & Help</h2>
           </div>
-          <div>
-            <Link href="/tips">
-              <div>
+          <div className="tips-help-links">
+            <Link href="/tips" className="tips-help-item">
+              <div className="icon-wrapper">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  className="icon" 
                 >
                   <path
                     strokeLinecap="round"
@@ -462,18 +476,21 @@ export default function AccountDashboard() {
                     d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                   />
                 </svg>
+                </div>
+                <div className="tips-help-text">
                 <h3>Moving Tips</h3>
                 <p>Useful tips and tricks for a stress-free move</p>
               </div>
             </Link>
 
-            <Link href="/guide">
-              <div>
+            <Link href="/guide" className="tips-help-item">
+              <div className="icon-wrapper">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  className="icon"
                 >
                   <path
                     strokeLinecap="round"
@@ -482,18 +499,21 @@ export default function AccountDashboard() {
                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
                   />
                 </svg>
+                </div>
+                <div className="tips-help-text">
                 <h3>Moving Checklist</h3>
                 <p>Step-by-step guide for your move</p>
               </div>
             </Link>
 
-            <Link href="/contact">
-              <div>
+            <Link href="/contact" className="tips-help-item">
+              <div className="icon-wrapper">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  className="icon" 
                 >
                   <path
                     strokeLinecap="round"
@@ -502,6 +522,8 @@ export default function AccountDashboard() {
                     d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                   />
                 </svg>
+                </div>
+                <div className="tips-help-text">
                 <h3>Support</h3>
                 <p>
                   Do you have any questions? Our team will be happy to help you

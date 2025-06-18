@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -49,11 +49,16 @@ const RegisterPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registerError, setRegisterError] = useState(null);
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
-    if (errors[name]) setErrors({ ...errors, [name]: null });
-  };
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: type === "checkbox" ? checked : value 
+    }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
+  }, [errors]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -121,6 +126,82 @@ const RegisterPage = () => {
         )}
 
         <form onSubmit={handleSubmit} className="register-form">
+<<<<<<< HEAD
+          <div className="form-field">
+            <label htmlFor="name">Full Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="First and Last Name"
+              disabled={isSubmitting}
+              autoComplete="name"
+            />
+            {errors.name && <p className="error">{errors.name}</p>}
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="example@email.com"
+              disabled={isSubmitting}
+              autoComplete="email"
+            />
+            {errors.email && <p className="error">{errors.email}</p>}
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="phone">Phone Number</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="+1 123 456 7890"
+              disabled={isSubmitting}
+              autoComplete="tel"
+            />
+            {errors.phone && <p className="error">{errors.phone}</p>}
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Minimum 6 characters"
+              disabled={isSubmitting}
+              autoComplete="new-password"
+            />
+            {errors.password && <p className="error">{errors.password}</p>}
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Repeat password"
+              disabled={isSubmitting}
+              autoComplete="new-password"
+            />
+            {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
+          </div>
+=======
           <InputField
             formData={formData}
             handleChange={handleChange}
@@ -174,6 +255,7 @@ const RegisterPage = () => {
             type="password"
             placeholder="Repeat password"
           />
+>>>>>>> user-dashboard
 
           <div className="form-field">
             <label htmlFor="role">
