@@ -6,10 +6,6 @@ import Order from "@/models/Order";
 import Review from "@/models/Review";
 import { getSession } from "@/lib/auth";
 
-/**
- * GET handler to retrieve a specific account by ID
- * @returns {Promise<NextResponse>} JSON response with account data
- */
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
@@ -63,10 +59,6 @@ export async function GET(request, { params }) {
   }
 }
 
-/**
- * PATCH handler to update account role or perform admin actions
- * @returns {Promise<NextResponse>} JSON response with success/failure message
- */
 export async function PATCH(request, { params }) {
   try {
     const { id } = await params;
@@ -215,10 +207,6 @@ export async function PATCH(request, { params }) {
   }
 }
 
-/**
- * DELETE handler to delete a account
- * @returns {Promise<NextResponse>} JSON response with success/failure message
- */
 export async function DELETE(request, { params }) {
   try {
     const { id } = await params;

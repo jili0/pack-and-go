@@ -28,6 +28,7 @@ export default function EditPage() {
     companyName: "",
     address: { street: "", city: "", postalCode: "", country: "" },
     taxId: "",
+    description: "",
     isVerified: false,
     isKisteKlarCertified: false,
   });
@@ -51,7 +52,6 @@ export default function EditPage() {
       const data = await response.json();
       const accountData = data.account || data;
       const companyDetails = data.companyDetails;
-
       setAccount(accountData);
 
       setFormData((prev) => ({
@@ -62,22 +62,38 @@ export default function EditPage() {
         role: accountData.role || "user",
       }));
 
-      // Handle company data if account is a company
-      if (accountData.role === "company" && companyDetails) {
-        setCompanyData(companyDetails);
-        setCompanyFormData({
-          companyName: companyDetails.companyName || "",
-          address: {
-            street: companyDetails.address?.street || "",
-            city: companyDetails.address?.city || "",
-            postalCode: companyDetails.address?.postalCode || "",
-            country: companyDetails.address?.country || "",
-          },
-          taxId: companyDetails.taxId || "",
-          isVerified: companyDetails.isVerified || false,
-          isKisteKlarCertified: companyDetails.isKisteKlarCertified || false,
-        });
-        setServiceAreas(companyDetails.serviceAreas || []);
+      // Handle company data - always initialize companyFormData for company accounts
+      if (accountData.role === "company") {
+        if (companyDetails) {
+          // Company profile exists - populate with existing data
+          setCompanyData(companyDetails);
+          setCompanyFormData({
+            companyName: companyDetails.companyName || "",
+            address: {
+              street: companyDetails.address?.street || "",
+              city: companyDetails.address?.city || "",
+              postalCode: companyDetails.address?.postalCode || "",
+              country: companyDetails.address?.country || "",
+            },
+            taxId: companyDetails.taxId || "",
+            description: companyDetails.description || "",
+            isVerified: companyDetails.isVerified || false,
+            isKisteKlarCertified: companyDetails.isKisteKlarCertified || false,
+          });
+          setServiceAreas(companyDetails.serviceAreas || []);
+        } else {
+          // No company profile exists - initialize with empty data
+          setCompanyData(null);
+          setCompanyFormData({
+            companyName: "",
+            address: { street: "", city: "", postalCode: "", country: "" },
+            taxId: "",
+            description: "",
+            isVerified: false,
+            isKisteKlarCertified: false,
+          });
+          setServiceAreas([]);
+        }
       }
     } catch (err) {
       setError("Failed to load account data: " + err.message);
@@ -196,7 +212,7 @@ export default function EditPage() {
       // Update password if provided
       if (formData.newPassword && formData.newPassword.trim() !== "") {
         const passwordResponse = await fetch(
-          `/api/admin/accounts/$accountrId}`,
+          `/api/admin/accounts/${accountId}`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -224,19 +240,36 @@ export default function EditPage() {
         if (!roleResponse.ok) throw new Error("Failed to update account role");
       }
 
-      // Update company data if applicable
-      if (formData.role === "company" && companyData) {
-        const companyResponse = await fetch(
-          `/api/admin/companies/${companyData._id}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...companyFormData, serviceAreas }),
-          }
-        );
+      // Handle company data - create or update
+      if (formData.role === "company") {
+        if (companyData && companyData._id) {
+          // Update existing company profile
+          const companyResponse = await fetch(
+            `/api/admin/companies/${companyData._id}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...companyFormData, serviceAreas }),
+            }
+          );
 
-        if (!companyResponse.ok)
-          throw new Error("Failed to update company data");
+          if (!companyResponse.ok)
+            throw new Error("Failed to update company data");
+        } else {
+          // Create new company profile
+          const companyResponse = await fetch(`/api/admin/companies`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              ...companyFormData, 
+              serviceAreas,
+              accountId: accountId 
+            }),
+          });
+
+          if (!companyResponse.ok)
+            throw new Error("Failed to create company profile");
+        }
       }
 
       let successMessage = "Account data updated successfully";
@@ -388,10 +421,25 @@ export default function EditPage() {
           </div>
         )}
 
-        {/* Company Information */}
-        {formData.role === "company" && companyData && (
+        {/* Company Information - Show for all company accounts */}
+        {formData.role === "company" && (
           <section>
             <h2>Company Information</h2>
+            
+            {/* Notice when no company profile exists */}
+            {!companyData && (
+              <div className="info-notice" style={{
+                background: '#f0f8ff',
+                border: '1px solid #b3d9ff',
+                borderRadius: '4px',
+                padding: '12px',
+                marginBottom: '20px',
+                color: '#0066cc'
+              }}>
+                <strong>Notice:</strong> This company account has not created a profile yet. 
+                You can create and manage their company profile below.
+              </div>
+            )}
 
             <div className="form-field">
               <label>Company Name</label>
@@ -531,13 +579,16 @@ export default function EditPage() {
               </div>
             </div>
 
-            {/* Company Statistics */}
-            <div className="stats-grid">
-              <div>Average Rating: {companyData.averageRating || 0}</div>
-              <div>Reviews Count: {companyData.reviewsCount || 0}</div>
-            </div>
+            {/* Company Statistics - only show if company profile exists */}
+            {companyData && (
+              <div className="stats-grid">
+                <div>Average Rating: {companyData.averageRating || 0}</div>
+                <div>Reviews Count: {companyData.reviewsCount || 0}</div>
+              </div>
+            )}
           </section>
         )}
+        
         {/* Form Actions */}
         <div className="form-actions">
           <button

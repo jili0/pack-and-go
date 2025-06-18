@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import "@/app/styles/styles.css";
 
 export default function AdminDashboard() {
