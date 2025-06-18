@@ -3,13 +3,13 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Order from "@/models/Order";
 import Company from "@/models/Company";
-import User from "@/models/User";
+import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
 import { sendOrderStatusUpdateEmail } from "@/lib/email";
 
 export async function GET(request, { params }) {
   try {
-    const { id } =await params;
+    const { id } = await params;
     const session = await getSession();
 
     if (!session) {
@@ -33,12 +33,12 @@ export async function GET(request, { params }) {
 
     // Prüfe, ob der Benutzer berechtigt ist, die Bestellung einzusehen
     if (
-      (session.role === "user" && order.userId.toString() !== session.id) ||
+      (session.role === "user" && order.accountId.toString() !== session.id) ||
       session.role === "company"
     ) {
       // Bei Unternehmen überprüfen, ob die Bestellung zu ihrem Unternehmen gehört
       if (session.role === "company") {
-        const company = await Company.findOne({ userId: session.id });
+        const company = await Company.findOne({ accountId: session.id });
 
         if (!company || order.companyId.toString() !== company._id.toString()) {
           return NextResponse.json(
@@ -58,7 +58,9 @@ export async function GET(request, { params }) {
     const company = await Company.findById(order.companyId).select(
       "companyName email phone isKisteKlarCertified averageRating reviewsCount"
     );
-    const user = await User.findById(order.userId).select("name email phone");
+    const account = await Account.findById(order.accountId).select(
+      "name email phone"
+    );
 
     return NextResponse.json(
       {
@@ -66,9 +68,9 @@ export async function GET(request, { params }) {
         order: {
           ...order.toObject(),
           companyName: company.companyName,
-          customerName: user.name,
-          customerEmail: user.email,
-          customerPhone: user.phone,
+          customerName: account.name,
+          customerEmail: account.email,
+          customerPhone: account.phone,
         },
         company,
       },
@@ -89,7 +91,7 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const { id } =await params;
+    const { id } = await params;
     const session = await getSession();
 
     if (!session) {
@@ -115,7 +117,7 @@ export async function PUT(request, { params }) {
 
     // Prüfe, ob der Benutzer berechtigt ist, die Bestellung zu aktualisieren
     if (session.role === "company") {
-      const company = await Company.findOne({ userId: session.id });
+      const company = await Company.findOne({ accountId: session.id });
 
       if (!company || order.companyId.toString() !== company._id.toString()) {
         return NextResponse.json(
@@ -125,7 +127,7 @@ export async function PUT(request, { params }) {
       }
     } else if (
       session.role === "user" &&
-      order.userId.toString() !== session.id
+      order.accountId.toString() !== session.id
     ) {
       return NextResponse.json(
         { success: false, message: "Keine Berechtigung" },
@@ -163,12 +165,12 @@ export async function PUT(request, { params }) {
 
     // Sende E-Mail-Benachrichtigung bei Statusänderung
     if (status && status !== order.status) {
-      const user = await User.findById(order.userId);
+      const account = await Account.findById(order.accountId);
       const company = await Company.findById(order.companyId);
 
       await sendOrderStatusUpdateEmail({
-        email: user.email,
-        name: user.name,
+        email: account.email,
+        name: account.name,
         orderId: order._id,
         oldStatus: order.status,
         newStatus: status,
@@ -202,7 +204,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const { id } =await params;
+    const { id } = await params;
     const session = await getSession();
 
     if (!session) {
@@ -227,7 +229,7 @@ export async function DELETE(request, { params }) {
     // Nur Administratoren und der Benutzer selbst können Bestellungen stornieren
     if (
       session.role !== "admin" &&
-      (session.role !== "user" || order.userId.toString() !== session.id)
+      (session.role !== "user" || order.accountId.toString() !== session.id)
     ) {
       return NextResponse.json(
         { success: false, message: "Keine Berechtigung" },
@@ -243,12 +245,12 @@ export async function DELETE(request, { params }) {
     );
 
     // Sende E-Mail-Benachrichtigung über die Stornierung
-    const user = await User.findById(order.userId);
+    const account = await Account.findById(order.accountId);
     const company = await Company.findById(order.companyId);
 
     await sendOrderStatusUpdateEmail({
-      email: user.email,
-      name: user.name,
+      email: account.email,
+      name: account.name,
       orderId: order._id,
       oldStatus: order.status,
       newStatus: "cancelled",

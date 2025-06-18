@@ -44,8 +44,8 @@ export default function Home() {
         <div className="container">
           <h2>Contact Information</h2>
           <p>
-            Get in touch with us through any of these channels. We're always
-            ready to help!
+            Get in touch with us through any of these channels. We&apos;re
+            always ready to help!
           </p>
 
           <div className="contact-info">

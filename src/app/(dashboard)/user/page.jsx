@@ -1,4 +1,4 @@
-// // src/app/(dashboard)/user/page.jsx (continuing from previous part)
+// // src/app/(dashboard)/account/page.jsx (continuing from previous part)
 
 "use client";
 
@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
-export default function UserDashboard() {
+export default function AccountDashboard() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { account, loading } = useAuth();
 
   const [orders, setOrders] = useState([]);
   const [upcomingOrders, setUpcomingOrders] = useState([]);
@@ -18,17 +18,17 @@ export default function UserDashboard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !account) {
       router.push("/login?redirect=/user");
     }
-  }, [user, loading, router]);
+  }, [account, loading, router]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!account) return;
 
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/api/user/orders");
+        const response = await fetch("/api/account/orders");
         const data = await response.json();
 
         if (data.success) {
@@ -73,9 +73,9 @@ export default function UserDashboard() {
     };
 
     fetchOrders();
-  }, [user]);
+  }, [account]);
 
-  if (loading || (!user && !loading)) {
+  if (loading || (!account && !loading)) {
     return (
       <div>
         <div>
@@ -145,9 +145,7 @@ export default function UserDashboard() {
         text = status;
     }
 
-    return (
-      <span </span>
-    );
+    return <span> </span>;
   };
 
   return (
@@ -155,26 +153,20 @@ export default function UserDashboard() {
       <div>
         {/* Greeting */}
         <div>
-          <h1>Hello, {user.name}</h1>
+          <h1>Hello, {account.name}</h1>
           <p>Welcome to your personal dashboard</p>
         </div>
 
         {/* Quick Access */}
         <div>
-          <div >
+          <div>
             <h2>Quick Access</h2>
           </div>
           <div>
-            <Link
-              href="/"
-              
-            >
-              <div
-                
-              >
+            <Link href="/">
+              <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -193,16 +185,10 @@ export default function UserDashboard() {
               </div>
             </Link>
 
-            <Link
-              href="/user/orders"
-              
-            >
-              <div
-                
-              >
+            <Link href="/account/orders">
+              <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -221,16 +207,10 @@ export default function UserDashboard() {
               </div>
             </Link>
 
-            <Link
-              href="/user/profile"
-              
-            >
-              <div
-                
-              >
+            <Link href="/account/profile">
+              <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -252,7 +232,7 @@ export default function UserDashboard() {
         </div>
 
         {error && (
-          <div >
+          <div>
             <div>
               <div>
                 <svg
@@ -280,9 +260,9 @@ export default function UserDashboard() {
 
         {/* Upcoming Orders */}
         <div>
-          <div >
+          <div>
             <h2>Upcoming Moves</h2>
-            <Link href="/user/orders">View All</Link>
+            <Link href="/account/orders">View All</Link>
           </div>
           <div>
             {dataLoading ? (
@@ -349,12 +329,7 @@ export default function UserDashboard() {
                       </div>
                     </div>
                     <div>
-                      <Link
-                        href={`/order/${order._id}`}
-                        
-                      >
-                        View Details
-                      </Link>
+                      <Link href={`/order/${order._id}`}>View Details</Link>
                     </div>
                   </div>
                 ))}
@@ -374,16 +349,9 @@ export default function UserDashboard() {
                     d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                   />
                 </svg>
-                <h3 >
-                  No Upcoming Moves
-                </h3>
+                <h3>No Upcoming Moves</h3>
                 <p>You currently have no planned moves.</p>
-                <Link
-                  href="/"
-                  
-                >
-                  Plan a Move Now
-                </Link>
+                <Link href="/">Plan a Move Now</Link>
               </div>
             )}
           </div>
@@ -391,7 +359,7 @@ export default function UserDashboard() {
 
         {/* Recent Activities */}
         <div>
-          <div >
+          <div>
             <h2>Recent Activities</h2>
           </div>
           <div>
@@ -475,15 +443,14 @@ export default function UserDashboard() {
 
         {/* Tips & Help */}
         <div>
-          <div >
+          <div>
             <h2>Tips & Help</h2>
           </div>
           <div>
             <Link href="/tips">
-              <div >
+              <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -501,10 +468,9 @@ export default function UserDashboard() {
             </Link>
 
             <Link href="/guide">
-              <div >
+              <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -522,10 +488,9 @@ export default function UserDashboard() {
             </Link>
 
             <Link href="/contact">
-              <div >
+              <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

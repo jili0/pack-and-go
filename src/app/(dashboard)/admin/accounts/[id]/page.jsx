@@ -2,97 +2,31 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import "@/app/styles/styles.css";
 
-export default function EditUserPage() {
+export default function EditPage() {
   const params = useParams();
   const router = useRouter();
-  const userId = params.id;
-
+  const accountId = params.id;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [user, setUser] = useState(null);
+  const [account, setAccount] = useState(null);
   const [companyData, setCompanyData] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  // Form data state
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     name: "",
     phone: "",
     role: "user",
-    newPassword: "", // Add this
-    confirmPassword: "", // Add this
+    newPassword: "",
+    confirmPassword: "",
   });
 
-  // Password visibility state
-  const [showPassword, setShowPassword] = useState(false);
-
-  // SVG Icons for password visibility
-  const EyeOpenIcon = () => (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-        stroke="currentColor"
-        strokeWidth="2"
-        fill="none"
-      />
-      <circle
-        cx="12"
-        cy="12"
-        r="3"
-        stroke="currentColor"
-        strokeWidth="2"
-        fill="none"
-      />
-    </svg>
-  );
-
-  const EyeClosedIcon = () => (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="m1 1 22 22" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="M6.71 6.71a13.94 13.94 0 0 0-4.7 5.29s4 8 11 8a13.94 13.94 0 0 0 5.29-1.71"
-        stroke="currentColor"
-        strokeWidth="2"
-        fill="none"
-      />
-      <path
-        d="m14 14a3 3 0 0 1-4-4"
-        stroke="currentColor"
-        strokeWidth="2"
-        fill="none"
-      />
-      <path
-        d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"
-        stroke="currentColor"
-        strokeWidth="2"
-        fill="none"
-      />
-    </svg>
-  ); // Add this
-
-  // Company form data state
   const [companyFormData, setCompanyFormData] = useState({
     companyName: "",
-    address: {
-      street: "",
-      city: "",
-      postalCode: "",
-      country: "",
-    },
+    address: { street: "", city: "", postalCode: "", country: "" },
     taxId: "",
     description: "",
     hourlyRate: 0,
@@ -100,97 +34,59 @@ export default function EditUserPage() {
     isKisteKlarCertified: false,
   });
 
-  // Service areas state
   const [serviceAreas, setServiceAreas] = useState([]);
   const [newServiceArea, setNewServiceArea] = useState({ from: "", to: "" });
 
-  // Fetch user data on component mount
   useEffect(() => {
-    fetchUserData();
-  }, [userId]);
+    fetchAccountData();
+  }, [accountId]);
 
-  const fetchUserData = async () => {
+  const fetchAccountData = async () => {
     try {
       setLoading(true);
+      const response = await fetch(`/api/admin/accounts/${accountId}`);
 
-      // Fetch user data
-      const userResponse = await fetch(`/api/admin/users/${userId}`);
-      if (!userResponse.ok) {
-        throw new Error("Failed to fetch user data");
+      if (!response.ok) {
+        throw new Error("Failed to fetch account data");
+        return;
       }
-      const responseData = await userResponse.json();
 
-      // Extract user data from API response
-      const userData = responseData.user || responseData;
-      const companyDetails = responseData.companyDetails;
+      const data = await response.json();
+      const accountData = data.account || data;
+      const companyDetails = data.companyDetails;
 
-      setUser(userData);
+      setAccount(accountData);
 
-      // Set basic user form data with existing values - PRESERVE password fields
+      // Set basic account form data
       setFormData((prev) => ({
-        ...prev, // Keep existing values including newPassword and confirmPassword
-        email: userData.email || "",
-        name: userData.name || "",
-        phone: userData.phone || "",
-        role: userData.role || "user",
+        ...prev,
+        email: accountData.email || "",
+        name: accountData.name || "",
+        phone: accountData.phone || "",
+        role: accountData.role || "user",
       }));
 
-      // If user is a company and we have company details
-      if (userData.role === "company") {
-        if (companyDetails) {
-          // Use company details from the user API response
-          setCompanyData(companyDetails);
-
-          setCompanyFormData({
-            companyName: companyDetails.companyName || "",
-            address: {
-              street: companyDetails.address?.street || "",
-              city: companyDetails.address?.city || "",
-              postalCode: companyDetails.address?.postalCode || "",
-              country: companyDetails.address?.country || "",
-            },
-            taxId: companyDetails.taxId || "",
-            description: companyDetails.description || "",
-            hourlyRate: companyDetails.hourlyRate || 0,
-            isVerified: companyDetails.isVerified || false,
-            isKisteKlarCertified: companyDetails.isKisteKlarCertified || false,
-          });
-
-          setServiceAreas(companyDetails.serviceAreas || []);
-        } else {
-          // Fallback: fetch company data separately if not included
-          try {
-            const companyResponse = await fetch(
-              `/api/admin/companies/by-user/${userId}`
-            );
-            if (companyResponse.ok) {
-              const companyData = await companyResponse.json();
-              setCompanyData(companyData);
-
-              setCompanyFormData({
-                companyName: companyData.companyName || "",
-                address: {
-                  street: companyData.address?.street || "",
-                  city: companyData.address?.city || "",
-                  postalCode: companyData.address?.postalCode || "",
-                  country: companyData.address?.country || "",
-                },
-                taxId: companyData.taxId || "",
-                description: companyData.description || "",
-                hourlyRate: companyData.hourlyRate || 0,
-                isVerified: companyData.isVerified || false,
-                isKisteKlarCertified: companyData.isKisteKlarCertified || false,
-              });
-
-              setServiceAreas(companyData.serviceAreas || []);
-            }
-          } catch (companyErr) {
-            console.log("Could not fetch company data:", companyErr.message);
-          }
-        }
+      // Handle company data if account is a company
+      if (accountData.role === "company" && companyDetails) {
+        setCompanyData(companyDetails);
+        setCompanyFormData({
+          companyName: companyDetails.companyName || "",
+          address: {
+            street: companyDetails.address?.street || "",
+            city: companyDetails.address?.city || "",
+            postalCode: companyDetails.address?.postalCode || "",
+            country: companyDetails.address?.country || "",
+          },
+          taxId: companyDetails.taxId || "",
+          description: companyDetails.description || "",
+          hourlyRate: companyDetails.hourlyRate || 0,
+          isVerified: companyDetails.isVerified || false,
+          isKisteKlarCertified: companyDetails.isKisteKlarCertified || false,
+        });
+        setServiceAreas(companyDetails.serviceAreas || []);
       }
     } catch (err) {
-      setError("Failed to load user data: " + err.message);
+      setError("Failed to load account data: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -200,7 +96,7 @@ export default function EditUserPage() {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value || "", // Ensure value is never undefined
+      [name]: type === "checkbox" ? checked : value || "",
     }));
   };
 
@@ -211,10 +107,7 @@ export default function EditUserPage() {
       const addressField = name.split(".")[1];
       setCompanyFormData((prev) => ({
         ...prev,
-        address: {
-          ...prev.address,
-          [addressField]: value,
-        },
+        address: { ...prev.address, [addressField]: value },
       }));
     } else {
       setCompanyFormData((prev) => ({
@@ -250,24 +143,19 @@ export default function EditUserPage() {
       setSuccess("");
 
       const response = await fetch(
-        `/api/admin/users/${userId}/reset-password`,
+        `/api/admin/edit/${accountId}/reset-password`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to reset password");
-      }
+      if (!response.ok) throw new Error("Failed to reset password");
 
       const data = await response.json();
-
       if (data.success) {
         setSuccess(
-          `Password reset successfully! Temporary password: ${data.tempPassword} (for ${data.userEmail})`
+          `Password reset! Temp password: ${data.tempPassword} (for ${data.accountEmail})`
         );
       } else {
         throw new Error(data.message || "Failed to reset password");
@@ -286,25 +174,22 @@ export default function EditUserPage() {
     setSaving(true);
 
     try {
-      // Validate new password if provided
+      // Validate password if provided
       if (formData.newPassword && formData.newPassword.trim() !== "") {
         if (formData.newPassword.length < 6) {
           setError("New password must be at least 6 characters long");
           return;
         }
-
         if (formData.newPassword !== formData.confirmPassword) {
           setError("New password and confirmation password do not match");
           return;
         }
       }
 
-      // Update user basic info first
-      const userResponse = await fetch(`/api/admin/users/${userId}`, {
+      // Update account profile
+      const response = await fetch(`/api/admin/accounts/${accountId}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "updateProfile",
           name: formData.name,
@@ -312,75 +197,57 @@ export default function EditUserPage() {
         }),
       });
 
-      if (!userResponse.ok) {
-        throw new Error("Failed to update user profile");
-      }
+      if (!response.ok) throw new Error("Failed to update account profile");
 
       // Update password if provided
       if (formData.newPassword && formData.newPassword.trim() !== "") {
-        const passwordResponse = await fetch(`/api/admin/users/${userId}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            action: "changePassword",
-            newPassword: formData.newPassword,
-          }),
-        });
+        const passwordResponse = await fetch(
+          `/api/admin/accounts/$accountrId}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "changePassword",
+              newPassword: formData.newPassword,
+            }),
+          }
+        );
 
-        if (!passwordResponse.ok) {
-          throw new Error("Failed to update password");
-        }
+        if (!passwordResponse.ok) throw new Error("Failed to update password");
       }
 
-      // Update role if it changed
-      if (formData.role !== user.role) {
-        const roleResponse = await fetch(`/api/admin/users/${userId}`, {
+      // Update role if changed
+      if (formData.role !== account.role) {
+        const roleResponse = await fetch(`/api/admin/accounts/$accountrId}`, {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "changeRole",
             role: formData.role,
           }),
         });
 
-        if (!roleResponse.ok) {
-          throw new Error("Failed to update user role");
-        }
+        if (!roleResponse.ok) throw new Error("Failed to update account role");
       }
 
-      // If company, update company data
+      // Update company data if applicable
       if (formData.role === "company" && companyData) {
-        const companyUpdateData = {
-          ...companyFormData,
-          serviceAreas: serviceAreas,
-        };
-
         const companyResponse = await fetch(
           `/api/admin/companies/${companyData._id}`,
           {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(companyUpdateData),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...companyFormData, serviceAreas }),
           }
         );
 
-        if (!companyResponse.ok) {
+        if (!companyResponse.ok)
           throw new Error("Failed to update company data");
-        }
       }
 
-      let successMessage = "User data updated successfully";
-
-      // Add specific success messages
+      let successMessage = "Account data updated successfully";
       if (formData.newPassword && formData.newPassword.trim() !== "") {
         successMessage += " (including password change)";
-        // Clear the password fields after successful update
         setFormData((prev) => ({
           ...prev,
           newPassword: "",
@@ -389,67 +256,61 @@ export default function EditUserPage() {
       }
 
       setSuccess(successMessage);
-
-      // Refresh data to show updated info
-      await fetchUserData();
+      await fetchAccountData();
     } catch (err) {
-      setError("Failed to update user: " + err.message);
+      setError("Failed to update account: " + err.message);
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) {
+  if (loading)
     return (
-      <div>
-        <div>Loading user data...</div>
+      <div className="container">
+        <p>Loading account data...</p>
       </div>
     );
-  }
-
-  if (!user) {
+  if (!loading && !account)
     return (
-      <div>
-        <div>User not found</div>
+      <div className="container">
+        <p>Account not found</p>
       </div>
     );
-  }
 
   return (
-    <div>
-      <div>
+    <div className="container">
+      <div className="page-header">
         <div>
-          <h1>Edit User</h1>
-          {user && (
-            <p>
-              Editing: {user.name} ({user.email}) - {user.role}
-            </p>
-          )}
+          <h1>Edit Account</h1>
+          <p>
+            Editing: {account.name} ({account.email}) - {account.role}
+          </p>
         </div>
-        <button onClick={() => router.push("/admin")}>← Back to Users</button>
+        <button className="btn-primary" onClick={() => router.push("/admin")}>
+          ← Back to Accounts
+        </button>
       </div>
 
-      {error && <div>{error}</div>}
-      {success && <div>{success}</div>}
+      {error && <div className="error">{error}</div>}
+      {success && <div className="success">{success}</div>}
 
       <form onSubmit={handleSubmit}>
-        {/* Basic User Information */}
-        <div>
+        {/* Basic Information */}
+        <section>
           <h2>Basic Information</h2>
 
-          <div>
+          <div className="form-field">
             <label>Email</label>
             <input
               type="email"
               name="email"
               value={formData.email}
-              onChange={handleInputChange}
               disabled
               title="Email cannot be changed for security reasons"
             />
           </div>
 
-          <div>
+          <div className="form-field">
             <label>Name</label>
             <input
               type="text"
@@ -460,7 +321,7 @@ export default function EditUserPage() {
             />
           </div>
 
-          <div>
+          <div className="form-field">
             <label>Phone</label>
             <input
               type="tel"
@@ -470,26 +331,27 @@ export default function EditUserPage() {
             />
           </div>
 
-          <div>
+          <div className="form-field">
             <label>Role</label>
             <select
               name="role"
               value={formData.role}
               onChange={handleInputChange}
             >
-              <option value="user">User</option>
+              <option value="user">Account</option>
               <option value="company">Company</option>
               <option value="admin">Admin</option>
             </select>
           </div>
 
-          {/* Password Reset */}
-          <div>
+          {/* Password Section */}
+          <div className="form-field">
             <label>Current Password</label>
-            <div>
+            <div className="password-field">
               <input type="password" value="••••••••••••" disabled />
               <button
                 type="button"
+                className="btn-primary"
                 onClick={handleResetPassword}
                 disabled={saving}
               >
@@ -498,10 +360,9 @@ export default function EditUserPage() {
             </div>
           </div>
 
-          {/* New Password Field */}
-          <div>
+          <div className="form-field">
             <label>New Password (Optional)</label>
-            <div>
+            <div className="password-field">
               <input
                 type={showPassword ? "text" : "password"}
                 name="newPassword"
@@ -512,22 +373,19 @@ export default function EditUserPage() {
               />
               <button
                 type="button"
+                className="password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
-                title={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
-              </button>
+              ></button>
             </div>
             <small>
               Leave empty to keep current password. Minimum 6 characters.
             </small>
           </div>
 
-          {/* Confirm Password Field */}
           {formData.newPassword && formData.newPassword.trim() !== "" && (
-            <div>
+            <div className="form-field">
               <label>Confirm New Password</label>
-              <div>
+              <div className="password-field">
                 <input
                   type={showPassword ? "text" : "password"}
                   name="confirmPassword"
@@ -538,43 +396,35 @@ export default function EditUserPage() {
                 />
                 <button
                   type="button"
+                  className="password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
-                  title={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
-                </button>
+                ></button>
               </div>
               {formData.confirmPassword &&
                 formData.newPassword !== formData.confirmPassword && (
-                  <small>Passwords do not match</small>
+                  <small className="error">Passwords do not match</small>
                 )}
             </div>
           )}
-        </div>
+        </section>
 
-        {/* User Statistics (for regular users) */}
-        {user.role === "user" && (
-          <div>
-            <h2>User Statistics</h2>
-            <div>
-              <div>
-                <span>Reviews:</span>
-                <span>{user.reviews?.length || 0}</span>
-              </div>
-              <div>
-                <span>Orders:</span>
-                <span>{user.orders?.length || 0}</span>
-              </div>
+        {/* Account Statistics */}
+        {account.role === "user" && (
+          <section>
+            <h2>Account Statistics</h2>
+            <div className="stats-grid">
+              <div>Reviews: {account.reviews?.length || 0}</div>
+              <div>Orders: {account.orders?.length || 0}</div>
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Company Information (only for company accounts) */}
+        {/* Company Information */}
         {formData.role === "company" && companyData && (
-          <div>
+          <section>
             <h2>Company Information</h2>
 
-            <div>
+            <div className="form-field">
               <label>Company Name</label>
               <input
                 type="text"
@@ -584,8 +434,8 @@ export default function EditUserPage() {
               />
             </div>
 
-            <div>
-              <div>
+            <div className="address-grid">
+              <div className="form-field">
                 <label>Street Address</label>
                 <input
                   type="text"
@@ -594,7 +444,7 @@ export default function EditUserPage() {
                   onChange={handleCompanyInputChange}
                 />
               </div>
-              <div>
+              <div className="form-field">
                 <label>City</label>
                 <input
                   type="text"
@@ -603,7 +453,7 @@ export default function EditUserPage() {
                   onChange={handleCompanyInputChange}
                 />
               </div>
-              <div>
+              <div className="form-field">
                 <label>Postal Code</label>
                 <input
                   type="text"
@@ -612,7 +462,7 @@ export default function EditUserPage() {
                   onChange={handleCompanyInputChange}
                 />
               </div>
-              <div>
+              <div className="form-field">
                 <label>Country</label>
                 <input
                   type="text"
@@ -623,7 +473,7 @@ export default function EditUserPage() {
               </div>
             </div>
 
-            <div>
+            <div className="form-field">
               <label>Tax ID</label>
               <input
                 type="text"
@@ -633,7 +483,7 @@ export default function EditUserPage() {
               />
             </div>
 
-            <div>
+            <div className="form-field">
               <label>Hourly Rate (€)</label>
               <input
                 type="number"
@@ -644,7 +494,7 @@ export default function EditUserPage() {
               />
             </div>
 
-            <div>
+            <div className="form-field">
               <label>Description</label>
               <textarea
                 name="description"
@@ -655,11 +505,11 @@ export default function EditUserPage() {
             </div>
 
             {/* Service Areas */}
-            <div>
+            <div className="form-field">
               <label>Service Areas</label>
-              <div>
+              <div className="service-areas">
                 {serviceAreas.map((area) => (
-                  <div key={area._id}>
+                  <div key={area._id} className="service-area-item">
                     <span>
                       {area.from} → {area.to}
                     </span>
@@ -671,7 +521,7 @@ export default function EditUserPage() {
                     </button>
                   </div>
                 ))}
-                <div>
+                <div className="service-area-form">
                   <input
                     type="text"
                     placeholder="From"
@@ -702,51 +552,45 @@ export default function EditUserPage() {
             </div>
 
             {/* Verification Status */}
-            <div>
-              <div>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="isVerified"
-                    checked={companyFormData.isVerified}
-                    onChange={handleCompanyInputChange}
-                  />
-                  Verified Company
-                </label>
+            <div className="checkbox-group">
+              <div className="checkbox-field">
+                <input
+                  type="checkbox"
+                  name="isVerified"
+                  checked={companyFormData.isVerified}
+                  onChange={handleCompanyInputChange}
+                />
+                <label>Verified Company</label>
               </div>
-              <div>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="isKisteKlarCertified"
-                    checked={companyFormData.isKisteKlarCertified}
-                    onChange={handleCompanyInputChange}
-                  />
-                  KisteKlar Certified
-                </label>
+              <div className="checkbox-field">
+                <input
+                  type="checkbox"
+                  name="isKisteKlarCertified"
+                  checked={companyFormData.isKisteKlarCertified}
+                  onChange={handleCompanyInputChange}
+                />
+                <label>KisteKlar Certified</label>
               </div>
             </div>
 
             {/* Company Statistics */}
-            <div>
-              <div>
-                <span>Average Rating:</span>
-                <span>{companyData.averageRating || 0}</span>
-              </div>
-              <div>
-                <span>Reviews Count:</span>
-                <span>{companyData.reviewsCount || 0}</span>
-              </div>
+            <div className="stats-grid">
+              <div>Average Rating: {companyData.averageRating || 0}</div>
+              <div>Reviews Count: {companyData.reviewsCount || 0}</div>
             </div>
-          </div>
+          </section>
         )}
 
         {/* Form Actions */}
-        <div>
-          <button type="button" onClick={() => router.push("/admin")}>
+        <div className="form-actions">
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={() => router.push("/admin")}
+          >
             Cancel
           </button>
-          <button type="submit" disabled={saving}>
+          <button type="submit" className="btn-primary" disabled={saving}>
             {saving ? "Saving..." : "Save Changes"}
           </button>
         </div>

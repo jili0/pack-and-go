@@ -1,7 +1,7 @@
 // src/app/api/auth/me/route.js
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
-import User from "@/models/User";
+import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
 
 export async function GET() {
@@ -19,36 +19,36 @@ export async function GET() {
     // Connect to the database
     await connectDB();
 
-    // Find the user by ID
-    const user = await User.findById(session.id).select("-password");
+    // Find the account by ID
+    const account = await Account.findById(session.id).select("-password");
 
-    if (!user) {
+    if (!account) {
       return NextResponse.json(
-        { success: false, message: "User not found" },
+        { success: false, message: "Account not found" },
         { status: 404 }
       );
     }
 
-    // Return the user data
+    // Return the account data
     return NextResponse.json(
       {
         success: true,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          role: user.role,
-          createdAt: user.createdAt,
+        account: {
+          id: account._id,
+          name: account.name,
+          email: account.email,
+          phone: account.phone,
+          role: account.role,
+          createdAt: account.createdAt,
         },
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error fetching authenticated user:", error);
+    console.error("Error fetching authenticated account:", error);
 
     return NextResponse.json(
-      { success: false, message: "Server error fetching user" },
+      { success: false, message: "Server error fetching account" },
       { status: 500 }
     );
   }

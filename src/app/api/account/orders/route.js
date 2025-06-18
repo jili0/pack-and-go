@@ -1,4 +1,4 @@
-// src/app/api/user/orders/route.js
+// src/app/api/account/orders/route.js
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Order from "@/models/Order";
@@ -19,11 +19,11 @@ export async function GET(request) {
     await connectDB();
 
     // Finde alle Bestellungen des Benutzers
-    const orders = await Order.find({ userId: session.id }).sort({
+    const orders = await Order.find({ accountId: session.id }).sort({
       createdAt: -1,
     });
 
-    // console.log("Gefundene Bestellungen in /api/user/orders/route.js:", orders);
+    // console.log("Gefundene Bestellungen in /api/account/orders/route.js:", orders);
 
     // Füge zusätzliche Informationen hinzu
     const ordersWithDetails = await Promise.all(

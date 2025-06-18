@@ -5,6 +5,33 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
+const InputField = ({
+  label,
+  name,
+  type = "text",
+  placeholder,
+  formData,
+  handleChange,
+  errors,
+  isSubmitting,
+}) => (
+  <div className="form-field">
+    <label htmlFor={name}>
+      {label}
+      <input
+        type={type}
+        id={name}
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+        placeholder={placeholder}
+        disabled={isSubmitting}
+      />
+    </label>
+    {errors[name] && <p className="error">{errors[name]}</p>}
+  </div>
+);
+
 const RegisterPage = () => {
   const router = useRouter();
   const { register } = useAuth();

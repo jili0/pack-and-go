@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
 // JWT-Token erstellen
-export const createToken = (userId, role) => {
-  return jwt.sign({ id: userId, role }, process.env.JWT_SECRET, {
+export const createToken = (accountId, role) => {
+  return jwt.sign({ id: accountId, role }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
@@ -76,7 +76,7 @@ export const authMiddleware = (handler, allowedRoles = []) => {
       }
 
       // Benutzerinformationen an Request anhängen
-      req.user = decoded;
+      req.account = decoded;
 
       return handler(req, res);
     } catch (error) {

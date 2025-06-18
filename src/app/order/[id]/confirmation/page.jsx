@@ -12,7 +12,7 @@ export default function OrderConfirmation() {
   const params = useParams(); // Use the hook instead
   const { id } = params; // Extract id from params
   const router = useRouter();
-  const { user } = useAuth();
+  const { account } = useAuth();
 
   const [order, setOrder] = useState(null);
   const [company, setCompany] = useState(null);
@@ -20,7 +20,7 @@ export default function OrderConfirmation() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user) {
+    if (!account) {
       // Redirect to login if not authenticated
       router.push("/login");
       return;
@@ -46,7 +46,7 @@ export default function OrderConfirmation() {
     };
 
     fetchOrderDetails();
-  }, [id, user, router]);
+  }, [id, account, router]);
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -76,7 +76,7 @@ export default function OrderConfirmation() {
         <div>
           <h3>Error</h3>
           <p>{error}</p>
-          <Link href="/user/orders">View My Orders</Link>
+          <Link href="/account/orders">View My Orders</Link>
         </div>
       </div>
     );
@@ -88,7 +88,7 @@ export default function OrderConfirmation() {
         <div>
           <h3>Order Not Found</h3>
           <p>The requested order could not be found.</p>
-          <Link href="/user/orders">View My Orders</Link>
+          <Link href="/account/orders">View My Orders</Link>
         </div>
       </div>
     );
@@ -299,8 +299,9 @@ export default function OrderConfirmation() {
           <div>
             <h3>Check Your Email</h3>
             <p>
-              We've sent a confirmation email to <strong>{user.email}</strong>{" "}
-              with all the details of your order.
+              We've sent a confirmation email to{" "}
+              <strong>{account.email}</strong> with all the details of your
+              order.
             </p>
             <p>If you don't see it, please check your spam folder.</p>
           </div>
@@ -308,9 +309,9 @@ export default function OrderConfirmation() {
 
         {/* Action Buttons */}
         <div>
-          <Link href={`/user/orders/${order._id}`}>View Order Details</Link>
+          <Link href={`/account/orders/${order._id}`}>View Order Details</Link>
 
-          <Link href="/user/orders">View All Orders</Link>
+          <Link href="/account/orders">View All Orders</Link>
 
           <Link href="/">Back to Home</Link>
         </div>

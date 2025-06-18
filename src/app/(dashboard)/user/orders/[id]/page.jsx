@@ -6,12 +6,12 @@ import { useAuth } from "@/context/AuthContext";
 import OrderDetails from "@/components/dashboard/OrderDetails";
 import { useEffect, useState } from "react";
 
-export default function UserDashboard() {
+export default function AccountDashboard() {
   const params = useParams();
   const orderId = params.id;
 
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useAuth();
+  const { account } = useAuth();
 
   useEffect(() => {
     if (orderId !== undefined) {
@@ -41,7 +41,7 @@ export default function UserDashboard() {
     );
   }
 
-  if (!user) {
+  if (!account) {
     return (
       <div>
         <h2>Login Required</h2>
