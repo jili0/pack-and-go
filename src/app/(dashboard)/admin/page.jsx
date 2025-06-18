@@ -243,7 +243,12 @@ export default function AdminDashboard() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           {searchTerm && (
-            <button onClick={() => setSearchTerm("")}>Clear</button>
+            <button
+              className="btn-primary clearSearchBtn"
+              onClick={() => setSearchTerm("")}
+            >
+              Clear
+            </button>
           )}
         </div>
 

@@ -538,7 +538,7 @@ footer a:hover {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 0.5rem;
-  margin: 2px 1rem;
+  margin: 2px 0;
   padding: 0.5rem;
   background: #f8f9fa;
   border-radius: 6px;
@@ -547,27 +547,37 @@ footer a:hover {
 
 .order-card {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 2px;
-  margin: 0.5rem 1rem;
+  margin: 0.5rem 0;
   padding: 0.5rem;
   border: 1px solid #eee;
   border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
 .order-card:hover {
-  border: solid #007bff 1px;
+  cursor: pointer;
+  border-color: #007bff;
 }
 
 .admin-search {
   display: flex;
   gap: 0.5rem;
-  margin: 1rem;
+  margin-block: 1rem;
+}
+
+.admin-search input,
+.clearSearchBtn {
+  margin: 0;
+  height: 40px;
 }
 
 .admin-search input {
   flex: 1;
-  margin: 0;
+  border: 1px solid #eee;
+  border-radius: 6px;
 }
 
 .account-card {
@@ -578,17 +588,6 @@ footer a:hover {
   margin: 0.5rem 0;
   border: 1px solid #eee;
   border-radius: 6px;
-}
-
-.order-card {
-  cursor: pointer;
-  text-align: left;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-}
-
-.order-card:hover {
-  cursor: pointer;
-  border-color: #007bff;
 }
 
 /* Company Setup Page */
