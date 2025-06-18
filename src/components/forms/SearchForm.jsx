@@ -12,10 +12,7 @@ export default function SearchForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-<<<<<<< HEAD
-=======
 
->>>>>>> user-dashboard
     if (!fromLocation.trim() || !toLocation.trim()) {
       alert("Please enter both locations");
       return;
@@ -121,12 +118,8 @@ export default function SearchForm() {
             />
           </div>
         </div>
-<<<<<<< HEAD
 
         <button type="submit" disabled={loading} className="btn-primary">
-=======
-<button type="submit" disabled={loading} className="btn-primary">
->>>>>>> user-dashboard
           {loading ? "Searching..." : "Find companies"}
           <svg
             xmlns="http://www.w3.org/2000/svg"
