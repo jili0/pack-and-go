@@ -1,301 +1,208 @@
-// src/components/dashboard/OrderDetails.jsx
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
+import "@/app/styles/styles.css";
 
-import Image from "@/components/ui/Image";
-
-const OrderDetails = ({ orderId }) => {
+export default function OrderDetail() {
   const router = useRouter();
+  const { id } = useParams();
   const [order, setOrder] = useState(null);
-  const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
-    const fetchOrderDetails = async () => {
-      try {
-        const response = await fetch(`/api/orders/${orderId}`);
-        const data = await response.json();
+    fetch(`/api/admin/orders/${id}`)
+      .then((res) => res.json())
+      .then((data) =>
+        data.success ? setOrder(data.order) : setMessage("Order not found")
+      )
+      .catch(() => setMessage("Failed to load"))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-        if (data.success) {
-          setOrder(data.order);
-          setCompany(data.company);
-        } else {
-          setError(data.message || "Failed to load order details.");
-        }
-      } catch (error) {
-        console.error("Error fetching order details:", error);
-        setError("An error occurred. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const update = async (data) => {
+    setSaving(true);
+    const res = await fetch(`/api/admin/orders/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
 
-    if (orderId) {
-      fetchOrderDetails();
+    if (result.success) {
+      setOrder(result.order);
+      setMessage("Updated!");
+      setTimeout(() => setMessage(""), 2000);
     }
-  }, [orderId]);
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "No date specified";
-
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return new Date(dateString).toLocaleDateString("en-US", options);
+    setSaving(false);
   };
 
-  const getStatusBadge = (status) => {
-    const statusMap = {
-      pending: { class: null, text: "Request Sent" },
-      confirmed: { class: null, text: "Confirmed" },
-      declined: { class: null, text: "Declined" },
-      completed: { class: null, text: "Completed" },
-      cancelled: { class: null, text: "Cancelled" },
-    };
-
-    const statusInfo = statusMap[status] || {
-      class: null,
-      text: status,
-    };
-
-    return <span>{statusInfo.text}</span>;
+  const deleteOrder = async () => {
+    if (!confirm("Delete order?")) return;
+    const res = await fetch(`/api/admin/orders/${id}`, { method: "DELETE" });
+    const data = await res.json();
+    data.success ? router.push("/admin/orders") : setMessage("Delete failed");
   };
 
-  const handleCancelOrder = async () => {
-    try {
-      setLoading(true);
-
-      const response = await fetch(`/api/orders/${orderId}`, {
-        method: "DELETE",
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setOrder(data.order);
-        setShowCancelModal(false);
-      } else {
-        setError(data.message || "Failed to cancel order.");
-      }
-    } catch (error) {
-      console.error("Error cancelling order:", error);
-      setError("An error occurred. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (loading) return <p>Loading...</p>;
+  if (!order)
     return (
       <div>
-        <div></div>
-        <p>Loading order details...</p>
+        <h1>Order Not Found</h1>
+        <Link href="/admin">← Back</Link>
       </div>
     );
-  }
-
-  if (error) {
-    return (
-      <div>
-        <h3>Error</h3>
-        <p>{error}</p>
-        <button onClick={() => router.push("/account/orders")}>
-          Back to Orders
-        </button>
-      </div>
-    );
-  }
-
-  if (!order || !company) {
-    return (
-      <div>
-        <h3>Order Not Found</h3>
-        <p>The requested order could not be found.</p>
-        <button onClick={() => router.push("/account/orders")}>
-          Back to Orders
-        </button>
-      </div>
-    );
-  }
 
   return (
-    <div>
+    <div className="container">
+      <h1>
+        Order #{order._id.slice(-8)} - {order.status}
+      </h1>
+      <Link href="/admin/orders">← Back to Orders</Link>
+
+      {message && <p>{message}</p>}
+
       <div>
-        <div>
-          <div>
-            <h2>Order Details</h2>
-            {getStatusBadge(order.status)}
-          </div>
-        </div>
-
-        <div>
-          {/* Order ID and Date */}
-          <div>
-            <div>
-              <span>Order ID:</span>
-              <span>{order._id}</span>
-            </div>
-            <div>
-              <span>Order Date:</span>
-              <span>{formatDate(order.createdAt)}</span>
-            </div>
-          </div>
-
-          {/* Moving Company */}
-          <div>
-            <h3>Moving Company</h3>
-            <div>
-              <div>
-                {company.logo ? (
-                  <Image
-                    src={company.logo}
-                    alt={company.companyName}
-                    width={64}
-                    height={64}
-                  />
-                ) : (
-                  <div>
-                    <span>{company.companyName.charAt(0)}</span>
-                  </div>
-                )}
-              </div>
-              <div>
-                <h4>{company.companyName}</h4>
-                <div>
-                  <div>
-                    {[...Array(5)].map((_, i) => (
-                      <span
-                        key={i}
-                        className={
-                          i < Math.round(company.averageRating) ? null : null
-                        }
-                      >
-                        ★
-                      </span>
-                    ))}
-                  </div>
-                  <span>
-                    ({company.reviewsCount}{" "}
-                    {company.reviewsCount === 1 ? "review" : "reviews"})
-                  </span>
-                </div>
-                {company.isKisteKlarCertified && <div>KisteKlar Certified</div>}
-              </div>
-            </div>
-          </div>
-
-          {/* Moving Details */}
-          <div>
-            <h3>Moving Details</h3>
-            <div>
-              <div>
-                <h4>From</h4>
-                <p>{order.fromAddress.street}</p>
-                <p>
-                  {order.fromAddress.postalCode} {order.fromAddress.city}
-                </p>
-                <p>{order.fromAddress.country}</p>
-              </div>
-              <div>→</div>
-              <div>
-                <h4>To</h4>
-                <p>{order.toAddress.street}</p>
-                <p>
-                  {order.toAddress.postalCode} {order.toAddress.city}
-                </p>
-                <p>{order.toAddress.country}</p>
-              </div>
-            </div>
-
-            <div>
-              <div>
-                <span>Moving Date:</span>
-                <span>
-                  {order.confirmedDate ? (
-                    formatDate(order.confirmedDate)
-                  ) : (
-                    <>
-                      <span>
-                        Preferred: {formatDate(order.preferredDates[0])}
-                      </span>
-                      <small>(Waiting for confirmation)</small>
-                    </>
-                  )}
-                </span>
-              </div>
-
-              <div>
-                <span>Helpers:</span>
-                <span>{order.helpersCount}</span>
-              </div>
-
-              <div>
-                <span>Estimated Hours:</span>
-                <span>{order.estimatedHours}</span>
-              </div>
-
-              <div>
-                <span>Total Price:</span>
-                <span>{order.totalPrice} €</span>
-              </div>
-            </div>
-
-            {order.notes && (
-              <div>
-                <h4>Additional Notes</h4>
-                <p>{order.notes}</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <div>
-            <button onClick={() => router.back()}>Back</button>
-
-            {order.status === "pending" && (
-              <button onClick={() => setShowCancelModal(true)}>
-                Cancel Order
-              </button>
-            )}
-
-            {order.status === "completed" && !order.review && (
-              <button
-                onClick={() => router.push(`/account/orders/${orderId}/review`)}
-              >
-                Leave Review
-              </button>
-            )}
-          </div>
-        </div>
+        {order.status === "pending" && (
+          <>
+            <button
+              className="btn-primary"
+              onClick={() => update({ status: "confirmed" })}
+            >
+              Confirm
+            </button>
+            <button
+              className="btn-primary"
+              onClick={() => update({ status: "declined" })}
+            >
+              Decline
+            </button>
+          </>
+        )}
+        {order.status === "confirmed" && (
+          <button
+            className="btn-primary"
+            onClick={() => update({ status: "completed" })}
+          >
+            Complete
+          </button>
+        )}
+        <button className="btn-primary" onClick={() => setEditing(!editing)}>
+          {editing ? "Cancel" : "Edit"}
+        </button>
+        <button className="btn-primary" onClick={deleteOrder}>
+          Delete
+        </button>
+        {editing && (
+          <button
+            className="btn-primary"
+            onClick={() => {
+              update(order);
+              setEditing(false);
+            }}
+          >
+            Save
+          </button>
+        )}
       </div>
 
-      {/* Cancel Confirmation Modal */}
-      {showCancelModal && (
-        <div>
-          <div>
-            <div>
-              <h3>Cancel Order</h3>
-            </div>
-            <div>
-              <p>Are you sure you want to cancel this order?</p>
-              <p>This action cannot be undone.</p>
-            </div>
-            <div>
-              <button onClick={() => setShowCancelModal(false)}>
-                No, Keep Order
-              </button>
-              <button onClick={handleCancelOrder} disabled={loading}>
-                {loading ? "Cancelling..." : "Yes, Cancel Order"}
-              </button>
-            </div>
-          </div>
-        </div>
+      <p>
+        <strong>Customer:</strong>
+        {editing ? (
+          <input
+            value={order.customerName || ""}
+            onChange={(e) =>
+              setOrder({ ...order, customerName: e.target.value })
+            }
+          />
+        ) : (
+          order.customerName
+        )}
+      </p>
+
+      <p>
+        <strong>From:</strong>
+        {editing ? (
+          <input
+            value={order.fromAddress?.street || ""}
+            onChange={(e) =>
+              setOrder({
+                ...order,
+                fromAddress: { ...order.fromAddress, street: e.target.value },
+              })
+            }
+          />
+        ) : (
+          `${order.fromAddress?.street}, ${order.fromAddress?.city}`
+        )}
+      </p>
+      <p>
+        <strong>To:</strong>
+        {editing ? (
+          <input
+            value={order.toAddress?.street || ""}
+            onChange={(e) =>
+              setOrder({
+                ...order,
+                toAddress: { ...order.toAddress, street: e.target.value },
+              })
+            }
+          />
+        ) : (
+          `${order.toAddress?.street}, ${order.toAddress?.city}`
+        )}
+      </p>
+
+      <p>
+        <strong>Helpers:</strong>
+        {editing ? (
+          <input
+            type="number"
+            value={order.helpersCount || ""}
+            onChange={(e) =>
+              setOrder({ ...order, helpersCount: e.target.value })
+            }
+          />
+        ) : (
+          order.helpersCount
+        )}
+      </p>
+
+      <p>
+        <strong>Hours:</strong>
+        {editing ? (
+          <input
+            type="number"
+            value={order.estimatedHours || ""}
+            onChange={(e) =>
+              setOrder({ ...order, estimatedHours: e.target.value })
+            }
+          />
+        ) : (
+          order.estimatedHours
+        )}
+      </p>
+
+      <p>
+        <strong>Notes:</strong>
+      </p>
+      {editing ? (
+        <textarea
+          value={order.notes || ""}
+          onChange={(e) => setOrder({ ...order, notes: e.target.value })}
+        />
+      ) : (
+        <p>{order.notes || "No notes"}</p>
       )}
+
+      <p>
+        <strong>Created:</strong>{" "}
+        {new Date(order.createdAt).toLocaleDateString("de-DE")}
+      </p>
     </div>
   );
-};
-
-export default OrderDetails;
+}
