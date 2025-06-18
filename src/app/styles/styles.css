@@ -59,7 +59,7 @@ button {
   justify-content: center;
   gap: 0.5rem;
   padding: clamp(7px, 1vw, 10px) 24px;
-  margin-top: clamp(14px, 2vw, 20px);
+  margin-block: clamp(14px, 2vw, 20px);
   margin-inline: 2px;
   border-radius: 6px;
   text-decoration: none;
@@ -502,6 +502,26 @@ footer a:hover {
 .order-card:hover {
   cursor: pointer;
   border-color: #007bff;
+}
+
+/* Company Setup Page */
+
+.service-area {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.service-inputs .form-field {
+  flex: 1;
+  margin: 0;
+}
+
+.form-field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  text-align: left;
 }
 
 /* Media Queries */

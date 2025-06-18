@@ -145,9 +145,7 @@ export default function AccountDashboard() {
         text = status;
     }
 
-    return (
-      <span </span>
-    );
+    return <span> </span>;
   };
 
   return (
@@ -161,20 +159,14 @@ export default function AccountDashboard() {
 
         {/* Quick Access */}
         <div>
-          <div >
+          <div>
             <h2>Quick Access</h2>
           </div>
           <div>
-            <Link
-              href="/"
-              
-            >
-              <div
-                
-              >
+            <Link href="/">
+              <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -193,16 +185,10 @@ export default function AccountDashboard() {
               </div>
             </Link>
 
-            <Link
-              href="/account/orders"
-              
-            >
-              <div
-                
-              >
+            <Link href="/account/orders">
+              <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -221,16 +207,10 @@ export default function AccountDashboard() {
               </div>
             </Link>
 
-            <Link
-              href="/account/profile"
-              
-            >
-              <div
-                
-              >
+            <Link href="/account/profile">
+              <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -252,7 +232,7 @@ export default function AccountDashboard() {
         </div>
 
         {error && (
-          <div >
+          <div>
             <div>
               <div>
                 <svg
@@ -280,7 +260,7 @@ export default function AccountDashboard() {
 
         {/* Upcoming Orders */}
         <div>
-          <div >
+          <div>
             <h2>Upcoming Moves</h2>
             <Link href="/account/orders">View All</Link>
           </div>
@@ -349,12 +329,7 @@ export default function AccountDashboard() {
                       </div>
                     </div>
                     <div>
-                      <Link
-                        href={`/order/${order._id}`}
-                        
-                      >
-                        View Details
-                      </Link>
+                      <Link href={`/order/${order._id}`}>View Details</Link>
                     </div>
                   </div>
                 ))}
@@ -374,16 +349,9 @@ export default function AccountDashboard() {
                     d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                   />
                 </svg>
-                <h3 >
-                  No Upcoming Moves
-                </h3>
+                <h3>No Upcoming Moves</h3>
                 <p>You currently have no planned moves.</p>
-                <Link
-                  href="/"
-                  
-                >
-                  Plan a Move Now
-                </Link>
+                <Link href="/">Plan a Move Now</Link>
               </div>
             )}
           </div>
@@ -391,7 +359,7 @@ export default function AccountDashboard() {
 
         {/* Recent Activities */}
         <div>
-          <div >
+          <div>
             <h2>Recent Activities</h2>
           </div>
           <div>
@@ -475,15 +443,14 @@ export default function AccountDashboard() {
 
         {/* Tips & Help */}
         <div>
-          <div >
+          <div>
             <h2>Tips & Help</h2>
           </div>
           <div>
             <Link href="/tips">
-              <div >
+              <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -501,10 +468,9 @@ export default function AccountDashboard() {
             </Link>
 
             <Link href="/guide">
-              <div >
+              <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -522,10 +488,9 @@ export default function AccountDashboard() {
             </Link>
 
             <Link href="/contact">
-              <div >
+              <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
