@@ -47,6 +47,47 @@ const INITIAL_FORM_DATA = {
   kisteKlarCertificate: null,
 };
 
+// Extracted FormField component outside of main component
+const FormField = ({ field, value, onChange, errors }) => {
+  const {
+    name,
+    label,
+    type = "text",
+    required = false,
+    placeholder,
+    ...props
+  } = field;
+
+  return (
+    <div className="form-field">
+      <label>
+        {label}
+        {required && "*"}
+        {type === "textarea" ? (
+          <textarea
+            name={name}
+            value={value}
+            onChange={(e) => onChange(name, e.target.value)}
+            placeholder={placeholder}
+            {...props}
+          />
+        ) : (
+          <input
+            type={type}
+            name={name}
+            value={value}
+            onChange={(e) => onChange(name, e.target.value)}
+            required={required}
+            placeholder={placeholder}
+            {...props}
+          />
+        )}
+        {errors[name] && <div className="error">{errors[name]}</div>}
+      </label>
+    </div>
+  );
+};
+
 export default function CompanySetup() {
   const router = useRouter();
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
@@ -145,47 +186,6 @@ export default function CompanySetup() {
     }
   };
 
-  // Reusable form field component
-  const FormField = ({ field, value, onChange }) => {
-    const {
-      name,
-      label,
-      type = "text",
-      required = false,
-      placeholder,
-      ...props
-    } = field;
-
-    return (
-      <div className="form-field">
-        <label>
-          {label}
-          {required && "*"}
-          {type === "textarea" ? (
-            <textarea
-              name={name}
-              value={value}
-              onChange={(e) => onChange(name, e.target.value)}
-              placeholder={placeholder}
-              {...props}
-            />
-          ) : (
-            <input
-              type={type}
-              name={name}
-              value={value}
-              onChange={(e) => onChange(name, e.target.value)}
-              required={required}
-              placeholder={placeholder}
-              {...props}
-            />
-          )}
-          {errors[name] && <div className="error">{errors[name]}</div>}
-        </label>
-      </div>
-    );
-  };
-
   return (
     <form onSubmit={handleSubmit} encType="multipart/form-data">
       <h2>Create your company profile</h2>
@@ -197,6 +197,7 @@ export default function CompanySetup() {
           field={field}
           value={formData[field.name]}
           onChange={handleInputChange}
+          errors={errors}
         />
       ))}
 
