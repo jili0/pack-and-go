@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -22,11 +22,16 @@ const RegisterPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registerError, setRegisterError] = useState(null);
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
-    if (errors[name]) setErrors({ ...errors, [name]: null });
-  };
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: type === "checkbox" ? checked : value 
+    }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
+  }, [errors]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -69,24 +74,6 @@ const RegisterPage = () => {
     }
   };
 
-  const InputField = ({ label, name, type = "text", placeholder }) => (
-    <div className="form-field">
-      <label htmlFor={name}>
-        {label}
-        <input
-          type={type}
-          id={name}
-          name={name}
-          value={formData[name]}
-          onChange={handleChange}
-          placeholder={placeholder}
-          disabled={isSubmitting}
-        />
-      </label>
-      {errors[name] && <p className="error">{errors[name]}</p>}
-    </div>
-  );
-
   return (
     <div className="register-page">
       <div className="register-container">
@@ -112,39 +99,80 @@ const RegisterPage = () => {
         )}
 
         <form onSubmit={handleSubmit} className="register-form">
-          <InputField
-            label="Full Name"
-            name="name"
-            placeholder="First and Last Name"
-          />
+          <div className="form-field">
+            <label htmlFor="name">Full Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="First and Last Name"
+              disabled={isSubmitting}
+              autoComplete="name"
+            />
+            {errors.name && <p className="error">{errors.name}</p>}
+          </div>
 
-          <InputField
-            label="Email Address"
-            name="email"
-            type="email"
-            placeholder="example@email.com"
-          />
+          <div className="form-field">
+            <label htmlFor="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="example@email.com"
+              disabled={isSubmitting}
+              autoComplete="email"
+            />
+            {errors.email && <p className="error">{errors.email}</p>}
+          </div>
 
-          <InputField
-            label="Phone Number"
-            name="phone"
-            type="tel"
-            placeholder="+1 123 456 7890"
-          />
+          <div className="form-field">
+            <label htmlFor="phone">Phone Number</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="+1 123 456 7890"
+              disabled={isSubmitting}
+              autoComplete="tel"
+            />
+            {errors.phone && <p className="error">{errors.phone}</p>}
+          </div>
 
-          <InputField
-            label="Password"
-            name="password"
-            type="password"
-            placeholder="Minimum 6 characters"
-          />
+          <div className="form-field">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Minimum 6 characters"
+              disabled={isSubmitting}
+              autoComplete="new-password"
+            />
+            {errors.password && <p className="error">{errors.password}</p>}
+          </div>
 
-          <InputField
-            label="Confirm Password"
-            name="confirmPassword"
-            type="password"
-            placeholder="Repeat password"
-          />
+          <div className="form-field">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Repeat password"
+              disabled={isSubmitting}
+              autoComplete="new-password"
+            />
+            {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
+          </div>
 
           <div className="form-field">
             <label htmlFor="role">
