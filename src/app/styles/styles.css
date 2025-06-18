@@ -545,6 +545,10 @@ footer a:hover {
   border: solid #f8f9fa 2px;
 }
 
+.admin-stats {
+  margin-top: clamp(20px, 15vw, 100px);
+}
+
 .order-card {
   display: grid;
   gap: 2px;
