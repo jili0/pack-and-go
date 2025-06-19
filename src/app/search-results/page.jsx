@@ -13,17 +13,10 @@ export default function SearchResults() {
   const [error, setError] = useState(null);
   const [sortBy, setSortBy] = useState("rating");
   const [selectedCompany, setSelectedCompany] = useState(null);
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const loadSessionData = () => {
+    const timer = setTimeout(() => {
       try {
-        if (typeof window === "undefined") {
-          setError("Page not ready. Please refresh.");
-          setLoading(false);
-          return;
-        }
-
         const savedFormData = sessionStorage.getItem("movingFormData");
         const savedResults = sessionStorage.getItem("searchResults");
 
@@ -32,83 +25,125 @@ export default function SearchResults() {
           return;
         }
 
-        const parsedFormData = JSON.parse(savedFormData);
-        const parsedResults = JSON.parse(savedResults);
-
-        setFormData(parsedFormData);
-        setCompanies(parsedResults);
-        setLoading(false);
+        setFormData(JSON.parse(savedFormData));
+        setCompanies(JSON.parse(savedResults));
       } catch (error) {
-        setError(`The search results could not be loaded: ${error.message}`);
+        setError(`Search results could not be loaded: ${error.message}`);
+      } finally {
         setLoading(false);
       }
-    };
-
-    const timer = setTimeout(() => {
-      loadSessionData();
     }, 100);
 
     return () => clearTimeout(timer);
   }, [router]);
 
-  const sortedCompanies = [...companies].sort((a, b) => {
-    if (sortBy === "rating") {
-      return b.averageRating - a.averageRating;
-    } else if (sortBy === "certified") {
-      if (a.isKisteKlarCertified && !b.isKisteKlarCertified) return -1;
-      if (!a.isKisteKlarCertified && b.isKisteKlarCertified) return 1;
-      return b.averageRating - a.averageRating;
-    }
-    return 0;
-  });
-
-  const handleSortChange = (value) => {
-    setSortBy(value);
+  const matchesServiceArea = (company, fromCity, toCity) => {
+    if (!company.serviceAreas || !fromCity || !toCity) return true;
+    return company.serviceAreas.some(
+      (area) =>
+        area.from.toLowerCase().includes(fromCity.toLowerCase()) &&
+        area.to.toLowerCase().includes(toCity.toLowerCase())
+    );
   };
 
-  const handleSelectCompany = (company) => {
-    setSelectedCompany(company);
-    setShowModal(true);
-  };
+  const filteredAndSortedCompanies = companies
+    .filter((company) =>
+      matchesServiceArea(
+        company,
+        formData?.fromAddress?.city,
+        formData?.toAddress?.city
+      )
+    )
+    .sort((a, b) => {
+      if (sortBy === "certified") {
+        if (a.isKisteKlarCertified !== b.isKisteKlarCertified) {
+          return a.isKisteKlarCertified ? -1 : 1;
+        }
+      }
+      return b.averageRating - a.averageRating;
+    });
 
-  const handleConfirmSelection = () => {
+  const handleAction = (action, data = null) => {
     try {
-      sessionStorage.setItem(
-        "selectedCompany",
-        JSON.stringify(selectedCompany)
-      );
-      router.push("/order/create");
+      switch (action) {
+        case "select":
+          setSelectedCompany(data);
+          break;
+        case "confirm":
+          sessionStorage.setItem(
+            "selectedCompany",
+            JSON.stringify(selectedCompany)
+          );
+          router.push("/order/create");
+          break;
+        case "cancel":
+          setSelectedCompany(null);
+          break;
+        default:
+          router.push("/");
+      }
     } catch (error) {
-      setError(`Failed to save selection: ${error.message}`);
+      setError(`Action failed: ${error.message}`);
     }
   };
 
-  if (loading) {
+  const renderStars = (rating) =>
+    [...Array(5)].map((_, i) => <span key={i}>★</span>);
+
+  const renderCertificationBadge = () => (
+    <div>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      KisteKlar Certified
+    </div>
+  );
+
+  const renderServiceAreas = (serviceAreas) => (
+    <div>
+      <h4>Service Areas</h4>
+      <div>
+        {serviceAreas.map((area, index) => (
+          <span key={index}>
+            {area.from} → {area.to}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (loading)
     return (
       <div>
-        <div></div>
         <h2>Loading moving companies...</h2>
         <p>Please wait a moment.</p>
       </div>
     );
-  }
 
-  if (error) {
+  if (error)
     return (
       <div>
-        <div>
-          <div>⚠️</div>
-          <h2>An error occurred</h2>
-          <p>{error}</p>
-          <button onClick={() => router.push("/")}>Back to Home</button>
-        </div>
+        <div>⚠️</div>
+        <h2>An error occurred</h2>
+        <p>{error}</p>
+        <button onClick={() => handleAction("home")}>Back to Home</button>
       </div>
     );
-  }
 
   return (
     <div>
-      {/* Header Section */}
+      {/* Header */}
       <div>
         <h1>Moving Companies Found</h1>
         <p>
@@ -120,19 +155,15 @@ export default function SearchResults() {
       {/* Filter Bar */}
       <div>
         <div>
-          <h2>{companies.length} moving companies found</h2>
+          <h2>{filteredAndSortedCompanies.length} moving companies found</h2>
           <p>
             For {formData?.estimatedHours || 0} hours with{" "}
             {formData?.helpersCount || 0} helpers
           </p>
         </div>
-
         <div>
           <span>Sort by:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => handleSortChange(e.target.value)}
-          >
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
             <option value="rating">Best Rating</option>
             <option value="certified">KisteKlar Certified</option>
           </select>
@@ -141,43 +172,28 @@ export default function SearchResults() {
 
       {/* Companies List */}
       <div>
-        {sortedCompanies.length > 0 ? (
-          sortedCompanies.map((company) => (
+        {filteredAndSortedCompanies.length > 0 ? (
+          filteredAndSortedCompanies.map((company) => (
             <div key={company._id}>
+              {/* Company Header */}
               <div>
                 <div>
-                  <div>
-                    {company.logo ? (
-                      <Image
-                        src={company.logo}
-                        alt={`${company.companyName} Logo`}
-                        width={64}
-                        height={64}
-                      />
-                    ) : (
-                      <div>
-                        <span>{company.companyName.charAt(0)}</span>
-                      </div>
-                    )}
-                  </div>
-
+                  {company.logo ? (
+                    <Image
+                      src={company.logo}
+                      alt={`${company.companyName} Logo`}
+                      width={64}
+                      height={64}
+                    />
+                  ) : (
+                    <div>
+                      <span>{company.companyName.charAt(0)}</span>
+                    </div>
+                  )}
                   <div>
                     <h3>{company.companyName}</h3>
                     <div>
-                      <div>
-                        {[...Array(5)].map((_, i) => (
-                          <span
-                            key={i}
-                            className={
-                              i < Math.round(company.averageRating)
-                                ? null
-                                : null
-                            }
-                          >
-                            ★
-                          </span>
-                        ))}
-                      </div>
+                      <div>{renderStars(company.averageRating)}</div>
                       <span>
                         ({company.reviewsCount}{" "}
                         {company.reviewsCount === 1 ? "review" : "reviews"})
@@ -185,30 +201,10 @@ export default function SearchResults() {
                     </div>
                   </div>
                 </div>
-
-                {company.isKisteKlarCertified && (
-                  <div>
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    KisteKlar Certified
-                  </div>
-                )}
+                {company.isKisteKlarCertified && renderCertificationBadge()}
               </div>
 
-              {/* Always visible company details section */}
+              {/* Company Details */}
               <div>
                 {company.description && (
                   <div>
@@ -216,28 +212,10 @@ export default function SearchResults() {
                     <p>{company.description}</p>
                   </div>
                 )}
-
-                {company.serviceAreas && company.serviceAreas.length > 0 && (
-                  <div>
-                    <h4>Service Areas</h4>
-                    <div>
-                      {company.serviceAreas.map((area, areaIndex) => (
-                        <span key={areaIndex}>
-                          {area.from} → {area.to}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Single action button */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => handleSelectCompany(company)}
-                >
-                  Select
+                {company.serviceAreas?.length > 0 &&
+                  renderServiceAreas(company.serviceAreas)}
+                <button onClick={() => handleAction("select", company)}>
+                  Select Company
                 </button>
               </div>
             </div>
@@ -250,37 +228,29 @@ export default function SearchResults() {
               Unfortunately, no matching moving companies were found for your
               request. Try different start or destination locations.
             </p>
-            <button onClick={() => router.push("/")}>Start New Search</button>
+            <button onClick={() => handleAction("home")}>
+              Start New Search
+            </button>
           </div>
         )}
       </div>
 
+      {/* Back Button */}
       <div>
-        <button onClick={() => router.push("/")}>
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M7.70711 14.7071C7.31658 15.0976 6.68342 15.0976 6.29289 14.7071L2.29289 10.7071C1.90237 10.3166 1.90237 9.68342 2.29289 9.29289L6.29289 5.29289C6.68342 4.90237 7.31658 4.90237 7.70711 5.29289C8.09763 5.68342 8.09763 6.31658 7.70711 6.70711L5.41421 9H17C17.5523 9 18 9.44772 18 10C18 10.5523 17.5523 11 17 11H5.41421L7.70711 13.2929C8.09763 13.6834 8.09763 14.3166 7.70711 14.7071Z"
-              fill="currentColor"
-            />
+        <button onClick={() => handleAction("home")}>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M7.70711 14.7071C7.31658 15.0976 6.68342 15.0976 6.29289 14.7071L2.29289 10.7071C1.90237 10.3166 1.90237 9.68342 2.29289 9.29289L6.29289 5.29289C6.68342 4.90237 7.31658 4.90237 7.70711 5.29289C8.09763 5.68342 8.09763 6.31658 7.70711 6.70711L5.41421 9H17C17.5523 9 18 9.44772 18 10C18 10.5523 17.5523 11 17 11H5.41421L7.70711 13.2929C8.09763 13.6834 8.09763 14.3166 7.70711 14.7071Z" />
           </svg>
           Back to Home
         </button>
       </div>
 
       {/* Confirmation Modal */}
-      {showModal && selectedCompany && (
+      {selectedCompany && (
         <div
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowModal(false);
-            }
-          }}
+          onClick={(e) =>
+            e.target === e.currentTarget && handleAction("cancel")
+          }
         >
           <div>
             <div>
@@ -291,34 +261,31 @@ export default function SearchResults() {
               <div>
                 <h4>{selectedCompany.companyName}</h4>
                 <div>
-                  <div>
-                    <span>{selectedCompany.averageRating.toFixed(1)}</span>
-                    <span>•</span>
-                    <span>{selectedCompany.reviewsCount} reviews</span>
-                    {selectedCompany.isKisteKlarCertified && (
-                      <>
-                        <span>•</span>
-                        <span>
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                          KisteKlar certified
-                        </span>
-                      </>
-                    )}
-                  </div>
+                  <span>{selectedCompany.averageRating.toFixed(1)}</span>
+                  <span>•</span>
+                  <span>{selectedCompany.reviewsCount} reviews</span>
+                  {selectedCompany.isKisteKlarCertified && (
+                    <>
+                      <span>•</span>
+                      <span>
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        KisteKlar certified
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
               <div>
@@ -326,9 +293,7 @@ export default function SearchResults() {
                   <span>Estimated Price:</span>
                   <span>
                     {formData
-                      ? 50 *
-                        formData.helpersCount *
-                        formData.estimatedHours
+                      ? 50 * formData.helpersCount * formData.estimatedHours
                       : 0}{" "}
                     €
                   </span>
@@ -340,10 +305,8 @@ export default function SearchResults() {
               </div>
             </div>
             <div>
-              <button type="button" onClick={() => setShowModal(false)}>
-                Cancel
-              </button>
-              <button type="button" onClick={handleConfirmSelection}>
+              <button onClick={() => handleAction("cancel")}>Cancel</button>
+              <button onClick={() => handleAction("confirm")}>
                 Select and Continue
               </button>
             </div>
