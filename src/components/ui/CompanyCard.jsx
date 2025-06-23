@@ -14,9 +14,8 @@ const CompanyCard = ({ company, onSelect }) => {
   };
 
   // Berechne den Preis basierend auf dem Stundensatz und 2 Helfern (Standardwert)
-  const hourlyRate = company.hourlyRate || 50;
   const helpersCount = 2;
-  const estimatedPrice = hourlyRate * helpersCount;
+  const estimatedPrice = 50 * helpersCount;
 
   return (
     <div>

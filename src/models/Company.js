@@ -32,10 +32,6 @@ const CompanySchema = new mongoose.Schema({
       to: String,
     },
   ],
-  hourlyRate: {
-    type: Number,
-    required: [true, "Bitte geben Sie Ihren Stundensatz ein"],
-  },
   isVerified: {
     type: Boolean,
     default: false,

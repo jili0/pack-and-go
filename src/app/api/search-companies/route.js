@@ -111,7 +111,6 @@ export async function POST(request) {
         address: 1,
         description: 1,
         serviceAreas: 1,
-        hourlyRate: 1,
         isVerified: 1,
         isKisteKlarCertified: 1,
         documents: 1,

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import "@/app/styles/styles.css";
 
 export default function AdminDashboard() {
@@ -74,10 +73,8 @@ export default function AdminDashboard() {
           <div>
             {filteredAccounts.map((accountData) => (
               <div key={accountData._id} className="account-card">
-                <div>
-                  <h4>{accountData.name}</h4>
-                  <p>{accountData.email}</p>
-                </div>
+                <p>{accountData.email}</p>
+                <p>{accountData.name}</p>
                 <div>
                   <button
                     className="btn-primary"
@@ -110,13 +107,17 @@ export default function AdminDashboard() {
         onClick={() => onViewOrder(order._id)}
       >
         <p>
-          <b>OrderID:</b> #{order._id}
+          <b>ID:</b> #{order._id}
         </p>
         <p>
           <b>CustomerName:</b> {order.customerName || "Unknown"}
         </p>
         <p>
-          <b>From:</b> {order.fromAddress?.city} <b>To: </b>
+          <b>From: </b>
+          {order.fromAddress?.city}
+        </p>
+        <p>
+          <b>To: </b>
           {order.toAddress?.city}
         </p>
         <p>
@@ -226,6 +227,13 @@ export default function AdminDashboard() {
           <p>Admins: {adminCount}</p>
         </div>
 
+        <div className="order-stats">
+          <p>Total Orders: {orderStats.total}</p>
+          <p>Pending: {orderStats.pending}</p>
+          <p>Active: {orderStats.confirmed}</p>
+          <p>Completed: {orderStats.completed}</p>
+        </div>
+
         <div className="admin-search">
           <input
             type="text"
@@ -234,7 +242,12 @@ export default function AdminDashboard() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           {searchTerm && (
-            <button onClick={() => setSearchTerm("")}>Clear</button>
+            <button
+              className="btn-primary clearSearchBtn"
+              onClick={() => setSearchTerm("")}
+            >
+              Clear
+            </button>
           )}
         </div>
 
@@ -246,16 +259,6 @@ export default function AdminDashboard() {
 
       {/* Order Management Section */}
       <div>
-        <h2>Order Management</h2>
-        <div className="order-stats">
-          <p>Total Orders: {orderStats.total}</p>
-          <p>Pending: {orderStats.pending}</p>
-          <p>Active: {orderStats.confirmed}</p>
-          <p>Completed: {orderStats.completed}</p>
-        </div>
-
-        <Link href="/admin/orders">Manage All Orders</Link>
-
         <h3>Recent Orders</h3>
         {recentOrders.length === 0 ? (
           <p>No orders found</p>

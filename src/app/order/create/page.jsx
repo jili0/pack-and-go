@@ -407,7 +407,7 @@ export default function CreateOrder() {
               <div className="price-breakdown">
                 <div className="price-row">
                   <span>Hourly Rate per Helper</span>
-                  <span>{selectedCompany.hourlyRate || 50} €</span>
+                  <span>50 €</span>
                 </div>
                 <div className="price-row">
                   <span>Number of Helpers</span>

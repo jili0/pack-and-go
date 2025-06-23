@@ -29,7 +29,6 @@ export default function EditPage() {
     address: { street: "", city: "", postalCode: "", country: "" },
     taxId: "",
     description: "",
-    hourlyRate: 0,
     isVerified: false,
     isKisteKlarCertified: false,
   });
@@ -48,16 +47,13 @@ export default function EditPage() {
 
       if (!response.ok) {
         throw new Error("Failed to fetch account data");
-        return;
       }
 
       const data = await response.json();
       const accountData = data.account || data;
       const companyDetails = data.companyDetails;
-
       setAccount(accountData);
 
-      // Set basic account form data
       setFormData((prev) => ({
         ...prev,
         email: accountData.email || "",
@@ -66,24 +62,38 @@ export default function EditPage() {
         role: accountData.role || "user",
       }));
 
-      // Handle company data if account is a company
-      if (accountData.role === "company" && companyDetails) {
-        setCompanyData(companyDetails);
-        setCompanyFormData({
-          companyName: companyDetails.companyName || "",
-          address: {
-            street: companyDetails.address?.street || "",
-            city: companyDetails.address?.city || "",
-            postalCode: companyDetails.address?.postalCode || "",
-            country: companyDetails.address?.country || "",
-          },
-          taxId: companyDetails.taxId || "",
-          description: companyDetails.description || "",
-          hourlyRate: companyDetails.hourlyRate || 0,
-          isVerified: companyDetails.isVerified || false,
-          isKisteKlarCertified: companyDetails.isKisteKlarCertified || false,
-        });
-        setServiceAreas(companyDetails.serviceAreas || []);
+      // Handle company data - always initialize companyFormData for company accounts
+      if (accountData.role === "company") {
+        if (companyDetails) {
+          // Company profile exists - populate with existing data
+          setCompanyData(companyDetails);
+          setCompanyFormData({
+            companyName: companyDetails.companyName || "",
+            address: {
+              street: companyDetails.address?.street || "",
+              city: companyDetails.address?.city || "",
+              postalCode: companyDetails.address?.postalCode || "",
+              country: companyDetails.address?.country || "",
+            },
+            taxId: companyDetails.taxId || "",
+            description: companyDetails.description || "",
+            isVerified: companyDetails.isVerified || false,
+            isKisteKlarCertified: companyDetails.isKisteKlarCertified || false,
+          });
+          setServiceAreas(companyDetails.serviceAreas || []);
+        } else {
+          // No company profile exists - initialize with empty data
+          setCompanyData(null);
+          setCompanyFormData({
+            companyName: "",
+            address: { street: "", city: "", postalCode: "", country: "" },
+            taxId: "",
+            description: "",
+            isVerified: false,
+            isKisteKlarCertified: false,
+          });
+          setServiceAreas([]);
+        }
       }
     } catch (err) {
       setError("Failed to load account data: " + err.message);
@@ -202,7 +212,7 @@ export default function EditPage() {
       // Update password if provided
       if (formData.newPassword && formData.newPassword.trim() !== "") {
         const passwordResponse = await fetch(
-          `/api/admin/accounts/$accountrId}`,
+          `/api/admin/accounts/${accountId}`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -218,7 +228,7 @@ export default function EditPage() {
 
       // Update role if changed
       if (formData.role !== account.role) {
-        const roleResponse = await fetch(`/api/admin/accounts/$accountrId}`, {
+        const roleResponse = await fetch(`/api/admin/accounts/${accountId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -230,22 +240,40 @@ export default function EditPage() {
         if (!roleResponse.ok) throw new Error("Failed to update account role");
       }
 
-      // Update company data if applicable
-      if (formData.role === "company" && companyData) {
-        const companyResponse = await fetch(
-          `/api/admin/companies/${companyData._id}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...companyFormData, serviceAreas }),
-          }
-        );
+      // Handle company data - create or update
+      if (formData.role === "company") {
+        if (companyData && companyData._id) {
+          // Update existing company profile
+          const companyResponse = await fetch(
+            `/api/admin/companies/${companyData._id}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...companyFormData, serviceAreas }),
+            }
+          );
 
-        if (!companyResponse.ok)
-          throw new Error("Failed to update company data");
+          if (!companyResponse.ok)
+            throw new Error("Failed to update company data");
+        } else {
+          // Create new company profile
+          const companyResponse = await fetch(`/api/admin/companies`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              ...companyFormData, 
+              serviceAreas,
+              accountId: accountId 
+            }),
+          });
+
+          if (!companyResponse.ok)
+            throw new Error("Failed to create company profile");
+        }
       }
 
       let successMessage = "Account data updated successfully";
+
       if (formData.newPassword && formData.newPassword.trim() !== "") {
         successMessage += " (including password change)";
         setFormData((prev) => ({
@@ -264,54 +292,30 @@ export default function EditPage() {
     }
   };
 
-  if (loading)
-    return (
-      <div className="container">
-        <p>Loading account data...</p>
-      </div>
-    );
-  if (!loading && !account)
-    return (
-      <div className="container">
-        <p>Account not found</p>
-      </div>
-    );
+  if (loading) return <p>Loading account data...</p>;
+
+  if (!loading && !account) return <p>Account not found</p>;
 
   return (
     <div className="container">
-      <div className="page-header">
-        <div>
-          <h1>Edit Account</h1>
-          <p>
-            Editing: {account.name} ({account.email}) - {account.role}
-          </p>
-        </div>
-        <button className="btn-primary" onClick={() => router.push("/admin")}>
-          ← Back to Accounts
+      <div className="edit-header">
+        <p>
+          Editing {account.role} account: <b>{account.name} </b>({account.email}
+          )
+        </p>
+
+        <button className="btn-secondary" onClick={() => router.push("/admin")}>
+          Back to Accounts
         </button>
       </div>
 
-      {error && <div className="error">{error}</div>}
-      {success && <div className="success">{success}</div>}
+      {error && <p className="error">{error}</p>}
+      {success && <p>{success}</p>}
 
       <form onSubmit={handleSubmit}>
-        {/* Basic Information */}
-        <section>
-          <h2>Basic Information</h2>
-
-          <div className="form-field">
-            <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              disabled
-              title="Email cannot be changed for security reasons"
-            />
-          </div>
-
-          <div className="form-field">
-            <label>Name</label>
+        <div className="form-field">
+          <label>
+            Name
             <input
               type="text"
               name="name"
@@ -319,20 +323,37 @@ export default function EditPage() {
               onChange={handleInputChange}
               required
             />
-          </div>
+          </label>
+        </div>
 
-          <div className="form-field">
-            <label>Phone</label>
+        <div className="form-field">
+          <label>
+            Email
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              disabled
+              title="Email cannot be changed for security reasons"
+            />
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label>
+            Phone
             <input
               type="tel"
               name="phone"
               value={formData.phone}
               onChange={handleInputChange}
             />
-          </div>
+          </label>
+        </div>
 
-          <div className="form-field">
-            <label>Role</label>
+        <div className="form-field">
+          <label>
+            Role
             <select
               name="role"
               value={formData.role}
@@ -342,87 +363,83 @@ export default function EditPage() {
               <option value="company">Company</option>
               <option value="admin">Admin</option>
             </select>
-          </div>
+          </label>
+        </div>
 
-          {/* Password Section */}
-          <div className="form-field">
-            <label>Current Password</label>
-            <div className="password-field">
-              <input type="password" value="••••••••••••" disabled />
-              <button
-                type="button"
-                className="btn-primary"
-                onClick={handleResetPassword}
-                disabled={saving}
-              >
-                Reset Password
-              </button>
-            </div>
-          </div>
+        <div className="form-field">
+          <label>
+            Current Password
+            <input type="password" value="••••••••••••" disabled />
+          </label>
+        </div>
+        <div className="form-field">
+          <label>
+            New Password (Optional)
+            <input
+              type={showPassword ? "text" : "password"}
+              name="newPassword"
+              value={formData.newPassword}
+              onChange={handleInputChange}
+              placeholder="Enter new password to change it"
+              minLength="6"
+            />
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              Toggle
+            </button>
+          </label>
+        </div>
 
+        {formData.newPassword && formData.newPassword.trim() !== "" && (
           <div className="form-field">
-            <label>New Password (Optional)</label>
-            <div className="password-field">
+            <label>
+              Confirm New Password
               <input
                 type={showPassword ? "text" : "password"}
-                name="newPassword"
-                value={formData.newPassword}
+                name="confirmPassword"
+                value={formData.confirmPassword}
                 onChange={handleInputChange}
-                placeholder="Enter new password to change it"
+                placeholder="Confirm new password"
                 minLength="6"
               />
               <button
                 type="button"
-                className="password-toggle"
+                className="btn-secondary"
                 onClick={() => setShowPassword(!showPassword)}
-              ></button>
-            </div>
-            <small>
-              Leave empty to keep current password. Minimum 6 characters.
-            </small>
+              >
+                Toggle
+              </button>
+            </label>
+
+            {formData.confirmPassword &&
+              formData.newPassword !== formData.confirmPassword && (
+                <small className="error">Passwords do not match</small>
+              )}
           </div>
-
-          {formData.newPassword && formData.newPassword.trim() !== "" && (
-            <div className="form-field">
-              <label>Confirm New Password</label>
-              <div className="password-field">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  placeholder="Confirm new password"
-                  minLength="6"
-                />
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                ></button>
-              </div>
-              {formData.confirmPassword &&
-                formData.newPassword !== formData.confirmPassword && (
-                  <small className="error">Passwords do not match</small>
-                )}
-            </div>
-          )}
-        </section>
-
-        {/* Account Statistics */}
-        {account.role === "user" && (
-          <section>
-            <h2>Account Statistics</h2>
-            <div className="stats-grid">
-              <div>Reviews: {account.reviews?.length || 0}</div>
-              <div>Orders: {account.orders?.length || 0}</div>
-            </div>
-          </section>
         )}
 
-        {/* Company Information */}
-        {formData.role === "company" && companyData && (
+        {/* Company Information - Show for all company accounts */}
+        {formData.role === "company" && (
           <section>
             <h2>Company Information</h2>
+            
+            {/* Notice when no company profile exists */}
+            {!companyData && (
+              <div className="info-notice" style={{
+                background: '#f0f8ff',
+                border: '1px solid #b3d9ff',
+                borderRadius: '4px',
+                padding: '12px',
+                marginBottom: '20px',
+                color: '#0066cc'
+              }}>
+                <strong>Notice:</strong> This company account has not created a profile yet. 
+                You can create and manage their company profile below.
+              </div>
+            )}
 
             <div className="form-field">
               <label>Company Name</label>
@@ -480,17 +497,6 @@ export default function EditPage() {
                 name="taxId"
                 value={companyFormData.taxId}
                 onChange={handleCompanyInputChange}
-              />
-            </div>
-
-            <div className="form-field">
-              <label>Hourly Rate (€)</label>
-              <input
-                type="number"
-                name="hourlyRate"
-                value={companyFormData.hourlyRate}
-                onChange={handleCompanyInputChange}
-                min="0"
               />
             </div>
 
@@ -573,14 +579,16 @@ export default function EditPage() {
               </div>
             </div>
 
-            {/* Company Statistics */}
-            <div className="stats-grid">
-              <div>Average Rating: {companyData.averageRating || 0}</div>
-              <div>Reviews Count: {companyData.reviewsCount || 0}</div>
-            </div>
+            {/* Company Statistics - only show if company profile exists */}
+            {companyData && (
+              <div className="stats-grid">
+                <div>Average Rating: {companyData.averageRating || 0}</div>
+                <div>Reviews Count: {companyData.reviewsCount || 0}</div>
+              </div>
+            )}
           </section>
         )}
-
+        
         {/* Form Actions */}
         <div className="form-actions">
           <button

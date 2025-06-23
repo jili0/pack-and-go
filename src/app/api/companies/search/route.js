@@ -45,7 +45,7 @@ export async function POST(request) {
           'serviceAreas.to': { $regex: new RegExp(toCity, 'i') }
         }
       ]
-    }).select('companyName hourlyRate isKisteKlarCertified averageRating reviewsCount serviceAreas logo');
+    }).select('companyName isKisteKlarCertified averageRating reviewsCount serviceAreas logo');
     
     // Für Testzwecke: Wenn keine Unternehmen gefunden wurden, erstelle einige Beispielunternehmen
     // In der Produktionsumgebung sollte dies entfernt werden
@@ -57,7 +57,6 @@ export async function POST(request) {
             {
               _id: '123456789012345678901234',
               companyName: 'Schnell & Sicher Umzüge',
-              hourlyRate: 50,
               isKisteKlarCertified: true,
               averageRating: 4.8,
               reviewsCount: 124,
@@ -69,7 +68,6 @@ export async function POST(request) {
             {
               _id: '123456789012345678901235',
               companyName: 'EasyMove GmbH',
-              hourlyRate: 45,
               isKisteKlarCertified: false,
               averageRating: 4.2,
               reviewsCount: 86,
@@ -81,7 +79,6 @@ export async function POST(request) {
             {
               _id: '123456789012345678901236',
               companyName: 'Premium Transport',
-              hourlyRate: 60,
               isKisteKlarCertified: true,
               averageRating: 4.9,
               reviewsCount: 58,
@@ -93,7 +90,6 @@ export async function POST(request) {
             {
               _id: '123456789012345678901237',
               companyName: 'Stadtumzüge',
-              hourlyRate: 47,
               isKisteKlarCertified: false,
               averageRating: 4.0,
               reviewsCount: 103,
@@ -105,7 +101,6 @@ export async function POST(request) {
             {
               _id: '123456789012345678901238',
               companyName: 'KisteKlar Transporte',
-              hourlyRate: 55,
               isKisteKlarCertified: true,
               averageRating: 4.6,
               reviewsCount: 92,
