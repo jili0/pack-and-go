@@ -1,10 +1,301 @@
-import React from "react";
+"use client";
 
-export default function CompanyOrder() {
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+
+export default function CompanyOrders() {
+  const router = useRouter();
+  const { account, loading: authLoading } = useAuth();
+
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState("all"); // all, pending, confirmed, completed, cancelled
+
+  useEffect(() => {
+    if (!authLoading && (!account || account.role !== "company")) {
+      router.push("/login");
+      return;
+    }
+
+    if (!authLoading && account) {
+      fetchOrders();
+    }
+  }, [account, authLoading, router]);
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/orders");
+      
+      if (!response.ok) {
+        throw new Error("Error loading orders");
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setOrders(result.orders);
+      } else {
+        setError(result.message || "Error loading orders");
+      }
+    } catch (error) {
+      console.error("Error loading orders:", error);
+      setError("Error loading orders. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update the order in the local state
+        setOrders(prevOrders =>
+          prevOrders.map(order =>
+            order._id === orderId ? { ...order, status: newStatus } : order
+          )
+        );
+      } else {
+        alert(result.message || "Error updating order status");
+      }
+    } catch (error) {
+      console.error("Error updating order:", error);
+      alert("Error updating order status. Please try again.");
+    }
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("de-DE", {
+      style: "currency",
+      currency: "EUR",
+    }).format(amount);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "No date";
+    return new Date(dateString).toLocaleDateString("de-DE", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "pending": return "status-pending";
+      case "confirmed": return "status-confirmed";
+      case "completed": return "status-completed";
+      case "cancelled": return "status-cancelled";
+      default: return "";
+    }
+  };
+
+  // Filter orders based on selected filter
+  const filteredOrders = orders.filter(order => {
+    if (filter === "all") return true;
+    return order.status === filter;
+  });
+
+  // Group orders by status for stats
+  const orderStats = {
+    total: orders.length,
+    pending: orders.filter(o => o.status === "pending").length,
+    confirmed: orders.filter(o => o.status === "confirmed").length,
+    completed: orders.filter(o => o.status === "completed").length,
+    cancelled: orders.filter(o => o.status === "cancelled").length,
+  };
+
+  if (authLoading || loading) {
+    return <div className="container"><p>Loading orders...</p></div>;
+  }
+
+  if (error) {
+    return (
+      <div className="container">
+        <div className="error">
+          <h3>Error</h3>
+          <p>{error}</p>
+          <button onClick={fetchOrders} className="btn-primary">
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <h1>Company Dashboard</h1>
-      {/* weitere Inhalte */}
+    <div className="container">
+      {/* Header */}
+      <div className="page-header">
+        <div>
+          <h1>Manage Orders</h1>
+          <p>View and manage all your moving requests</p>
+        </div>
+        <Link href="/company" className="btn-secondary">
+          ← Back to Dashboard
+        </Link>
+      </div>
+
+      {/* Statistics */}
+      <div className="admin-stats">
+        <div>
+          <h3>Total Orders</h3>
+          <p>{orderStats.total}</p>
+        </div>
+        <div>
+          <h3>Pending</h3>
+          <p>{orderStats.pending}</p>
+        </div>
+        <div>
+          <h3>Confirmed</h3>
+          <p>{orderStats.confirmed}</p>
+        </div>
+        <div>
+          <h3>Completed</h3>
+          <p>{orderStats.completed}</p>
+        </div>
+      </div>
+
+      {/* Filter Buttons */}
+      <div className="filter-buttons">
+        <button 
+          className={filter === "all" ? "btn-primary" : "btn-secondary"}
+          onClick={() => setFilter("all")}
+        >
+          All ({orderStats.total})
+        </button>
+        <button 
+          className={filter === "pending" ? "btn-primary" : "btn-secondary"}
+          onClick={() => setFilter("pending")}
+        >
+          Pending ({orderStats.pending})
+        </button>
+        <button 
+          className={filter === "confirmed" ? "btn-primary" : "btn-secondary"}
+          onClick={() => setFilter("confirmed")}
+        >
+          Confirmed ({orderStats.confirmed})
+        </button>
+        <button 
+          className={filter === "completed" ? "btn-primary" : "btn-secondary"}
+          onClick={() => setFilter("completed")}
+        >
+          Completed ({orderStats.completed})
+        </button>
+        <button 
+          className={filter === "cancelled" ? "btn-primary" : "btn-secondary"}
+          onClick={() => setFilter("cancelled")}
+        >
+          Cancelled ({orderStats.cancelled})
+        </button>
+      </div>
+
+      {/* Orders List */}
+      <div className="orders-list">
+        {filteredOrders.length === 0 ? (
+          <div className="empty-state">
+            <h3>No Orders Found</h3>
+            <p>
+              {filter === "all" 
+                ? "You currently have no moving requests." 
+                : `No ${filter} orders found.`
+              }
+            </p>
+          </div>
+        ) : (
+          filteredOrders.map((order) => (
+            <div key={order._id} className="order-card">
+              <div className="order-header">
+                <div>
+                  <h3>Order #{order._id.slice(-6)}</h3>
+                  <span className={`status-badge ${getStatusColor(order.status)}`}>
+                    {order.status.toUpperCase()}
+                  </span>
+                </div>
+                <div className="order-date">
+                  {formatDate(order.createdAt)}
+                </div>
+              </div>
+
+              <div className="order-details">
+                <div className="detail-row">
+                  <strong>Customer:</strong> {order.accountId?.name || "Unknown"}
+                </div>
+                <div className="detail-row">
+                  <strong>Email:</strong> {order.accountId?.email || "N/A"}
+                </div>
+                <div className="detail-row">
+                  <strong>Route:</strong> {order.fromAddress?.city} → {order.toAddress?.city}
+                </div>
+                <div className="detail-row">
+                  <strong>Moving Date:</strong>{" "}
+                  {order.confirmedDate
+                    ? formatDate(order.confirmedDate)
+                    : order.preferredDates?.length > 0
+                    ? `Preferred: ${formatDate(order.preferredDates[0])}`
+                    : "Not specified"}
+                </div>
+                <div className="detail-row">
+                  <strong>Price:</strong> {formatCurrency(order.totalPrice)}
+                </div>
+                {order.rooms && (
+                  <div className="detail-row">
+                    <strong>Rooms:</strong> {order.rooms} room(s)
+                  </div>
+                )}
+              </div>
+
+              <div className="order-actions">
+                {order.status === "pending" && (
+                  <>
+                    <button
+                      onClick={() => updateOrderStatus(order._id, "confirmed")}
+                      className="btn-success"
+                    >
+                      Confirm Order
+                    </button>
+                    <button
+                      onClick={() => updateOrderStatus(order._id, "cancelled")}
+                      className="btn-danger"
+                    >
+                      Decline Order
+                    </button>
+                  </>
+                )}
+                
+                {order.status === "confirmed" && (
+                  <button
+                    onClick={() => updateOrderStatus(order._id, "completed")}
+                    className="btn-success"
+                  >
+                    Mark as Completed
+                  </button>
+                )}
+
+                <Link
+                  href={`/company/orders/${order._id}`}
+                  className="btn-primary"
+                >
+                  View Details
+                </Link>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
