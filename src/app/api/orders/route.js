@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Order from "@/models/Order";
 import Company from "@/models/Company";
+// import User from "@/models/User";
 import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
 import {
@@ -53,8 +54,8 @@ export async function POST(request) {
 
     // Überprüfe, ob die Firma existiert
     // const company = await Company.findById(companyId);
-    const company = await Company.findOne({ _id: companyId });
-
+    const company = await Company.findOne({_id:companyId});
+ 
     if (!company) {
       return NextResponse.json(
         {
@@ -67,12 +68,13 @@ export async function POST(request) {
 
     // Erstelle die Bestellung
     const newOrder = await Order.create({
+      // userId: session.id,
       accountId: session.id,
       companyId,
       fromAddress,
       toAddress,
       // preferredDates,
-      preferredDates: preferredDates.map((date) => new Date(date)), // Convert strings to Dates
+      preferredDates: preferredDates.map(date => new Date(date)), // Convert strings to Dates
       helpersCount,
       estimatedHours,
       totalPrice,
@@ -81,15 +83,21 @@ export async function POST(request) {
     });
 
     // Aktualisiere die Benutzer- und Firmendaten mit der neuen Bestellung
+    // await User.findByIdAndUpdate(session.id, {
+    //   $push: { orders: newOrder._id },
+    // });
     await Account.findByIdAndUpdate(session.id, {
       $push: { orders: newOrder._id },
     });
 
     // Sende Bestätigungsemails
+    // const user = await User.findById(session.id);
     const account = await Account.findById(session.id);
 
     // E-Mail an den Benutzer
     await sendOrderConfirmationEmail({
+      // email: user.email,
+      // name: user.name,
       email: account.email,
       name: account.name,
       orderId: newOrder._id,
@@ -106,6 +114,9 @@ export async function POST(request) {
       companyName: company.companyName,
       orderDetails: {
         id: newOrder._id,
+        // customerName: user.name,
+        // customerEmail: user.email,
+        // customerPhone: user.phone,
         customerName: account.name,
         customerEmail: account.email,
         customerPhone: account.phone,
@@ -153,6 +164,7 @@ export async function GET(request) {
     // Prüfe die Rolle des Benutzers
     if (session.role === "user") {
       // Benutzer sehen nur ihre eigenen Bestellungen
+      // const orders = await Order.find({ userId: session.id })
       const orders = await Order.find({ accountId: session.id })
         .populate("companyId", "companyName")
         .sort({ createdAt: -1 });
@@ -160,6 +172,7 @@ export async function GET(request) {
       return NextResponse.json({ success: true, orders }, { status: 200 });
     } else if (session.role === "company") {
       // Unternehmen sehen nur Bestellungen für ihr Unternehmen
+      // const company = await Company.findOne({ userId: session.id });
       const company = await Company.findOne({ accountId: session.id });
 
       if (!company) {
@@ -170,6 +183,7 @@ export async function GET(request) {
       }
 
       const orders = await Order.find({ companyId: company._id })
+        // .populate("userId", "name email phone")
         .populate("accountId", "name email phone")
         .sort({ createdAt: -1 });
 
@@ -177,6 +191,7 @@ export async function GET(request) {
     } else if (session.role === "admin") {
       // Administratoren sehen alle Bestellungen
       const orders = await Order.find()
+        // .populate("userId", "name email")
         .populate("accountId", "name email")
         .populate("companyId", "companyName")
         .sort({ createdAt: -1 });
