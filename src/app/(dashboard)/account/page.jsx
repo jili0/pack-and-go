@@ -19,7 +19,8 @@ export default function AccountDashboard() {
 
   useEffect(() => {
     if (!loading && !account) {
-      router.push("/login?redirect=/user");
+      // router.push("/login?redirect=/user");
+      router.push("/login?redirect=/account");
     }
   }, [account, loading, router]);
 

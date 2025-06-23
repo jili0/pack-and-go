@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 const protectedPaths = [
-  "/user",
+  // "/user",
+  "/account",
   "/company",
   "/admin",
   "/api/orders",
   "/api/company",
-  "/api/user",
+  // "/api/user",
+  "/api/account",
   "/api/admin",
   "/order/create",
   "/order/confirmation",
@@ -32,7 +34,8 @@ const isProtectedPath = (path) => {
 };
 
 const roleBasedPaths = {
-  "/user": ["user"],
+  // "/user": ["user"],
+  "/account": ["user"],
   "/company": ["company"],
   "/admin": ["admin"],
   "/api/orders": ["user", "company", "admin"],
