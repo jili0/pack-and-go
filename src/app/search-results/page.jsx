@@ -71,7 +71,7 @@ export default function SearchResults() {
   });
 
   const handleContactCustomerService = () => {
-    router.push('/contact');
+    router.push('/#contact');
   };
 
   const handleSortChange = (value) => {

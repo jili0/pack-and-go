@@ -63,8 +63,7 @@ const Header = () => {
                 <div className="dropdown-menu">
                   <Link
                     // href={`/${currentUser.role}`}
-                    // href={`${currentUser.role === "user" ? "/account" : "/company/setup"}`}
-                    href={`${currentUser.role === "user" && "/account" }`}
+                     href={currentUser.role === "user" ? "/account" : "/company"}
                     onClick={() => setDropdownOpen(false)}
                   >
                     Dashboard

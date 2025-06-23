@@ -208,7 +208,7 @@ export default function AccountDashboard() {
               </div>
             </Link>
 
-            <Link href="/account/profile">
+            {/* <Link href="/account/profile">
               <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -228,7 +228,7 @@ export default function AccountDashboard() {
                 <h3>My Profile</h3>
                 <p>Manage personal data</p>
               </div>
-            </Link>
+            </Link> */}
           </div>
         </div>
 
@@ -444,11 +444,11 @@ export default function AccountDashboard() {
 
         {/* Tips & Help */}
         <div>
-          <div>
+          {/* <div>
             <h2>Tips & Help</h2>
-          </div>
+          </div> */}
           <div>
-            <Link href="/tips">
+            {/* <Link href="/tips">
               <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -486,9 +486,9 @@ export default function AccountDashboard() {
                 <h3>Moving Checklist</h3>
                 <p>Step-by-step guide for your move</p>
               </div>
-            </Link>
+            </Link> */}
 
-            <Link href="/contact">
+            <Link href="/#contact">
               <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

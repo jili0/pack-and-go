@@ -67,7 +67,8 @@ const LoginContent = () => {
       const result = await login(formData.email, formData.password);
 
       if (result.success) {
-        router.push(`/${result.account.role}`);
+          // router.push(`/${result.account.role}`);
+          router.push(result.account.role === "user" ? "/account" : "/company");
       } else {
         setLoginError(result.message || "Login failed");
       }
