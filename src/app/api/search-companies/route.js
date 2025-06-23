@@ -30,7 +30,7 @@ export async function POST(request) {
       // Same-city moving: only need to match one city
       console.log('Performing same-city moving search');
       searchQuery = {
-        isVerified: true, // Only show verified companies
+        // isVerified: true, // Only show verified companies
         $or: [
           // Service areas include this city (as from or to)
           {
@@ -53,7 +53,7 @@ export async function POST(request) {
       // Cross-city moving: need to handle moving between two different cities
       console.log('Performing cross-city moving search');
       searchQuery = {
-        isVerified: true, // Only show verified companies
+        // isVerified: true, // Only show verified companies
         $or: [
           // Exact match: service areas explicitly include this route
           {
@@ -135,7 +135,7 @@ export async function POST(request) {
       
       // Relaxed search: any company that serves either city
       const relaxedQuery = {
-        isVerified: true,
+        // isVerified: true,
         'serviceAreas': {
           $elemMatch: {
             $or: [
@@ -229,7 +229,8 @@ export async function POST(request) {
         averageRating: companyObj.averageRating || 0,
         reviewsCount: companyObj.reviewsCount || 0,
         hourlyRate: companyObj.hourlyRate || 25,
-        isVerified: companyObj.isVerified !== false, // Default true unless explicitly false
+        // isVerified: companyObj.isVerified !== false, // Default true unless explicitly false
+        isVerified: companyObj.isVerified || false, // Default true unless explicitly false
         isKisteKlarCertified: companyObj.isKisteKlarCertified || false,
         description: companyObj.description || 'No detailed description available',
         serviceAreas: companyObj.serviceAreas || [],
