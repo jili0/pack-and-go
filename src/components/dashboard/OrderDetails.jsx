@@ -1,9 +1,7 @@
-// src/components/dashboard/OrderDetails.jsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
 import Image from "@/components/ui/Image";
 
 const OrderDetails = ({ orderId }) => {
@@ -34,43 +32,35 @@ const OrderDetails = ({ orderId }) => {
       }
     };
 
-    if (orderId) {
-      fetchOrderDetails();
-    }
+    if (orderId) fetchOrderDetails();
   }, [orderId]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "No date specified";
-
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return new Date(dateString).toLocaleDateString("en-US", options);
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   const getStatusBadge = (status) => {
     const statusMap = {
-      pending: { class: null, text: "Request Sent" },
-      confirmed: { class: null, text: "Confirmed" },
-      declined: { class: null, text: "Declined" },
-      completed: { class: null, text: "Completed" },
-      cancelled: { class: null, text: "Cancelled" },
+      pending: "Request Sent",
+      confirmed: "Confirmed",
+      declined: "Declined",
+      completed: "Completed",
+      cancelled: "Cancelled",
     };
-
-    const statusInfo = statusMap[status] || {
-      class: null,
-      text: status,
-    };
-
-    return <span>{statusInfo.text}</span>;
+    return <span>{statusMap[status] || status}</span>;
   };
 
   const handleCancelOrder = async () => {
     try {
       setLoading(true);
-
       const response = await fetch(`/api/orders/${orderId}`, {
         method: "DELETE",
       });
-
       const data = await response.json();
 
       if (data.success) {
@@ -87,207 +77,168 @@ const OrderDetails = ({ orderId }) => {
     }
   };
 
-  if (loading) {
+  const renderDetailRow = (label, value) => (
+    <div>
+      <strong>{label}:</strong> {value}
+    </div>
+  );
+
+  if (loading)
     return (
-      <div>
-        <div></div>
+      <div className="container">
         <p>Loading order details...</p>
       </div>
     );
-  }
 
-  if (error) {
+  if (error)
     return (
-      <div>
-        <h3>Error</h3>
+      <div className="container">
+        <h3 className="error">Error</h3>
         <p>{error}</p>
-        <button onClick={() => router.push("/account/orders")}>
+        <button
+          className="btn-primary"
+          onClick={() => router.push("/account/orders")}
+        >
           Back to Orders
         </button>
       </div>
     );
-  }
 
-  if (!order || !company) {
+  if (!order || !company)
     return (
-      <div>
+      <div className="container">
         <h3>Order Not Found</h3>
         <p>The requested order could not be found.</p>
-        <button onClick={() => router.push("/account/orders")}>
+        <button
+          className="btn-primary"
+          onClick={() => router.push("/account/orders")}
+        >
           Back to Orders
         </button>
       </div>
     );
-  }
 
   return (
-    <div>
-      <div>
+    <div className="container">
+      <h2>Order Details</h2>
+
+      <div className="moving-details-card">
+        {renderDetailRow("Order ID", order._id)}
         <div>
-          <div>
-            <h2>Order Details</h2>
-            {getStatusBadge(order.status)}
-          </div>
+          {renderDetailRow("Order Date", formatDate(order.createdAt))}
+          <b>Status: </b>
+          {getStatusBadge(order.status)}
         </div>
+      </div>
 
-        <div>
-          {/* Order ID and Date */}
-          <div>
-            <div>
-              <span>Order ID:</span>
-              <span>{order._id}</span>
-            </div>
-            <div>
-              <span>Order Date:</span>
-              <span>{formatDate(order.createdAt)}</span>
-            </div>
+      <div className="order-card">
+        <h3>Moving Company</h3>
+        <div className="company-info">
+          <div className="contact-icon">
+            <span>{company.companyName.charAt(0)}</span>
           </div>
 
-          {/* Moving Company */}
           <div>
-            <h3>Moving Company</h3>
-            <div>
+            <h4>{company.companyName}</h4>
+            <div className="contact-item">
               <div>
-                {company.logo ? (
-                  <Image
-                    src={company.logo}
-                    alt={company.companyName}
-                    width={64}
-                    height={64}
-                  />
-                ) : (
-                  <div>
-                    <span>{company.companyName.charAt(0)}</span>
-                  </div>
-                )}
+                {[...Array(5)].map((_, i) => (
+                  <span key={i}>★</span>
+                ))}
               </div>
-              <div>
-                <h4>{company.companyName}</h4>
-                <div>
-                  <div>
-                    {[...Array(5)].map((_, i) => (
-                      <span
-                        key={i}
-                        className={
-                          i < Math.round(company.averageRating) ? null : null
-                        }
-                      >
-                        ★
-                      </span>
-                    ))}
-                  </div>
-                  <span>
-                    ({company.reviewsCount}{" "}
-                    {company.reviewsCount === 1 ? "review" : "reviews"})
-                  </span>
-                </div>
-                {company.isKisteKlarCertified && <div>KisteKlar Certified</div>}
-              </div>
+              <span>
+                ({company.reviewsCount}{" "}
+                {company.reviewsCount === 1 ? "review" : "reviews"})
+              </span>
             </div>
-          </div>
-
-          {/* Moving Details */}
-          <div>
-            <h3>Moving Details</h3>
-            <div>
-              <div>
-                <h4>From</h4>
-                <p>{order.fromAddress.street}</p>
-                <p>
-                  {order.fromAddress.postalCode} {order.fromAddress.city}
-                </p>
-                <p>{order.fromAddress.country}</p>
-              </div>
-              <div>→</div>
-              <div>
-                <h4>To</h4>
-                <p>{order.toAddress.street}</p>
-                <p>
-                  {order.toAddress.postalCode} {order.toAddress.city}
-                </p>
-                <p>{order.toAddress.country}</p>
-              </div>
-            </div>
-
-            <div>
-              <div>
-                <span>Moving Date:</span>
-                <span>
-                  {order.confirmedDate ? (
-                    formatDate(order.confirmedDate)
-                  ) : (
-                    <>
-                      <span>
-                        Preferred: {formatDate(order.preferredDates[0])}
-                      </span>
-                      <small>(Waiting for confirmation)</small>
-                    </>
-                  )}
-                </span>
-              </div>
-
-              <div>
-                <span>Helpers:</span>
-                <span>{order.helpersCount}</span>
-              </div>
-
-              <div>
-                <span>Estimated Hours:</span>
-                <span>{order.estimatedHours}</span>
-              </div>
-
-              <div>
-                <span>Total Price:</span>
-                <span>{order.totalPrice} €</span>
-              </div>
-            </div>
-
-            {order.notes && (
-              <div>
-                <h4>Additional Notes</h4>
-                <p>{order.notes}</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <div>
-            <button onClick={() => router.back()}>Back</button>
-
-            {order.status === "pending" && (
-              <button onClick={() => setShowCancelModal(true)}>
-                Cancel Order
-              </button>
-            )}
-
-            {order.status === "completed" && !order.review && (
-              <button
-                onClick={() => router.push(`/account/orders/${orderId}/review`)}
-              >
-                Leave Review
-              </button>
-            )}
+            {company.isKisteKlarCertified && <div>KisteKlar Certified</div>}
           </div>
         </div>
       </div>
 
-      {/* Cancel Confirmation Modal */}
-      {showCancelModal && (
-        <div>
+      <div className="moving-details-card">
+        <h3>Moving Details</h3>
+
+        {renderDetailRow(
+          "From",
+          `${order.fromAddress.street}, ${order.fromAddress.postalCode} ${order.fromAddress.city}, ${order.fromAddress.country}`
+        )}
+        {renderDetailRow(
+          "To",
+          `${order.toAddress.street}, ${order.toAddress.postalCode} ${order.toAddress.city}, ${order.toAddress.country}`
+        )}
+        {renderDetailRow(
+          "Moving Date",
+          order.confirmedDate ? (
+            formatDate(order.confirmedDate)
+          ) : (
+            <span>
+              Preferred: {formatDate(order.preferredDates[0])}
+              <small>(Waiting for confirmation)</small>
+            </span>
+          )
+        )}
+
+        <div className="details-inline">
+          <span>
+            <strong>Helpers:</strong> {order.helpersCount}
+          </span>
+          <span>
+            <strong>Estimated Hours:</strong> {order.estimatedHours}
+          </span>
+          <span>
+            <strong>Total Price:</strong> {order.totalPrice} €
+          </span>
+        </div>
+
+        {order.notes && (
           <div>
-            <div>
-              <h3>Cancel Order</h3>
-            </div>
-            <div>
-              <p>Are you sure you want to cancel this order?</p>
-              <p>This action cannot be undone.</p>
-            </div>
-            <div>
-              <button onClick={() => setShowCancelModal(false)}>
+            <h4>Additional Notes</h4>
+            <p>{order.notes}</p>
+          </div>
+        )}
+      </div>
+
+      <div className="form-footer">
+        <button className="btn-primary" onClick={() => router.back()}>
+          Back
+        </button>
+        {order.status === "pending" && (
+          <button
+            className="btn-primary"
+            onClick={() => setShowCancelModal(true)}
+          >
+            Cancel Order
+          </button>
+        )}
+        {order.status === "completed" && !order.review && (
+          <button
+            className="btn-primary"
+            onClick={() => router.push(`/account/orders/${orderId}/review`)}
+          >
+            Leave Review
+          </button>
+        )}
+      </div>
+
+      {showCancelModal && (
+        <div className="modal-overlay">
+          <div className="dropdown-menu">
+            <h3>Cancel Order</h3>
+            <p>Are you sure you want to cancel this order?</p>
+            <p>This action cannot be undone.</p>
+            <div className="form-footer">
+              <button
+                className="btn-secondary"
+                onClick={() => setShowCancelModal(false)}
+              >
                 No, Keep Order
               </button>
-              <button onClick={handleCancelOrder} disabled={loading}>
+              <button
+                className="btn-primary"
+                onClick={handleCancelOrder}
+                disabled={loading}
+              >
                 {loading ? "Cancelling..." : "Yes, Cancel Order"}
               </button>
             </div>
