@@ -220,11 +220,22 @@ export default function CompanyDashboard() {
                   {order.toAddress.city}
                 </p>
                 <p>
-                  <strong>Date:</strong>{" "}
-                  {order.confirmedDate
-                    ? formatDate(order.confirmedDate)
-                    : formatDate(order.preferredDates[0])}
-                </p>
+                   <strong>Date:</strong>{" "}
+                    {order.confirmedDate ? (
+                   <span>Confirmed: {formatDate(order.confirmedDate)}</span>
+                    ) : order.preferredDates?.length > 0 ? (
+                   <span>
+                      Preferred: {order.preferredDates.map((date, index) => (
+                        <span key={index}>
+                        {index > 0 && ", "}
+                        {formatDate(date)}
+                   </span>
+                  ))}
+                  </span>
+                  ) : (
+                 "No date specified"
+                   )}
+</p>
                 <p>
                   <strong>Status:</strong> {order.status}
                 </p>
