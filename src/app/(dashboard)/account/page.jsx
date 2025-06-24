@@ -109,57 +109,51 @@ export default function AccountDashboard() {
 
   return (
     <main className="container">
-      <div>
-        <h1>Hello, {account.name}</h1>
-        <p>Welcome to your personal dashboard</p>
+      <h1>Hello, {account.name}</h1>
+      <p>Welcome to your personal dashboard</p>
+
+      <div className="quick-actions">
+        <a href="/" className="quick-action-link">
+          <svg
+            className="quick-action-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
+            />
+          </svg>
+          <div>
+            <h3>Plan a New Move</h3>
+            <p>Receive offers from moving companies</p>
+          </div>
+        </a>
+        <a href="/account/orders" className="quick-action-link">
+          <svg
+            className="quick-action-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+            />
+          </svg>
+          <div>
+            <h3>My Orders</h3>
+            <p>View all your moves</p>
+          </div>
+        </a>
       </div>
-
-      <section>
-        <h2>Quick Access</h2>
-        <div className="quick-actions">
-          <a href="/" className="quick-action-link">
-            <svg
-              className="quick-action-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
-              />
-            </svg>
-            <div>
-              <h3>Plan a New Move</h3>
-              <p>Receive offers from moving companies</p>
-            </div>
-          </a>
-
-          <a href="/account/orders" className="quick-action-link">
-            <svg
-              className="quick-action-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-              />
-            </svg>
-            <div>
-              <h3>My Orders</h3>
-              <p>View all your moves</p>
-            </div>
-          </a>
-        </div>
-      </section>
 
       {error && (
         <div className="error">
@@ -190,7 +184,11 @@ export default function AccountDashboard() {
         ) : upcomingOrders.length > 0 ? (
           <div>
             {upcomingOrders.slice(0, 3).map((order) => (
-              <div key={order._id} className="order-card">
+              <Link
+                href={`/account/orders/${order._id}`}
+                key={order._id}
+                className="order-card"
+              >
                 <div>
                   <h3>
                     Move from {order.fromAddress.city} to {order.toAddress.city}
@@ -230,8 +228,7 @@ export default function AccountDashboard() {
                     <p>{order.totalPrice} €</p>
                   </div>
                 </div>
-                <Link href={`/account/orders/${order._id}`}>View Details</Link>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (

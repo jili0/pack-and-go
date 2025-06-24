@@ -87,7 +87,7 @@ select,
 button,
 ::placeholder,
 ::-webkit-input-placeholder {
-  font: inherit !important;
+  font: inherit;
 }
 
 input,
@@ -96,7 +96,6 @@ select {
   padding: 5px 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
-  font-size: 1rem;
   margin-block: 0.4rem;
 }
 
@@ -247,12 +246,13 @@ nav {
 
 /* Home */
 main {
-  margin-top: 80px;
+  padding-top: 80px;
+  margin-top: 30px;
   min-height: 50vh;
 }
 
 section {
-  padding-top: clamp(20px, 15vw, 100px);
+  padding-top: clamp(20px, 15vw, 80px);
   padding-bottom: 1rem;
 }
 
@@ -403,6 +403,35 @@ section {
   background: #0056b3;
 }
 
+/* SearchResults */
+.company-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  align-items: baseline;
+  justify-content: center;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.company-card:hover {
+  border-color: #007bff;
+}
+
+.company-info {
+  display: block !important;
+}
+
+.company-rating {
+  color: #ffc107;
+}
+
+.company-certified {
+  color: #28a745;
+}
+
 /* Company Dashboard */
 .verification-warning {
   background: #fff3cd;
@@ -437,13 +466,6 @@ section {
   gap: 0.5rem;
   flex-wrap: wrap;
   margin: 1rem 0;
-}
-
-.service-area-tag {
-  padding: 0.25rem 0.5rem;
-  background: #f8f9fa;
-  border-radius: 4px;
-  font-size: 0.9rem;
 }
 
 /* Footer */
@@ -600,30 +622,58 @@ footer a:hover {
   align-items: center;
   gap: 0.5rem;
 }
+/* OrderDetails */
 
-/* Order Details Page */
-.order-detail {
+.address-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.moving-details-card {
+  display: block;
+  gap: 2px;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  cursor: pointer;
   text-align: left;
-  padding: 1rem 2rem;
 }
 
-.order-detail strong {
-  display: inline-block;
-  min-width: 100px;
-  margin-right: 0.5rem;
+.details-inline {
+  display: flex;
+  gap: 2rem;
+  margin: 1rem 0;
 }
 
-.order-detail input,
-.order-detail textarea {
-  margin-left: 0.5rem;
-  width: 200px;
+.company-info {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
-.order-detail textarea {
-  width: 100%;
-  height: 80px;
-  margin-left: 0;
-  margin-top: 0.5rem;
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
 }
 
 /* Edit Account Page */
@@ -689,11 +739,6 @@ footer a:hover {
 
 .activity-content time {
   color: #666;
-  font-size: 0.9rem;
-}
-
-.support-section {
-  margin-top: 3rem;
 }
 
 /* Media Queries */
