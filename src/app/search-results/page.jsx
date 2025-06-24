@@ -40,7 +40,10 @@ export default function SearchResults() {
         }
 
         setFormData(JSON.parse(savedFormData));
-        setCompanies(JSON.parse(savedResults));
+        const parsedResults = JSON.parse(savedResults);
+        // Handle both old format (direct array) and new format (object with companies property)
+        const companiesArray = parsedResults.companies || parsedResults;
+        setCompanies(Array.isArray(companiesArray) ? companiesArray : []);
       } catch (error) {
         setError(`Search results could not be loaded: ${error.message}`);
       } finally {
@@ -51,7 +54,7 @@ export default function SearchResults() {
     return () => clearTimeout(timer);
   }, [router]);
 
-  const filteredAndSortedCompanies = companies
+  const filteredAndSortedCompanies = (companies || [])
     .filter((company) => {
       if (
         !company.serviceAreas ||
