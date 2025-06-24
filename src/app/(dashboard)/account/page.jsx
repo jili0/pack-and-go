@@ -190,44 +190,46 @@ export default function AccountDashboard() {
         ) : upcomingOrders.length > 0 ? (
           <div>
             {upcomingOrders.slice(0, 3).map((order) => (
-              <div key={order._id} className="order-card">
-                <div>
-                  <h3>
-                    Move from {order.fromAddress.city} to {order.toAddress.city}
-                  </h3>
-                  <StatusBadge status={order.status} />
+              <Link href={`/account/orders/${order._id}`}>
+                <div key={order._id} className="order-card">
+                  <div>
+                    <h3>
+                      Move from {order.fromAddress.city} to{" "}
+                      {order.toAddress.city}
+                    </h3>
+                    <StatusBadge status={order.status} />
+                  </div>
+                  <div>
+                    <div>
+                      <p>Moving Company</p>
+                      <p>{order.companyName}</p>
+                    </div>
+                    <div>
+                      <p>Moving Date</p>
+                      <p>
+                        {order.confirmedDate
+                          ? formatDate(order.confirmedDate)
+                          : order.preferredDates &&
+                              order.preferredDates.length > 0
+                            ? formatDate(order.preferredDates[0]) +
+                              " (not confirmed)"
+                            : "No date set"}
+                      </p>
+                    </div>
+                    <div>
+                      <p>Helpers / Hours</p>
+                      <p>
+                        {order.helpersCount} Helpers / {order.estimatedHours}{" "}
+                        Hours
+                      </p>
+                    </div>
+                    <div>
+                      <p>Price</p>
+                      <p>{order.totalPrice} €</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div>
-                    <p>Moving Company</p>
-                    <p>{order.companyName}</p>
-                  </div>
-                  <div>
-                    <p>Moving Date</p>
-                    <p>
-                      {order.confirmedDate
-                        ? formatDate(order.confirmedDate)
-                        : order.preferredDates &&
-                            order.preferredDates.length > 0
-                          ? formatDate(order.preferredDates[0]) +
-                            " (not confirmed)"
-                          : "No date set"}
-                    </p>
-                  </div>
-                  <div>
-                    <p>Helpers / Hours</p>
-                    <p>
-                      {order.helpersCount} Helpers / {order.estimatedHours}{" "}
-                      Hours
-                    </p>
-                  </div>
-                  <div>
-                    <p>Price</p>
-                    <p>{order.totalPrice} €</p>
-                  </div>
-                </div>
-                <Link href={`/account/orders/${order._id}`}>View Details</Link>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
