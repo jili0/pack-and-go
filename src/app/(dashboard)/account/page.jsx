@@ -205,13 +205,17 @@ export default function AccountDashboard() {
                   <div>
                     <p>Moving Date</p>
                     <p>
-                      {order.confirmedDate
+                      {/* {order.confirmedDate
                         ? formatDate(order.confirmedDate)
                         : order.preferredDates &&
                             order.preferredDates.length > 0
                           ? formatDate(order.preferredDates[0]) +
                             " (not confirmed)"
-                          : "No date set"}
+                          : "No date set"} */}
+                          {order.confirmedDate
+                        ? formatDate(order.confirmedDate)
+                        : order.preferredDates &&
+                            "(waiting for confirmation)"}
                     </p>
                   </div>
                   <div>
@@ -274,7 +278,7 @@ export default function AccountDashboard() {
                   <p>
                     Move from {order.fromAddress.city} to {order.toAddress.city}
                   </p>
-                  <time>{formatDate(order.createdAt)}</time>
+                  <span>Order create: </span><time>{formatDate(order.createdAt)}</time>
                 </div>
                 <Link href={`/account/orders/${order._id}`}>
                   View Order Details
