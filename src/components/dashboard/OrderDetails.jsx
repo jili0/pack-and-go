@@ -120,8 +120,6 @@ const OrderDetails = ({ orderId }) => {
 
   return (
     <div className="container">
-      <h2>Order Details</h2>
-
       <div className="moving-details-card">
         {renderDetailRow("Order ID", order._id)}
         <div>
@@ -223,16 +221,16 @@ const OrderDetails = ({ orderId }) => {
 
       {showCancelModal && (
         <div className="modal-overlay">
-          <div className="dropdown-menu">
+          <div className="modal-content">
             <h3>Cancel Order</h3>
             <p>Are you sure you want to cancel this order?</p>
             <p>This action cannot be undone.</p>
             <div className="form-footer">
               <button
-                className="btn-secondary"
+                className="btn-primary"
                 onClick={() => setShowCancelModal(false)}
               >
-                No, Keep Order
+                No
               </button>
               <button
                 className="btn-primary"

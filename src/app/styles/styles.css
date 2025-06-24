@@ -645,6 +645,16 @@ footer a:hover {
   justify-content: center;
   z-index: 1000;
 }
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+}
+
 /* Edit Account Page */
 
 .edit-header {
