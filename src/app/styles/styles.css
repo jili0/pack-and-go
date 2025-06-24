@@ -253,7 +253,7 @@ main {
 }
 
 section {
-  padding-top: clamp(20px, 15vw, 100px);
+  padding-top: clamp(20px, 15vw, 80px);
   padding-bottom: 1rem;
 }
 
@@ -719,10 +719,6 @@ footer a:hover {
 .activity-content time {
   color: #666;
   font-size: 0.9rem;
-}
-
-.support-section {
-  margin-top: 3rem;
 }
 
 /* Media Queries */

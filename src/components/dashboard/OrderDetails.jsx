@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "@/components/ui/Image";
 
 const OrderDetails = ({ orderId }) => {
   const router = useRouter();
