@@ -49,6 +49,39 @@ export default function CompanyOrders() {
     }
   };
 
+  const confirmOrderWithDate = async (orderId, selectedDate) => {
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          status: "confirmed",
+          confirmedDate: selectedDate
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update the order in the local state
+        setOrders(prevOrders =>
+          prevOrders.map(order =>
+            order._id === orderId 
+              ? { ...order, status: "confirmed", confirmedDate: selectedDate } 
+              : order
+          )
+        );
+      } else {
+        alert(result.message || "Error confirming order with date");
+      }
+    } catch (error) {
+      console.error("Error confirming order:", error);
+      alert("Error confirming order. Please try again.");
+    }
+  };
+
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       const response = await fetch(`/api/orders/${orderId}`, {
@@ -226,7 +259,7 @@ export default function CompanyOrders() {
                   </span>
                 </div>
                 <div className="order-date">
-                  {formatDate(order.createdAt)}
+                  <small>Request created: {formatDate(order.createdAt)}</small>
                 </div>
               </div>
 
@@ -242,11 +275,24 @@ export default function CompanyOrders() {
                 </div>
                 <div className="detail-row">
                   <strong>Moving Date:</strong>{" "}
-                  {order.confirmedDate
-                    ? formatDate(order.confirmedDate)
-                    : order.preferredDates?.length > 0
-                    ? `Preferred: ${formatDate(order.preferredDates[0])}`
-                    : "Not specified"}
+                  {order.confirmedDate ? (
+                    <span className="confirmed-date">
+                      Confirmed: {formatDate(order.confirmedDate)}
+                    </span>
+                  ) : order.preferredDates?.length > 0 ? (
+                    <div className="preferred-dates">
+                      <div>Customer's preferred dates:</div>
+                      <ul>
+                        {order.preferredDates.map((date, index) => (
+                          <li key={index}>
+                            Option {index + 1}: {formatDate(date)}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    "Not specified"
+                  )}
                 </div>
                 <div className="detail-row">
                   <strong>Price:</strong> {formatCurrency(order.totalPrice)}
@@ -273,6 +319,26 @@ export default function CompanyOrders() {
                     >
                       Decline Order
                     </button>
+                    {order.preferredDates?.length > 0 && (
+                      <div className="date-selection">
+                        <label>Select moving date:</label>
+                        <select 
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              confirmOrderWithDate(order._id, e.target.value);
+                            }
+                          }}
+                          defaultValue=""
+                        >
+                          <option value="">Choose date to confirm</option>
+                          {order.preferredDates.map((date, index) => (
+                            <option key={index} value={date}>
+                              {formatDate(date)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
                   </>
                 )}
                 
