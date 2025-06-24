@@ -246,8 +246,8 @@ nav {
 
 /* Home */
 main {
-  margin-top: 80px;
-  padding-top: 30px;
+  padding-top: 80px;
+  margin-top: 30px;
   min-height: 50vh;
 }
 
@@ -423,7 +423,6 @@ section {
 .company-info {
   display: block !important;
 }
-
 
 .company-rating {
   color: #ffc107;
