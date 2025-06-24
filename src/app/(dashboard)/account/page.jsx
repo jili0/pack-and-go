@@ -330,7 +330,7 @@ export default function AccountDashboard() {
                       </div>
                     </div>
                     <div>
-                      <Link href={`/order/${order._id}`}>View Details</Link>
+                      <Link href={`/account/orders/${order._id}`}>View Details</Link>
                     </div>
                   </div>
                 ))}
@@ -412,7 +412,7 @@ export default function AccountDashboard() {
                         <time>{formatDate(order.createdAt)}</time>
                       </div>
                       <div>
-                        <Link href={`/order/${order._id}`}>
+                        <Link href={`/account/orders/${order._id}`}>
                           View Order Details
                         </Link>
                       </div>
