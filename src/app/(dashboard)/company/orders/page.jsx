@@ -13,6 +13,7 @@ export default function CompanyOrders() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all"); // all, pending, confirmed, completed, cancelled
+  const [selectedDates, setSelectedDates] = useState({}); // Store selected dates for each order
 
   useEffect(() => {
     if (!authLoading && (!account || account.role !== "company")) {
@@ -73,6 +74,12 @@ export default function CompanyOrders() {
               : order
           )
         );
+        // Clear the selected date for this order
+        setSelectedDates(prev => {
+          const updated = { ...prev };
+          delete updated[orderId];
+          return updated;
+        });
       } else {
         alert(result.message || "Error confirming order with date");
       }
@@ -107,6 +114,22 @@ export default function CompanyOrders() {
     } catch (error) {
       console.error("Error updating order:", error);
       alert("Error updating order status. Please try again.");
+    }
+  };
+
+  const handleDateSelection = (orderId, selectedDate) => {
+    setSelectedDates(prev => ({
+      ...prev,
+      [orderId]: selectedDate
+    }));
+  };
+
+  const handleConfirmWithDate = (orderId) => {
+    const selectedDate = selectedDates[orderId];
+    if (selectedDate) {
+      confirmOrderWithDate(orderId, selectedDate);
+    } else {
+      alert("Please select a date first");
     }
   };
 
@@ -307,38 +330,44 @@ export default function CompanyOrders() {
               <div className="order-actions">
                 {order.status === "pending" && (
                   <>
-                    <button
-                      onClick={() => updateOrderStatus(order._id, "confirmed")}
-                      className="btn-success"
-                    >
-                      Confirm Order
-                    </button>
+                    {order.preferredDates?.length > 0 ? (
+                      <div className="date-selection-group">
+                        <div className="date-selection">
+                          <label>Select moving date:</label>
+                          <select 
+                            value={selectedDates[order._id] || ""}
+                            onChange={(e) => handleDateSelection(order._id, e.target.value)}
+                          >
+                            <option value="">Choose a date</option>
+                            {order.preferredDates.map((date, index) => (
+                              <option key={index} value={date}>
+                                {formatDate(date)}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <button
+                          onClick={() => handleConfirmWithDate(order._id)}
+                          className="btn-success"
+                          disabled={!selectedDates[order._id]}
+                        >
+                          Confirm with Selected Date
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => updateOrderStatus(order._id, "confirmed")}
+                        className="btn-success"
+                      >
+                        Confirm Order
+                      </button>
+                    )}
                     <button
                       onClick={() => updateOrderStatus(order._id, "cancelled")}
                       className="btn-danger"
                     >
                       Decline Order
                     </button>
-                    {order.preferredDates?.length > 0 && (
-                      <div className="date-selection">
-                        <label>Select moving date:</label>
-                        <select 
-                          onChange={(e) => {
-                            if (e.target.value) {
-                              confirmOrderWithDate(order._id, e.target.value);
-                            }
-                          }}
-                          defaultValue=""
-                        >
-                          <option value="">Choose date to confirm</option>
-                          {order.preferredDates.map((date, index) => (
-                            <option key={index} value={date}>
-                              {formatDate(date)}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
                   </>
                 )}
                 
