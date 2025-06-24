@@ -151,9 +151,10 @@ export async function PUT(request, { params }) {
       updateData.status = status;
     }
 
-    if (confirmedDate) {
-      updateData.confirmedDate = confirmedDate;
-    }
+    
+  if (status === "confirmed" && confirmedDate) {
+  updateData.confirmedDate = confirmedDate;
+  }
 
     if (notes) {
       updateData.notes = notes;
