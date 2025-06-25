@@ -93,9 +93,9 @@ export default function SearchResults() {
     <div className="container">
       <h1>{filteredAndSortedCompanies.length} moving companies found</h1>
       <p>
-        From <b>{formData?.fromAddress?.city || "Start location"}</b> to{" "}
-        <b>{formData?.toAddress?.city || "Destination"}</b>, for{" "}
-        <b>{formData?.estimatedHours || 0}</b> hours with{" "}
+        From <b>{formData?.fromAddress?.city || "Start location"}</b> to&nbsp;
+        <b>{formData?.toAddress?.city || "Destination"}</b>, for&nbsp;
+        <b>{formData?.estimatedHours || 0}</b> hours with&nbsp;
         <b>{formData?.helpersCount || 0}</b> helpers
       </p>
 
@@ -118,7 +118,7 @@ export default function SearchResults() {
           >
             <div className="company-info">
               <strong className="company-name">{company.companyName}</strong>
-              <div className="company-rating">
+              <div className="yellow">
                 {[...Array(5)].map((_, i) => (
                   <span key={i}>★</span>
                 ))}
@@ -127,7 +127,7 @@ export default function SearchResults() {
               </div>
             </div>
 
-            <div className="company-certified">
+            <div className="green">
               {company.isKisteKlarCertified && (
                 <div>
                   <svg

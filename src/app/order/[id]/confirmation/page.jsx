@@ -172,7 +172,7 @@ export default function OrderConfirmation() {
                       ))}
                     </div>
                     <span>
-                      ({company.reviewsCount}{" "}
+                      ({company.reviewsCount}&nbsp;
                       {company.reviewsCount === 1 ? "review" : "reviews"})
                     </span>
                   </div>
@@ -255,7 +255,8 @@ export default function OrderConfirmation() {
               <div>2</div>
               <h3>Preparation</h3>
               <p>
-                Once confirmed, you can prepare for your move. Check out our{" "}
+                Once confirmed, you can prepare for your move. Check out
+                our&nbsp;
                 <Link href="/tips">Tips</Link> for helpful advice.
               </p>
             </div>
@@ -299,7 +300,7 @@ export default function OrderConfirmation() {
           <div>
             <h3>Check Your Email</h3>
             <p>
-              We've sent a confirmation email to{" "}
+              We've sent a confirmation email to&nbsp;
               <strong>{account.email}</strong> with all the details of your
               order.
             </p>

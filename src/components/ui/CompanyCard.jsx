@@ -42,7 +42,7 @@ const CompanyCard = ({ company, onSelect }) => {
               <div>
                 <StarRating rating={company.averageRating} />
                 <span>
-                  ({company.reviewsCount}{" "}
+                  ({company.reviewsCount}&nbsp;
                   {company.reviewsCount === 1 ? "Bewertung" : "Bewertungen"})
                 </span>
               </div>
