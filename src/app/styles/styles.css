@@ -436,7 +436,7 @@ section {
   color: #28a745;
 }
 
-/* AccountDashboard.jsx */
+/* AccountDashboard*/
 .quick-action-link {
   flex: 1;
   min-width: 0;
@@ -458,6 +458,10 @@ section {
   color: inherit;
   align-items: start;
   text-align: left;
+}
+
+.account-order-card div:first-child {
+  margin-bottom: -0.4rem;
 }
 
 /* Company Dashboard */

@@ -204,7 +204,7 @@ export default function CompanySetup() {
       {/* Service areas section */}
       <div className="form-field">
         <label>
-          Service area*{" "}
+          Service area*&nbsp;
           <button
             type="button"
             className="btn-primary"

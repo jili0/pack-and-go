@@ -144,7 +144,7 @@ const OrderDetails = ({ orderId }) => {
                 ))}
               </div>
               <span>
-                ({company.reviewsCount}{" "}
+                ({company.reviewsCount}&nbsp;
                 {company.reviewsCount === 1 ? "review" : "reviews"})
               </span>
             </div>

@@ -202,8 +202,8 @@ const RegisterPage = () => {
                 onChange={handleChange}
                 disabled={isSubmitting}
               />
-              &nbsp; I agree to the <Link href="/terms">Terms of Service</Link>{" "}
-              and <Link href="/privacy">Privacy Policy</Link>.
+              &nbsp; I agree to the <Link href="/terms">Terms of Service</Link>
+              &nbsp; and <Link href="/privacy">Privacy Policy</Link>.
             </label>
             {errors.terms && <p className="error">{errors.terms}</p>}
           </div>

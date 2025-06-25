@@ -179,7 +179,7 @@ export default function CompanyDashboard() {
         <div>
           <h3>{company.companyName}</h3>
           <p>
-            {company.address?.street}, {company.address?.postalCode}{" "}
+            {company.address?.street}, {company.address?.postalCode}&nbsp;
             {company.address?.city}
           </p>
           <p>
@@ -212,30 +212,31 @@ export default function CompanyDashboard() {
             {recentOrders.map((order) => (
               <div key={order._id} className="order-card">
                 <p>
-                  <strong>Customer:</strong>{" "}
+                  <strong>Customer:</strong>&nbsp;
                   {order.accountId?.name || "Unknown"}
                 </p>
                 <p>
-                  <strong>Route:</strong> {order.fromAddress.city} →{" "}
+                  <strong>Route:</strong> {order.fromAddress.city} →&nbsp;
                   {order.toAddress.city}
                 </p>
                 <p>
-                   <strong>Date:</strong>{" "}
-                    {order.confirmedDate ? (
-                   <span>Confirmed: {formatDate(order.confirmedDate)}</span>
-                    ) : order.preferredDates?.length > 0 ? (
-                   <span>
-                      Preferred: {order.preferredDates.map((date, index) => (
+                  <strong>Date:</strong>&nbsp;
+                  {order.confirmedDate ? (
+                    <span>Confirmed: {formatDate(order.confirmedDate)}</span>
+                  ) : order.preferredDates?.length > 0 ? (
+                    <span>
+                      Preferred:{" "}
+                      {order.preferredDates.map((date, index) => (
                         <span key={index}>
-                        {index > 0 && ", "}
-                        {formatDate(date)}
-                   </span>
-                  ))}
-                  </span>
+                          {index > 0 && ", "}
+                          {formatDate(date)}
+                        </span>
+                      ))}
+                    </span>
                   ) : (
-                 "No date specified"
-                   )}
-</p>
+                    "No date specified"
+                  )}
+                </p>
                 <p>
                   <strong>Status:</strong> {order.status}
                 </p>

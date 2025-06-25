@@ -216,14 +216,20 @@ export default function AccountDashboard() {
               >
                 <div>
                   <p>
-                    <strong>From:</strong> {order.fromAddress.city}
-                  </p>
-                  <p>
+                    <strong>From:</strong> {order.fromAddress.city}&nbsp;&nbsp;
                     <strong>To:</strong> {order.toAddress.city}
                   </p>
                   <p>
-                    <strong>Status:</strong>{" "}
+                    <strong>Status:</strong>&nbsp;
                     <StatusBadge status={order.status} />
+                  </p>
+                  <p>
+                    <strong>Moving Date:</strong>&nbsp;
+                    {order.status === "cancelled"
+                      ? "Not applicable"
+                      : order.confirmedDate
+                        ? formatDate(order.confirmedDate)
+                        : "Waiting for confirmation"}
                   </p>
                 </div>
                 <div>
@@ -231,16 +237,7 @@ export default function AccountDashboard() {
                     <strong>Moving Company:</strong> {order.companyName}
                   </p>
                   <p>
-                    <strong>Moving Date:</strong>{" "}
-                    {order.confirmedDate
-                      ? formatDate(order.confirmedDate)
-                      : order.preferredDates?.length > 0
-                        ? formatDate(order.preferredDates[0]) +
-                          " (not confirmed)"
-                        : "No date set"}
-                  </p>
-                  <p>
-                    <strong>Helpers / Hours:</strong> {order.helpersCount}{" "}
+                    <strong>Helpers / Hours:</strong> {order.helpersCount}&nbsp;
                     Helpers / {order.estimatedHours} Hours
                   </p>
                   <p>

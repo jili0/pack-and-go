@@ -45,7 +45,6 @@ const FORM_FIELDS = [
     type: "email",
     placeholder: "contact@company.com",
   },
-
 ];
 
 const INITIAL_FORM_DATA = {
@@ -109,7 +108,7 @@ const FormField = ({ field, value, onChange, errors }) => {
 export default function CompanyProfileEdit() {
   const router = useRouter();
   const { account, loading: authLoading } = useAuth();
-  
+
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState({});
   const [submitMessage, setSubmitMessage] = useState("");
@@ -131,7 +130,7 @@ export default function CompanyProfileEdit() {
     try {
       setLoading(true);
       const response = await fetch("/api/company/me");
-      
+
       if (!response.ok) {
         if (response.status === 404) {
           router.push("/company/setup");
@@ -141,10 +140,10 @@ export default function CompanyProfileEdit() {
       }
 
       const result = await response.json();
-      
+
       if (result.success && result.company) {
         const company = result.company;
-        
+
         // Populate form with existing data
         setFormData({
           companyName: company.companyName || "",
@@ -156,9 +155,10 @@ export default function CompanyProfileEdit() {
           phone: company.phone || "",
           email: company.email || "",
           isKisteKlarCertified: company.isKisteKlarCertified || false,
-          serviceAreas: company.serviceAreas && company.serviceAreas.length > 0 
-            ? company.serviceAreas 
-            : [{ from: "", to: "" }],
+          serviceAreas:
+            company.serviceAreas && company.serviceAreas.length > 0
+              ? company.serviceAreas
+              : [{ from: "", to: "" }],
           businessLicense: null, // Files are not pre-loaded
           kisteKlarCertificate: null,
         });
@@ -210,10 +210,16 @@ export default function CompanyProfileEdit() {
   // Form validation
   const validateForm = () => {
     const newErrors = {};
-    
+
     // Required field validation
-    const requiredFields = ["companyName", "taxId", "street", "city", "postalCode"];
-    requiredFields.forEach(field => {
+    const requiredFields = [
+      "companyName",
+      "taxId",
+      "street",
+      "city",
+      "postalCode",
+    ];
+    requiredFields.forEach((field) => {
       if (!formData[field] || formData[field].trim() === "") {
         newErrors[field] = `${field} is required`;
       }
@@ -221,10 +227,11 @@ export default function CompanyProfileEdit() {
 
     // Service areas validation
     const hasEmptyServiceArea = formData.serviceAreas.some(
-      area => !area.from.trim() || !area.to.trim()
+      (area) => !area.from.trim() || !area.to.trim()
     );
     if (hasEmptyServiceArea) {
-      newErrors.serviceAreas = "All service areas must have both from and to cities";
+      newErrors.serviceAreas =
+        "All service areas must have both from and to cities";
     }
 
     // KisteKlar certificate validation
@@ -310,7 +317,11 @@ export default function CompanyProfileEdit() {
   };
 
   if (authLoading || loading) {
-    return <div className="container"><p>Loading profile...</p></div>;
+    return (
+      <div className="container">
+        <p>Loading profile...</p>
+      </div>
+    );
   }
 
   return (
@@ -340,7 +351,7 @@ export default function CompanyProfileEdit() {
           <h2>Service Areas</h2>
           <div className="form-field">
             <label>
-              Service Areas*{" "}
+              Service Areas*&nbsp;
               <button
                 type="button"
                 className="btn-secondary"
@@ -354,7 +365,9 @@ export default function CompanyProfileEdit() {
                 <input
                   type="text"
                   value={area.from}
-                  onChange={(e) => updateServiceArea(index, "from", e.target.value)}
+                  onChange={(e) =>
+                    updateServiceArea(index, "from", e.target.value)
+                  }
                   placeholder="Starting city"
                   required
                 />
@@ -362,7 +375,9 @@ export default function CompanyProfileEdit() {
                 <input
                   type="text"
                   value={area.to}
-                  onChange={(e) => updateServiceArea(index, "to", e.target.value)}
+                  onChange={(e) =>
+                    updateServiceArea(index, "to", e.target.value)
+                  }
                   placeholder="Destination city"
                   required
                 />
@@ -386,7 +401,7 @@ export default function CompanyProfileEdit() {
         {/* Certification Section */}
         <div className="form-section">
           <h2>Certifications</h2>
-          
+
           {/* KisteKlar certification checkbox */}
           <div className="checkbox-field">
             <input
@@ -443,15 +458,11 @@ export default function CompanyProfileEdit() {
 
         {/* Action Buttons */}
         <div className="form-actions">
-          <button 
-            type="submit" 
-            className="btn-primary"
-            disabled={isSubmitting}
-          >
+          <button type="submit" className="btn-primary" disabled={isSubmitting}>
             {isSubmitting ? "Updating..." : "Update Profile"}
           </button>
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="btn-secondary"
             onClick={handleCancel}
             disabled={isSubmitting}

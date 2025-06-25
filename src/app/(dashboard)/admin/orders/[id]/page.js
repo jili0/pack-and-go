@@ -201,7 +201,7 @@ export default function OrderDetail() {
         )}
 
         <p>
-          <strong>Created:</strong>{" "}
+          <strong>Created:</strong>&nbsp;
           {new Date(order.createdAt).toLocaleDateString("de-DE")}
         </p>
       </div>

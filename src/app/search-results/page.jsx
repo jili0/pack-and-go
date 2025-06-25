@@ -93,9 +93,9 @@ export default function SearchResults() {
     <div className="container">
       <h1>{filteredAndSortedCompanies.length} moving companies found</h1>
       <p>
-        From <b>{formData?.fromAddress?.city || "Start location"}</b> to{" "}
-        <b>{formData?.toAddress?.city || "Destination"}</b>, for{" "}
-        <b>{formData?.estimatedHours || 0}</b> hours with{" "}
+        From <b>{formData?.fromAddress?.city || "Start location"}</b> to&nbsp;
+        <b>{formData?.toAddress?.city || "Destination"}</b>, for&nbsp;
+        <b>{formData?.estimatedHours || 0}</b> hours with&nbsp;
         <b>{formData?.helpersCount || 0}</b> helpers
       </p>
 
