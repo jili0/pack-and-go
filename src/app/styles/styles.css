@@ -5,6 +5,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-padding-top: 80px;
+}
+
 body {
   font-family: system-ui, sans-serif;
   line-height: 1.6;
@@ -252,7 +256,7 @@ main {
 }
 
 section {
-  padding-top: clamp(20px, 15vw, 80px);
+  padding-top: clamp(20px, 8vw, 60px);
   padding-bottom: 1rem;
 }
 
