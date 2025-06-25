@@ -51,7 +51,7 @@ const OrderDetails = ({ orderId }) => {
       completed: "Completed",
       cancelled: "Cancelled",
     };
-    return <span>{statusMap[status] || status}</span>;
+    return statusMap[status] || status;
   };
 
   const handleCancelOrder = async () => {
@@ -77,7 +77,7 @@ const OrderDetails = ({ orderId }) => {
   };
 
   const renderDetailRow = (label, value) => (
-    <div>
+    <div className="order-detail">
       <strong>{label}:</strong> {value}
     </div>
   );
@@ -119,42 +119,25 @@ const OrderDetails = ({ orderId }) => {
 
   return (
     <div className="container">
-      <div className="moving-details-card">
+      <div className="order-details-card">
+        <h2>Order Details</h2>
+
         {renderDetailRow("Order ID", order._id)}
-        <div>
-          {renderDetailRow("Order Date", formatDate(order.createdAt))}
-          <b>Status: </b>
-          {getStatusBadge(order.status)}
-        </div>
-      </div>
+        {renderDetailRow("Order Date", formatDate(order.createdAt))}
+        {renderDetailRow("Status", getStatusBadge(order.status))}
 
-      <div className="order-card">
-        <h3>Moving Company</h3>
-        <div className="company-info">
-          <div className="contact-icon">
-            <span>{company.companyName.charAt(0)}</span>
-          </div>
-
-          <div>
-            <h4>{company.companyName}</h4>
-            <div className="contact-item">
-              <div>
-                {[...Array(5)].map((_, i) => (
-                  <span key={i}>★</span>
-                ))}
-              </div>
-              <span>
-                ({company.reviewsCount}&nbsp;
-                {company.reviewsCount === 1 ? "review" : "reviews"})
-              </span>
-            </div>
-            {company.isKisteKlarCertified && <div>KisteKlar Certified</div>}
-          </div>
-        </div>
-      </div>
-
-      <div className="moving-details-card">
-        <h3>Moving Details</h3>
+        {renderDetailRow(
+          "Moving Company",
+          <p>
+            {company.companyName} •{" "}
+            {[...Array(5)].map((_, i) => (
+              <span key={i}>★</span>
+            ))}{" "}
+            ({company.reviewsCount}{" "}
+            {company.reviewsCount === 1 ? "review" : "reviews"}){" "}
+            {company.isKisteKlarCertified && "• KisteKlar Certified"}
+          </p>
+        )}
 
         {renderDetailRow(
           "From",
@@ -170,30 +153,16 @@ const OrderDetails = ({ orderId }) => {
             formatDate(order.confirmedDate)
           ) : (
             <span>
-              Preferred: {formatDate(order.preferredDates[0])}
+              Preferred: {formatDate(order.preferredDates[0])}{" "}
               <small>(Waiting for confirmation)</small>
             </span>
           )
         )}
+        {renderDetailRow("Helpers", order.helpersCount)}
+        {renderDetailRow("Estimated Hours", order.estimatedHours)}
+        {renderDetailRow("Total Price", `${order.totalPrice} €`)}
 
-        <div className="details-inline">
-          <span>
-            <strong>Helpers:</strong> {order.helpersCount}
-          </span>
-          <span>
-            <strong>Estimated Hours:</strong> {order.estimatedHours}
-          </span>
-          <span>
-            <strong>Total Price:</strong> {order.totalPrice} €
-          </span>
-        </div>
-
-        {order.notes && (
-          <div>
-            <h4>Additional Notes</h4>
-            <p>{order.notes}</p>
-          </div>
-        )}
+        {order.notes && renderDetailRow("Additional Notes", order.notes)}
       </div>
 
       <div className="form-footer">

@@ -651,34 +651,20 @@ footer a:hover {
 }
 /* OrderDetails */
 
-.address-grid {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 1rem;
-  align-items: start;
-}
-
-.moving-details-card {
-  display: block;
-  gap: 2px;
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  border: 1px solid #eee;
-  border-radius: 6px;
-  cursor: pointer;
-  text-align: left;
-}
-
-.details-inline {
+.order-details-card .order-detail {
   display: flex;
-  gap: 2rem;
-  margin: 1rem 0;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.company-info {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
+.order-details-card .order-detail:last-child {
+  border-bottom: none;
+}
+
+.order-details-card .order-detail strong {
+  min-width: 140px;
+  color: #666;
 }
 
 .modal-overlay {
