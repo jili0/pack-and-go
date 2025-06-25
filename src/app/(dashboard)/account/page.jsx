@@ -104,11 +104,31 @@ export default function AccountDashboard() {
       completed: "Completed",
       cancelled: "Cancelled",
     };
-    return <span>{statusMap[status] || status}</span>;
+
+    const getStatusClass = (status) => {
+      switch (status) {
+        case "pending":
+          return "yellow";
+        case "confirmed":
+        case "completed":
+          return "green";
+        case "declined":
+        case "cancelled":
+          return "error";
+        default:
+          return "";
+      }
+    };
+
+    return (
+      <span className={getStatusClass(status)}>
+        {statusMap[status] || status}
+      </span>
+    );
   };
 
   return (
-    <main className="container">
+    <div className="container">
       <h1>Hello, {account.name}</h1>
       <p>Welcome to your personal dashboard</p>
 
@@ -133,7 +153,7 @@ export default function AccountDashboard() {
             <p>Receive offers from moving companies</p>
           </div>
         </a>
-        <a href="/account/orders" className="quick-action-link">
+        <a href="/#contact" className="quick-action-link">
           <svg
             className="quick-action-icon"
             xmlns="http://www.w3.org/2000/svg"
@@ -145,12 +165,12 @@ export default function AccountDashboard() {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
             />
           </svg>
           <div>
-            <h3>My Orders</h3>
-            <p>View all your moves</p>
+            <h3>Need help?</h3>
+            <p>Our team will be happy to help you</p>
           </div>
         </a>
       </div>
@@ -174,10 +194,7 @@ export default function AccountDashboard() {
       )}
 
       <section>
-        <div className="section-header">
-          <h2>Upcoming Moves</h2>
-          <Link href="/account/orders">View All</Link>
-        </div>
+        <h2>View Orders</h2>
 
         {dataLoading ? (
           <p>Loading orders...</p>
@@ -187,42 +204,40 @@ export default function AccountDashboard() {
               <Link
                 href={`/account/orders/${order._id}`}
                 key={order._id}
-                className="order-card"
+                className="account-order-card"
               >
                 <div>
-                  <h3>
-                    Move from {order.fromAddress.city} to {order.toAddress.city}
-                  </h3>
-                  <StatusBadge status={order.status} />
+                  <p>
+                    <strong>From:</strong> {order.fromAddress.city}
+                  </p>
+                  <p>
+                    <strong>To:</strong> {order.toAddress.city}
+                  </p>
+                  <p>
+                    <strong>Status:</strong>{" "}
+                    <StatusBadge status={order.status} />
+                  </p>
                 </div>
                 <div>
-                  <div>
-                    <p>Moving Company</p>
-                    <p>{order.companyName}</p>
-                  </div>
-                  <div>
-                    <p>Moving Date</p>
-                    <p>
-                      {order.confirmedDate
-                        ? formatDate(order.confirmedDate)
-                        : order.preferredDates &&
-                            order.preferredDates.length > 0
-                          ? formatDate(order.preferredDates[0]) +
-                            " (not confirmed)"
-                          : "No date set"}
-                    </p>
-                  </div>
-                  <div>
-                    <p>Helpers / Hours</p>
-                    <p>
-                      {order.helpersCount} Helpers / {order.estimatedHours}{" "}
-                      Hours
-                    </p>
-                  </div>
-                  <div>
-                    <p>Price</p>
-                    <p>{order.totalPrice} €</p>
-                  </div>
+                  <p>
+                    <strong>Moving Company:</strong> {order.companyName}
+                  </p>
+                  <p>
+                    <strong>Moving Date:</strong>{" "}
+                    {order.confirmedDate
+                      ? formatDate(order.confirmedDate)
+                      : order.preferredDates && order.preferredDates.length > 0
+                        ? formatDate(order.preferredDates[0]) +
+                          " (not confirmed)"
+                        : "No date set"}
+                  </p>
+                  <p>
+                    <strong>Helpers / Hours:</strong> {order.helpersCount}{" "}
+                    Helpers / {order.estimatedHours} Hours
+                  </p>
+                  <p>
+                    <strong>Estimated Price:</strong> {order.totalPrice} €
+                  </p>
                 </div>
               </Link>
             ))}
@@ -250,75 +265,6 @@ export default function AccountDashboard() {
           </div>
         )}
       </section>
-
-      <section>
-        <h2>Recent Activities</h2>
-
-        {dataLoading ? (
-          <p>Loading activities...</p>
-        ) : orders.length > 0 ? (
-          <ul className="activity-list">
-            {orders.slice(0, 5).map((order) => (
-              <li key={order._id} className="activity-item">
-                <div className="activity-content">
-                  <h3>
-                    {order.status === "pending" && "Move request sent"}
-                    {order.status === "confirmed" && "Move confirmed"}
-                    {order.status === "declined" && "Move request declined"}
-                    {order.status === "completed" && "Move completed"}
-                    {order.status === "cancelled" && "Move cancelled"}
-                  </h3>
-                  <p>
-                    Move from {order.fromAddress.city} to {order.toAddress.city}
-                  </p>
-                  <time>{formatDate(order.createdAt)}</time>
-                </div>
-                <Link href={`/account/orders/${order._id}`}>
-                  View Order Details
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="empty-state">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <h3>No Activities</h3>
-            <p>There is no activity on your account yet.</p>
-          </div>
-        )}
-      </section>
-
-      <section className="support-section">
-        <a href="/#contact" className="quick-action-link">
-          <svg
-            className="quick-action-icon"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-            />
-          </svg>
-          <p>Do you have any questions? Our team will be happy to help you</p>
-        </a>
-      </section>
-    </main>
+    </div>
   );
 }

@@ -118,7 +118,7 @@ export default function SearchResults() {
           >
             <div className="company-info">
               <strong className="company-name">{company.companyName}</strong>
-              <div className="company-rating">
+              <div className="yellow">
                 {[...Array(5)].map((_, i) => (
                   <span key={i}>★</span>
                 ))}
@@ -127,7 +127,7 @@ export default function SearchResults() {
               </div>
             </div>
 
-            <div className="company-certified">
+            <div className="green">
               {company.isKisteKlarCertified && (
                 <div>
                   <svg

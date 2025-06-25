@@ -428,11 +428,11 @@ section {
   display: block !important;
 }
 
-.company-rating {
+.yellow {
   color: #ffc107;
 }
 
-.company-certified {
+.green {
   color: #28a745;
 }
 
@@ -686,7 +686,6 @@ footer a:hover {
   display: flex;
   justify-content: space-between;
 }
-
 /* AccountDashboard.jsx */
 .quick-actions {
   display: flex;
@@ -743,6 +742,25 @@ footer a:hover {
 
 .activity-content time {
   color: #666;
+}
+
+.account-order-card {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  align-items: start;
+  text-align: left;
+}
+
+.account-order-card:hover {
+  border-color: #007bff;
 }
 
 /* Media Queries */
