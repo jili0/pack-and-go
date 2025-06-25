@@ -2,17 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 
 export default function SearchResults() {
   const router = useRouter();
+  const sessionLoading = useLoading("api", "searchResults");
+
   const [companies, setCompanies] = useState([]);
   const [formData, setFormData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortBy, setSortBy] = useState("rating");
 
   useEffect(() => {
     const timer = setTimeout(() => {
+      sessionLoading.startLoading();
       try {
         const savedFormData = sessionStorage.getItem("movingFormData");
         const savedResults = sessionStorage.getItem("searchResults");
@@ -29,7 +33,7 @@ export default function SearchResults() {
       } catch (error) {
         setError(`Search results could not be loaded: ${error.message}`);
       } finally {
-        setLoading(false);
+        sessionLoading.stopLoading();
       }
     }, 500);
 
@@ -77,9 +81,15 @@ export default function SearchResults() {
     }
   };
 
-  if (loading) return <p>Loading moving companies...</p>;
+  if (sessionLoading.isLoading) {
+    return (
+      <div className="container">
+        <Loader text="Loading moving companies..." />
+      </div>
+    );
+  }
 
-  if (error)
+  if (error) {
     return (
       <div className="container">
         <p className="error">{error}</p>
@@ -88,6 +98,7 @@ export default function SearchResults() {
         </button>
       </div>
     );
+  }
 
   return (
     <div className="container">

@@ -2,15 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 
 const OrderDetails = () => {
   const router = useRouter();
   const params = useParams();
   const orderId = params.id;
 
+  const orderDetailsLoading = useLoading("api", "orderDetails");
+  const cancelLoading = useLoading("api", "cancelOrder");
+
   const [order, setOrder] = useState(null);
   const [company, setCompany] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
 
@@ -18,10 +22,11 @@ const OrderDetails = () => {
     const fetchOrderDetails = async () => {
       if (!orderId) {
         setError("Invalid Order ID");
-        setLoading(false);
+        orderDetailsLoading.stopLoading();
         return;
       }
 
+      orderDetailsLoading.startLoading();
       try {
         const response = await fetch(`/api/orders/${orderId}`);
         const data = await response.json();
@@ -36,7 +41,7 @@ const OrderDetails = () => {
         console.error("Error fetching order details:", error);
         setError("An error occurred. Please try again later.");
       } finally {
-        setLoading(false);
+        orderDetailsLoading.stopLoading();
       }
     };
 
@@ -64,8 +69,8 @@ const OrderDetails = () => {
   };
 
   const handleCancelOrder = async () => {
+    cancelLoading.startLoading();
     try {
-      setLoading(true);
       const response = await fetch(`/api/orders/${orderId}`, {
         method: "DELETE",
       });
@@ -81,7 +86,7 @@ const OrderDetails = () => {
       console.error("Error cancelling order:", error);
       setError("An error occurred. Please try again later.");
     } finally {
-      setLoading(false);
+      cancelLoading.stopLoading();
     }
   };
 
@@ -91,10 +96,10 @@ const OrderDetails = () => {
     </div>
   );
 
-  if (loading) {
+  if (orderDetailsLoading.isLoading) {
     return (
       <div className="container">
-        <p>Loading order details...</p>
+        <Loader text="Loading order details..." />
       </div>
     );
   }
@@ -215,9 +220,11 @@ const OrderDetails = () => {
               <button
                 className="btn-primary"
                 onClick={handleCancelOrder}
-                disabled={loading}
+                disabled={cancelLoading.isLoading}
               >
-                {loading ? "Cancelling..." : "Yes, Cancel Order"}
+                {cancelLoading.isLoading
+                  ? "Cancelling..."
+                  : "Yes, Cancel Order"}
               </button>
             </div>
           </div>

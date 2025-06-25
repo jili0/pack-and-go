@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 
 const STATUS_COLORS = {
   pending: "status-pending",
@@ -23,9 +25,9 @@ const FILTER_OPTIONS = [
 export default function CompanyOrders() {
   const router = useRouter();
   const { account, loading: authLoading } = useAuth();
+  const ordersLoading = useLoading("api", "companyOrders");
 
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
   const [selectedDates, setSelectedDates] = useState({});
@@ -40,8 +42,8 @@ export default function CompanyOrders() {
   }, [account, authLoading, router]);
 
   const fetchOrders = async () => {
+    ordersLoading.startLoading();
     try {
-      setLoading(true);
       const response = await fetch("/api/orders");
 
       if (!response.ok) throw new Error("Error loading orders");
@@ -57,7 +59,7 @@ export default function CompanyOrders() {
       console.error("Error loading orders:", error);
       setError("Error loading orders. Please try again.");
     } finally {
-      setLoading(false);
+      ordersLoading.stopLoading();
     }
   };
 
@@ -78,7 +80,6 @@ export default function CompanyOrders() {
           )
         );
 
-        // Clear selected date if confirming with date
         if (updates.confirmedDate) {
           setSelectedDates((prev) => {
             const updated = { ...prev };
@@ -131,10 +132,10 @@ export default function CompanyOrders() {
     return stats;
   }, {});
 
-  if (authLoading || loading) {
+  if (authLoading || ordersLoading.isLoading) {
     return (
       <div className="container">
-        <p>Loading orders...</p>
+        <Loader text="Loading orders..." />
       </div>
     );
   }
@@ -348,7 +349,6 @@ export default function CompanyOrders() {
 
   return (
     <div className="container">
-      {/* Header */}
       <div className="page-header">
         <div>
           <h1>Manage Orders</h1>
@@ -359,7 +359,6 @@ export default function CompanyOrders() {
         </Link>
       </div>
 
-      {/* Statistics */}
       <div className="admin-stats">
         {[
           { label: "Total Orders", key: "all" },
@@ -374,7 +373,6 @@ export default function CompanyOrders() {
         ))}
       </div>
 
-      {/* Filter Buttons */}
       <div className="filter-buttons">
         {FILTER_OPTIONS.map((option) => (
           <button
@@ -390,7 +388,6 @@ export default function CompanyOrders() {
         ))}
       </div>
 
-      {/* Orders List */}
       <div className="orders-list">
         {filteredOrders.length === 0 ? (
           <div className="empty-state">
@@ -470,7 +467,6 @@ export default function CompanyOrders() {
         )}
       </div>
 
-      {/* Details Modal */}
       {selectedOrder && (
         <Modal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
       )}
