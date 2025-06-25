@@ -436,6 +436,30 @@ section {
   color: #28a745;
 }
 
+/* AccountDashboard.jsx */
+.quick-action-link {
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+}
+
+.quick-action-link:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+
+.account-order-card {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+  text-decoration: none;
+  color: inherit;
+  align-items: start;
+  text-align: left;
+}
+
 /* Company Dashboard */
 .verification-warning {
   background: #fff3cd;
@@ -685,82 +709,6 @@ footer a:hover {
 .edit-header {
   display: flex;
   justify-content: space-between;
-}
-/* AccountDashboard.jsx */
-.quick-actions {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin: 1rem 0;
-}
-
-.quick-action-link {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 1rem;
-  padding: 1.5rem;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.2s;
-}
-
-.quick-action-link div {
-  flex: 1;
-}
-
-.quick-action-link:hover {
-  border-color: #007bff;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
-}
-
-.quick-action-icon {
-  width: 40px;
-  height: 40px;
-  color: #007bff;
-  flex-shrink: 0;
-}
-
-.activity-list {
-  list-style: none;
-  padding: 0;
-}
-
-.activity-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border: 1px solid #eee;
-  border-radius: 6px;
-  margin-bottom: 0.5rem;
-}
-
-.activity-content time {
-  color: #666;
-}
-
-.account-order-card {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 1rem;
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  border: 1px solid #eee;
-  border-radius: 6px;
-  cursor: pointer;
-  text-decoration: none;
-  color: inherit;
-  align-items: start;
-  text-align: left;
-}
-
-.account-order-card:hover {
-  border-color: #007bff;
 }
 
 /* Media Queries */
