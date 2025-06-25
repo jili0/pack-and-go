@@ -445,11 +445,6 @@ section {
   transition: all 0.2s;
 }
 
-.quick-action-link:hover {
-  border-color: #007bff;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
-}
-
 .account-order-card {
   display: grid;
   grid-template-columns: 1fr 2fr;
