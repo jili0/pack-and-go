@@ -85,6 +85,23 @@ button {
   cursor: pointer;
 }
 
+textarea {
+  width: 100%;
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-block: 0.4rem;
+  resize: vertical;
+  min-height: 80px;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
 input,
 textarea,
 select,
@@ -589,8 +606,14 @@ footer a:hover {
   animation: spin 1s linear infinite;
 }
 
-.loader-small { width: 1rem; height: 1rem; }
-.loader-large { width: 3rem; height: 3rem; }
+.loader-small {
+  width: 1rem;
+  height: 1rem;
+}
+.loader-large {
+  width: 3rem;
+  height: 3rem;
+}
 
 .loader-overlay {
   position: fixed;
@@ -603,8 +626,12 @@ footer a:hover {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Admin Dashboard Styles */
@@ -729,7 +756,7 @@ footer a:hover {
   align-items: center;
   gap: 1rem;
   margin: 1rem 0 2rem 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .company-rating {
@@ -746,16 +773,6 @@ footer a:hover {
   font-weight: 500;
 }
 
-.form-row {
-  display: flex;
-  gap: 2rem;
-  margin: 2rem 0;
-}
-
-.form-row .input-field {
-  flex: 1;
-}
-
 .form-actions {
   display: flex;
   justify-content: space-between;
@@ -765,9 +782,11 @@ footer a:hover {
   border-top: 1px solid #eee;
 }
 
-.pricing-info p {
-  margin: 0.25rem 0;
-  text-align: right;
+.horizontal-fields {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 /* Media Queries */

@@ -68,28 +68,40 @@ export default function CreateOrder() {
 
   const AddressInputs = ({ type, address, onChange }) => (
     <>
-      <p>{type === "from" ? "Origin" : "Destination"}</p>
-      <label>Street and Number</label>
-      <input
-        type="text"
-        value={address.street || ""}
-        onChange={(e) => onChange({ ...address, street: e.target.value })}
-        placeholder="Example Street 123"
-      />
-      <label>Postal Code</label>
-      <input
-        type="text"
-        value={address.postalCode || ""}
-        onChange={(e) => onChange({ ...address, postalCode: e.target.value })}
-        placeholder="12345"
-      />
-      <label>City</label>
-      <input
-        type="text"
-        value={address.city || ""}
-        onChange={(e) => onChange({ ...address, city: e.target.value })}
-        placeholder="Berlin"
-      />
+      <p className="section-header">{type === "from" ? "From:" : "To:"}</p>
+      <div className="form-field">
+        <label>
+          Address
+          <input
+            type="text"
+            value={address.street || ""}
+            onChange={(e) => onChange({ ...address, street: e.target.value })}
+            placeholder="Example Street 123"
+          />
+        </label>
+      </div>
+      <div className="form-field">
+        <label>
+          Postal Code
+          <input
+            type="text"
+            value={address.postalCode || ""}
+            onChange={(e) =>
+              onChange({ ...address, postalCode: e.target.value })
+            }
+            placeholder="12345"
+          />
+        </label>
+        <label>
+          City
+          <input
+            type="text"
+            value={address.city || ""}
+            onChange={(e) => onChange({ ...address, city: e.target.value })}
+            placeholder="Berlin"
+          />
+        </label>
+      </div>
     </>
   );
 
@@ -179,20 +191,14 @@ export default function CreateOrder() {
 
   if (authLoading || sessionLoading.isLoading) {
     return (
-      <div className="container">
-        <Loader
-          text={authLoading ? "Authenticating..." : "Loading order details..."}
-        />
-      </div>
+      <Loader
+        text={authLoading ? "Authenticating..." : "Loading order details..."}
+      />
     );
   }
 
   if (!selectedCompany) {
-    return (
-      <div className="container">
-        <p>No company selected. Redirecting...</p>
-      </div>
-    );
+    return <p>No company selected. Redirecting...</p>;
   }
 
   return (
@@ -201,146 +207,111 @@ export default function CreateOrder() {
       {error && <p className="error">{error}</p>}
 
       <div className="company-info">
-        <p>{selectedCompany.companyName}</p>
-        <div className="company-rating">
+        <p>
+          {selectedCompany.companyName} •{" "}
           {[...Array(5)].map((_, i) => (
             <span key={i}>
               {i < Math.round(selectedCompany.averageRating || 0) ? "★" : "☆"}
             </span>
-          ))}
-          <span>
-            ({selectedCompany.reviewsCount || 0}{" "}
-            {selectedCompany.reviewsCount === 1 ? "review" : "reviews"})
-          </span>
-        </div>
-        {selectedCompany.isKisteKlarCertified && (
-          <div className="certified-badge">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              width="20"
-              height="20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-            KisteKlar Certified
-          </div>
-        )}
+          ))}{" "}
+          ({selectedCompany.reviewsCount || 0}{" "}
+          {selectedCompany.reviewsCount === 1 ? "review" : "reviews"})
+          {selectedCompany.isKisteKlarCertified && " • KisteKlar Certified"}
+        </p>
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="form-row">
-          <div className="input-field">
-            <AddressInputs
-              type="from"
-              address={formData.fromAddress}
-              onChange={(addr) =>
-                setFormData((prev) => ({ ...prev, fromAddress: addr }))
-              }
-            />
-          </div>
-          <div className="input-field">
-            <AddressInputs
-              type="to"
-              address={formData.toAddress}
-              onChange={(addr) =>
-                setFormData((prev) => ({ ...prev, toAddress: addr }))
-              }
-            />
-          </div>
-        </div>
+        <AddressInputs
+          type="from"
+          address={formData.fromAddress}
+          onChange={(addr) =>
+            setFormData((prev) => ({ ...prev, fromAddress: addr }))
+          }
+        />
 
-        <div className="form-row">
-          <div className="input-field">
-            <p>Preferred Dates</p>
-            <p>
-              Please select up to three preferred dates for your move. The
-              company will confirm one of these dates.
-            </p>
-            {[0, 1, 2].map((index) => (
-              <div key={index} className="form-field">
-                <label>
-                  {index === 0 ? "Primary Date*" : `Alternative ${index}`}
-                </label>
-                <input
-                  type="date"
-                  value={formData.preferredDates?.[index] || ""}
-                  onChange={(e) => {
-                    const newDates = [
-                      ...(formData.preferredDates || ["", "", ""]),
-                    ];
-                    newDates[index] = e.target.value;
-                    setFormData((prev) => ({
-                      ...prev,
-                      preferredDates: newDates,
-                    }));
-                  }}
-                  min={new Date().toISOString().split("T")[0]}
-                  required={index === 0}
-                />
-              </div>
-            ))}
-          </div>
-          <div className="input-field">
-            <div className="form-field">
-              <label>Additional Notes</label>
-              <textarea
-                value={formData.notes || ""}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, notes: e.target.value }))
-                }
-                placeholder="Add any special instructions or information for the moving company..."
-                rows={8}
-              />
-            </div>
-          </div>
-        </div>
+        <AddressInputs
+          type="to"
+          address={formData.toAddress}
+          onChange={(addr) =>
+            setFormData((prev) => ({ ...prev, toAddress: addr }))
+          }
+        />
 
-        <div className="form-row">
-          <div className="input-field">
-            <div className="form-field">
-              <label>Number of Helpers</label>
+        <p className="section-header">Date Suggestion:</p>
+        <div className="form-field">
+          {[0, 1, 2].map((index) => (
+            <label key={index}>
+              {index === 0 ? "Date 1*" : `Date ${index + 1}`}
               <input
-                value={formData.helpersCount || 2}
-                onChange={(e) =>
+                type="date"
+                value={formData.preferredDates?.[index] || ""}
+                onChange={(e) => {
+                  const newDates = [
+                    ...(formData.preferredDates || ["", "", ""]),
+                  ];
+                  newDates[index] = e.target.value;
                   setFormData((prev) => ({
                     ...prev,
-                    helpersCount: Number(e.target.value),
-                  }))
-                }
-                type="number"
-                min="1"
-                max="100"
-                required
+                    preferredDates: newDates,
+                  }));
+                }}
+                min={new Date().toISOString().split("T")[0]}
+                required={index === 0}
               />
-            </div>
-            <div className="form-field">
-              <label>Estimated Hours</label>
-              <input
-                value={formData.estimatedHours || 4}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    estimatedHours: Number(e.target.value),
-                  }))
-                }
-                type="number"
-                min="1"
-                max="100"
-                required
-              />
-            </div>
-          </div>
-          <div className="input-field pricing-info">
-            <p>Hourly Rate per Helper: 50 €</p>
-            <p>Total Estimated Price: {totalPrice} €</p>
-          </div>
+            </label>
+          ))}
         </div>
+
+        <p className="section-header">Additional Notes</p>
+        <div className="form-field">
+          <textarea
+            value={formData.notes || ""}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, notes: e.target.value }))
+            }
+            placeholder="Add any special instructions or information for the moving company..."
+            rows={8}
+          />
+        </div>
+
+        <div className="form-field">
+          <label>
+            Number of Helpers
+            <input
+              value={formData.helpersCount || 2}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  helpersCount: Number(e.target.value),
+                }))
+              }
+              type="number"
+              min="1"
+              max="100"
+              required
+            />
+          </label>
+          <label>
+            Estimated Hours
+            <input
+              value={formData.estimatedHours || 4}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  estimatedHours: Number(e.target.value),
+                }))
+              }
+              type="number"
+              min="1"
+              max="100"
+              required
+            />
+          </label>
+        </div>
+
+        <p>
+          Hourly Rate per Helper: 50 €. Total Estimated Price: {totalPrice} €
+        </p>
 
         <div className="form-actions">
           <Link href="/search-results" className="btn-primary">
