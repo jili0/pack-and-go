@@ -33,7 +33,6 @@ export default function CompanyOrders() {
     try {
       const response = await fetch("/api/orders");
 
-
       if (!response.ok) {
         throw new Error("Error loading orders");
       }
@@ -121,21 +120,27 @@ export default function CompanyOrders() {
   };
 
   const deleteOrder = async (orderId) => {
-    if (!window.confirm("Are you sure you want to delete this order? This action cannot be undone.")) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this order? This action cannot be undone."
+      )
+    )
+      return;
 
     try {
       const response = await fetch(`/api/orders/${orderId}`, {
         method: "DELETE",
-        cache: 'no-store',
-        headers: { "Content-Type": "application/json",
-          'Cache-Control': 'no-cache'
-         },
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
       });
       const result = await response.json();
 
       if (result.success) {
-        setOrders(prev => prev.filter(order => order._id !== orderId));
-        setSelectedDates(prev => {
+        setOrders((prev) => prev.filter((order) => order._id !== orderId));
+        setSelectedDates((prev) => {
           const updated = { ...prev };
           delete updated[orderId];
           return updated;
@@ -210,10 +215,10 @@ export default function CompanyOrders() {
     cancelled: orders.filter((o) => o.status === "cancelled").length,
   };
 
-  if (authLoading || loading) {
+  if (authLoading || ordersLoading.isLoading) {
     return (
       <div className="container">
-        <p>Loading orders...</p>
+        <Loader text="Loading orders..." />
       </div>
     );
   }
