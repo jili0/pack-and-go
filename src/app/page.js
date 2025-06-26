@@ -4,8 +4,7 @@ import "@/app/styles/styles.css";
 
 export default function Home() {
   return (
-    <main>
-      {/* Hero Section */}
+    <>
       <section id="home" className="hero">
         <div className="container">
           <div className="hero-content">
@@ -192,6 +191,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </main>
+    </>
   );
 }

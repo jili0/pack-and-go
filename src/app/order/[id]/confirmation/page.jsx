@@ -1,32 +1,32 @@
-// src/app/order/[id]/confirmation/page.jsx
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation"; // Add useParams import
+import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 import Link from "next/link";
 import Image from "@/components/ui/Image";
 
 export default function OrderConfirmation() {
-  // Remove { params } from props
-  const params = useParams(); // Use the hook instead
-  const { id } = params; // Extract id from params
+  const params = useParams();
+  const { id } = params;
   const router = useRouter();
   const { account } = useAuth();
+  const orderLoading = useLoading('api', 'orderConfirmation');
 
   const [order, setOrder] = useState(null);
   const [company, setCompany] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!account) {
-      // Redirect to login if not authenticated
       router.push("/login");
       return;
     }
 
     const fetchOrderDetails = async () => {
+      orderLoading.startLoading();
       try {
         const response = await fetch(`/api/orders/${id}`);
         const data = await response.json();
@@ -41,14 +41,13 @@ export default function OrderConfirmation() {
         console.error("Error fetching order details:", error);
         setError("An error occurred. Please try again later.");
       } finally {
-        setLoading(false);
+        orderLoading.stopLoading();
       }
     };
 
     fetchOrderDetails();
   }, [id, account, router]);
 
-  // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return "No date specified";
 
@@ -61,11 +60,10 @@ export default function OrderConfirmation() {
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
 
-  if (loading) {
+  if (orderLoading.isLoading) {
     return (
       <div>
-        <div></div>
-        <p>Loading order details...</p>
+        <Loader text="Loading order details..." />
       </div>
     );
   }
@@ -97,7 +95,6 @@ export default function OrderConfirmation() {
   return (
     <div>
       <div>
-        {/* Success Message */}
         <div>
           <div>
             <svg
@@ -120,7 +117,6 @@ export default function OrderConfirmation() {
           </p>
         </div>
 
-        {/* Order Overview */}
         <div>
           <div>
             <h2>Order Overview</h2>
@@ -138,7 +134,6 @@ export default function OrderConfirmation() {
               </div>
             </div>
 
-            {/* Moving Company */}
             <div>
               <h3>Moving Company</h3>
               <div>
@@ -172,7 +167,7 @@ export default function OrderConfirmation() {
                       ))}
                     </div>
                     <span>
-                      ({company.reviewsCount}{" "}
+                      ({company.reviewsCount}&nbsp;
                       {company.reviewsCount === 1 ? "review" : "reviews"})
                     </span>
                   </div>
@@ -183,7 +178,6 @@ export default function OrderConfirmation() {
               </div>
             </div>
 
-            {/* Moving Details */}
             <div>
               <h3>Moving Details</h3>
               <div>
@@ -238,7 +232,6 @@ export default function OrderConfirmation() {
           </div>
         </div>
 
-        {/* What's Next */}
         <div>
           <h2>What's Next?</h2>
           <div>
@@ -255,7 +248,8 @@ export default function OrderConfirmation() {
               <div>2</div>
               <h3>Preparation</h3>
               <p>
-                Once confirmed, you can prepare for your move. Check out our{" "}
+                Once confirmed, you can prepare for your move. Check out
+                our&nbsp;
                 <Link href="/tips">Tips</Link> for helpful advice.
               </p>
             </div>
@@ -280,7 +274,6 @@ export default function OrderConfirmation() {
           </div>
         </div>
 
-        {/* Email Notification */}
         <div>
           <div>
             <svg
@@ -299,7 +292,7 @@ export default function OrderConfirmation() {
           <div>
             <h3>Check Your Email</h3>
             <p>
-              We've sent a confirmation email to{" "}
+              We've sent a confirmation email to&nbsp;
               <strong>{account.email}</strong> with all the details of your
               order.
             </p>
@@ -307,7 +300,6 @@ export default function OrderConfirmation() {
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div>
           <Link href={`/account/orders/${order._id}`}>View Order Details</Link>
 

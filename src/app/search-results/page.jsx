@@ -2,34 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 
 export default function SearchResults() {
   const router = useRouter();
+  const sessionLoading = useLoading("api", "searchResults");
+
   const [companies, setCompanies] = useState([]);
   const [formData, setFormData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortBy, setSortBy] = useState("rating");
 
-  const CheckIcon = () => (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-      />
-    </svg>
-  );
-
   useEffect(() => {
     const timer = setTimeout(() => {
+      sessionLoading.startLoading();
       try {
         const savedFormData = sessionStorage.getItem("movingFormData");
         const savedResults = sessionStorage.getItem("searchResults");
@@ -41,13 +28,12 @@ export default function SearchResults() {
 
         setFormData(JSON.parse(savedFormData));
         const parsedResults = JSON.parse(savedResults);
-        // Handle both old format (direct array) and new format (object with companies property)
         const companiesArray = parsedResults.companies || parsedResults;
         setCompanies(Array.isArray(companiesArray) ? companiesArray : []);
       } catch (error) {
         setError(`Search results could not be loaded: ${error.message}`);
       } finally {
-        setLoading(false);
+        sessionLoading.stopLoading();
       }
     }, 500);
 
@@ -95,25 +81,32 @@ export default function SearchResults() {
     }
   };
 
-  if (loading) return <p>Loading moving companies...</p>;
-
-  if (error)
+  if (sessionLoading.isLoading) {
     return (
-      <>
-        <p>{error}</p>
+      <div className="container">
+        <Loader text="Loading moving companies..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container">
+        <p className="error">{error}</p>
         <button className="btn-primary" onClick={() => router.push("/")}>
           Back to Home
         </button>
-      </>
+      </div>
     );
+  }
 
   return (
     <div className="container">
       <h1>{filteredAndSortedCompanies.length} moving companies found</h1>
       <p>
-        From <b>{formData?.fromAddress?.city || "Start location"}</b> to{" "}
-        <b>{formData?.toAddress?.city || "Destination"}</b>, for{" "}
-        <b>{formData?.estimatedHours || 0}</b> hours with{" "}
+        From <b>{formData?.fromAddress?.city || "Start location"}</b> to&nbsp;
+        <b>{formData?.toAddress?.city || "Destination"}</b>, for&nbsp;
+        <b>{formData?.estimatedHours || 0}</b> hours with&nbsp;
         <b>{formData?.helpersCount || 0}</b> helpers
       </p>
 
@@ -129,51 +122,61 @@ export default function SearchResults() {
 
       {filteredAndSortedCompanies.length > 0 ? (
         filteredAndSortedCompanies.map((company) => (
-          <div key={company._id}>
-            <h3>{company.companyName}</h3>
-            <div>
-              <span>
+          <div
+            key={company._id}
+            className="company-card"
+            onClick={() => selectCompany(company)}
+          >
+            <div className="company-info">
+              <strong className="company-name">{company.companyName}</strong>
+              <div className="yellow">
                 {[...Array(5)].map((_, i) => (
                   <span key={i}>★</span>
                 ))}
-              </span>
-              <span>
-                ({company.reviewsCount}{" "}
+                &nbsp; ({company.reviewsCount}&nbsp;
                 {company.reviewsCount === 1 ? "review" : "reviews"})
-              </span>
+              </div>
             </div>
-            {company.isKisteKlarCertified && (
-              <div>
-                <CheckIcon /> KisteKlar Certified
-              </div>
-            )}
 
-            {company.serviceAreas?.length > 0 && (
-              <div>
-                <h4>Service Areas</h4>
-                {company.serviceAreas.map((area, index) => (
-                  <span key={index}>
-                    {area.from} → {area.to}
-                  </span>
-                ))}
-              </div>
-            )}
+            <div className="green">
+              {company.isKisteKlarCertified && (
+                <div>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  &nbsp;KisteKlar Certified
+                </div>
+              )}
+            </div>
 
-            <button
-              className="btn-primary"
-              onClick={() => selectCompany(company)}
-            >
-              Select and Create Order
-            </button>
+            <div>
+              <strong>Service Areas</strong>
+              {company.serviceAreas?.map((area, index) => (
+                <div key={index}>
+                  {area.from} → {area.to}
+                </div>
+              ))}
+            </div>
           </div>
         ))
       ) : (
-        <p>
-          No matching moving companies found.
+        <div>
+          <p>No matching moving companies found.</p>
           <button className="btn-primary" onClick={() => router.push("/")}>
             Start New Search
           </button>
-        </p>
+        </div>
       )}
     </div>
   );

@@ -4,16 +4,18 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 
 export default function CompanyOrders() {
   const router = useRouter();
   const { account, loading: authLoading } = useAuth();
+  const ordersLoading = useLoading("api", "companyOrders");
 
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filter, setFilter] = useState("all"); // all, pending, confirmed, completed, cancelled
-  const [selectedDates, setSelectedDates] = useState({}); // Store selected dates for each order
+  const [filter, setFilter] = useState("all");
+  const [selectedDates, setSelectedDates] = useState({});
 
   useEffect(() => {
     if (!authLoading && (!account || account.role !== "company")) {
@@ -27,9 +29,10 @@ export default function CompanyOrders() {
   }, [account, authLoading, router]);
 
   const fetchOrders = async () => {
+    ordersLoading.startLoading();
     try {
-      setLoading(true);
       const response = await fetch("/api/orders");
+
 
       if (!response.ok) {
         throw new Error("Error loading orders");
@@ -46,7 +49,7 @@ export default function CompanyOrders() {
       console.error("Error loading orders:", error);
       setError("Error loading orders. Please try again.");
     } finally {
-      setLoading(false);
+      ordersLoading.stopLoading();
     }
   };
 
@@ -199,7 +202,6 @@ export default function CompanyOrders() {
     return order.status === filter;
   });
 
-  // Group orders by status for stats
   const orderStats = {
     total: orders.length,
     pending: orders.filter((o) => o.status === "pending").length,
@@ -232,7 +234,6 @@ export default function CompanyOrders() {
 
   return (
     <div className="container">
-      {/* Header */}
       <div className="page-header">
         <div>
           <h1>Manage Orders</h1>
@@ -243,7 +244,6 @@ export default function CompanyOrders() {
         </Link>
       </div>
 
-      {/* Statistics */}
       <div className="admin-stats">
         <div>
           <h3>Total Orders</h3>
@@ -263,7 +263,6 @@ export default function CompanyOrders() {
         </div>
       </div>
 
-      {/* Filter Buttons */}
       <div className="filter-buttons">
         <button
           className={filter === "all" ? "btn-primary" : "btn-secondary"}
@@ -297,7 +296,6 @@ export default function CompanyOrders() {
         </button>
       </div>
 
-      {/* Orders List */}
       <div className="orders-list">
         {filteredOrders.length === 0 ? (
           <div className="empty-state">

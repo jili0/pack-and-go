@@ -4,22 +4,30 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 
 const STATUS_COLORS = {
   pending: "status-pending",
-  confirmed: "status-confirmed", 
+  confirmed: "status-confirmed",
   completed: "status-completed",
-  cancelled: "status-cancelled"
+  cancelled: "status-cancelled",
 };
 
-const FILTER_OPTIONS = ["all", "pending", "confirmed", "completed", "cancelled"];
+const FILTER_OPTIONS = [
+  "all",
+  "pending",
+  "confirmed",
+  "completed",
+  "cancelled",
+];
 
 export default function CompanyOrders() {
   const router = useRouter();
   const { account, loading: authLoading } = useAuth();
-  
+  const ordersLoading = useLoading("api", "companyOrders");
+
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
   const [selectedDates, setSelectedDates] = useState({});
@@ -34,14 +42,14 @@ export default function CompanyOrders() {
   }, [account, authLoading, router]);
 
   const fetchOrders = async () => {
+    ordersLoading.startLoading();
     try {
-      setLoading(true);
       const response = await fetch("/api/orders");
-      
+
       if (!response.ok) throw new Error("Error loading orders");
-      
+
       const result = await response.json();
-      
+
       if (result.success) {
         setOrders(result.orders);
       } else {
@@ -51,7 +59,7 @@ export default function CompanyOrders() {
       console.error("Error loading orders:", error);
       setError("Error loading orders. Please try again.");
     } finally {
-      setLoading(false);
+      ordersLoading.stopLoading();
     }
   };
 
@@ -66,13 +74,14 @@ export default function CompanyOrders() {
       const result = await response.json();
 
       if (result.success) {
-        setOrders(prev => prev.map(order =>
-          order._id === orderId ? { ...order, ...updates } : order
-        ));
-        
-        // Clear selected date if confirming with date
+        setOrders((prev) =>
+          prev.map((order) =>
+            order._id === orderId ? { ...order, ...updates } : order
+          )
+        );
+
         if (updates.confirmedDate) {
-          setSelectedDates(prev => {
+          setSelectedDates((prev) => {
             const updated = { ...prev };
             delete updated[orderId];
             return updated;
@@ -96,27 +105,39 @@ export default function CompanyOrders() {
     updateOrder(orderId, { status: "confirmed", confirmedDate: selectedDate });
   };
 
-  const formatCurrency = (amount) => 
-    new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(amount);
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("de-DE", {
+      style: "currency",
+      currency: "EUR",
+    }).format(amount);
 
   const formatDate = (dateString) => {
     if (!dateString) return "No date";
     return new Date(dateString).toLocaleDateString("de-DE", {
-      year: "numeric", month: "long", day: "numeric"
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
-  const filteredOrders = orders.filter(order => 
-    filter === "all" || order.status === filter
+  const filteredOrders = orders.filter(
+    (order) => filter === "all" || order.status === filter
   );
 
   const orderStats = FILTER_OPTIONS.reduce((stats, status) => {
-    stats[status] = status === "all" ? orders.length : orders.filter(o => o.status === status).length;
+    stats[status] =
+      status === "all"
+        ? orders.length
+        : orders.filter((o) => o.status === status).length;
     return stats;
   }, {});
 
-  if (authLoading || loading) {
-    return <div className="container"><p>Loading orders...</p></div>;
+  if (authLoading || ordersLoading.isLoading) {
+    return (
+      <div className="container">
+        <Loader text="Loading orders..." />
+      </div>
+    );
   }
 
   if (error) {
@@ -125,7 +146,9 @@ export default function CompanyOrders() {
         <div className="error">
           <h3>Error</h3>
           <p>{error}</p>
-          <button onClick={fetchOrders} className="btn-primary">Retry</button>
+          <button onClick={fetchOrders} className="btn-primary">
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -139,13 +162,20 @@ export default function CompanyOrders() {
             <div className="date-selection-group">
               <div className="date-selection">
                 <label>Select moving date:</label>
-                <select 
+                <select
                   value={selectedDates[order._id] || ""}
-                  onChange={(e) => setSelectedDates(prev => ({...prev, [order._id]: e.target.value}))}
+                  onChange={(e) =>
+                    setSelectedDates((prev) => ({
+                      ...prev,
+                      [order._id]: e.target.value,
+                    }))
+                  }
                 >
                   <option value="">Choose a date</option>
                   {order.preferredDates.map((date, index) => (
-                    <option key={index} value={date}>{formatDate(date)}</option>
+                    <option key={index} value={date}>
+                      {formatDate(date)}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -174,7 +204,7 @@ export default function CompanyOrders() {
         </>
       );
     }
-    
+
     if (order.status === "confirmed") {
       return (
         <button
@@ -185,62 +215,123 @@ export default function CompanyOrders() {
         </button>
       );
     }
-    
+
     return null;
   };
 
   const Modal = ({ order, onClose }) => (
-    <div 
+    <div
       style={{
-        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
-        alignItems: 'center', justifyContent: 'center', zIndex: 1000
-      }} 
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1000,
+      }}
       onClick={onClose}
     >
-      <div 
+      <div
         style={{
-          backgroundColor: 'white', padding: '20px', borderRadius: '8px',
-          maxWidth: '800px', width: '90%', maxHeight: '90vh', overflowY: 'auto'
-        }} 
+          backgroundColor: "white",
+          padding: "20px",
+          borderRadius: "8px",
+          maxWidth: "800px",
+          width: "90%",
+          maxHeight: "90vh",
+          overflowY: "auto",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
           <h2>Order Details #{order._id.slice(-6)}</h2>
-          <button onClick={onClose} style={{ fontSize: '24px', border: 'none', background: 'none', cursor: 'pointer' }}>×</button>
+          <button
+            onClick={onClose}
+            style={{
+              fontSize: "24px",
+              border: "none",
+              background: "none",
+              cursor: "pointer",
+            }}
+          >
+            ×
+          </button>
         </div>
-        
+
         <div>
           <h3>Customer Information</h3>
-          <p><strong>Name:</strong> {order.accountId?.name || "Unknown"}</p>
-          <p><strong>Email:</strong> {order.accountId?.email || "N/A"}</p>
-          <p><strong>Phone:</strong> {order.accountId?.phone || "N/A"}</p>
-          
+          <p>
+            <strong>Name:</strong> {order.accountId?.name || "Unknown"}
+          </p>
+          <p>
+            <strong>Email:</strong> {order.accountId?.email || "N/A"}
+          </p>
+          <p>
+            <strong>Phone:</strong> {order.accountId?.phone || "N/A"}
+          </p>
+
           <h3>Moving Details</h3>
-          <p><strong>From:</strong> {order.fromAddress?.street}, {order.fromAddress?.city} {order.fromAddress?.postalCode}</p>
-          <p><strong>To:</strong> {order.toAddress?.street}, {order.toAddress?.city} {order.toAddress?.postalCode}</p>
-          
+          <p>
+            <strong>From:</strong> {order.fromAddress?.street},{" "}
+            {order.fromAddress?.city} {order.fromAddress?.postalCode}
+          </p>
+          <p>
+            <strong>To:</strong> {order.toAddress?.street},{" "}
+            {order.toAddress?.city} {order.toAddress?.postalCode}
+          </p>
+
           <h3>Pricing</h3>
-          <p><strong>Total Price:</strong> {formatCurrency(order.totalPrice)}</p>
-          
+          <p>
+            <strong>Total Price:</strong> {formatCurrency(order.totalPrice)}
+          </p>
+
           {order.selectedServices?.length > 0 && (
             <div>
               <strong>Selected Services:</strong>
-              <ul>{order.selectedServices.map((service, index) => <li key={index}>{service}</li>)}</ul>
+              <ul>
+                {order.selectedServices.map((service, index) => (
+                  <li key={index}>{service}</li>
+                ))}
+              </ul>
             </div>
           )}
-          
+
           <h3>Dates & Status</h3>
-          <p><strong>Status:</strong> {order.status.toUpperCase()}</p>
-          <p><strong>Order Created:</strong> {formatDate(order.createdAt)}</p>
-          {order.confirmedDate && <p><strong>Confirmed Date:</strong> {formatDate(order.confirmedDate)}</p>}
+          <p>
+            <strong>Status:</strong> {order.status.toUpperCase()}
+          </p>
+          <p>
+            <strong>Order Created:</strong> {formatDate(order.createdAt)}
+          </p>
+          {order.confirmedDate && (
+            <p>
+              <strong>Confirmed Date:</strong> {formatDate(order.confirmedDate)}
+            </p>
+          )}
           {order.preferredDates?.length > 0 && (
             <div>
-              <p><strong>Customer's Preferred Dates:</strong></p>
-              <ul>{order.preferredDates.map((date, index) => <li key={index}>{formatDate(date)}</li>)}</ul>
+              <p>
+                <strong>Customer's Preferred Dates:</strong>
+              </p>
+              <ul>
+                {order.preferredDates.map((date, index) => (
+                  <li key={index}>{formatDate(date)}</li>
+                ))}
+              </ul>
             </div>
           )}
-          
+
           {order.notes && (
             <div>
               <h3>Notes</h3>
@@ -249,7 +340,7 @@ export default function CompanyOrders() {
           )}
         </div>
 
-        <div style={{ marginTop: '20px', textAlign: 'right' }}>
+        <div style={{ marginTop: "20px", textAlign: "right" }}>
           <button onClick={onClose}>Close</button>
         </div>
       </div>
@@ -258,22 +349,22 @@ export default function CompanyOrders() {
 
   return (
     <div className="container">
-      {/* Header */}
       <div className="page-header">
         <div>
           <h1>Manage Orders</h1>
           <p>View and manage all your moving requests</p>
         </div>
-        <Link href="/company" className="btn-secondary">← Back to Dashboard</Link>
+        <Link href="/company" className="btn-secondary">
+          ← Back to Dashboard
+        </Link>
       </div>
 
-      {/* Statistics */}
       <div className="admin-stats">
         {[
           { label: "Total Orders", key: "all" },
           { label: "Pending", key: "pending" },
           { label: "Confirmed", key: "confirmed" },
-          { label: "Completed", key: "completed" }
+          { label: "Completed", key: "completed" },
         ].map(({ label, key }) => (
           <div key={key}>
             <h3>{label}</h3>
@@ -282,25 +373,30 @@ export default function CompanyOrders() {
         ))}
       </div>
 
-      {/* Filter Buttons */}
       <div className="filter-buttons">
-        {FILTER_OPTIONS.map(option => (
-          <button 
+        {FILTER_OPTIONS.map((option) => (
+          <button
             key={option}
             className={filter === option ? "btn-primary" : "btn-secondary"}
             onClick={() => setFilter(option)}
           >
-            {option === "all" ? "All" : option.charAt(0).toUpperCase() + option.slice(1)} ({orderStats[option]})
+            {option === "all"
+              ? "All"
+              : option.charAt(0).toUpperCase() + option.slice(1)}{" "}
+            ({orderStats[option]})
           </button>
         ))}
       </div>
 
-      {/* Orders List */}
       <div className="orders-list">
         {filteredOrders.length === 0 ? (
           <div className="empty-state">
             <h3>No Orders Found</h3>
-            <p>{filter === "all" ? "You currently have no moving requests." : `No ${filter} orders found.`}</p>
+            <p>
+              {filter === "all"
+                ? "You currently have no moving requests."
+                : `No ${filter} orders found.`}
+            </p>
           </div>
         ) : (
           filteredOrders.map((order) => (
@@ -308,7 +404,9 @@ export default function CompanyOrders() {
               <div className="order-header">
                 <div>
                   <h3>Order #{order._id.slice(-6)}</h3>
-                  <span className={`status-badge ${STATUS_COLORS[order.status]}`}>
+                  <span
+                    className={`status-badge ${STATUS_COLORS[order.status]}`}
+                  >
                     {order.status.toUpperCase()}
                   </span>
                 </div>
@@ -318,30 +416,49 @@ export default function CompanyOrders() {
               </div>
 
               <div className="order-details">
-                <div className="detail-row"><strong>Customer:</strong> {order.accountId?.name || "Unknown"}</div>
-                <div className="detail-row"><strong>Email:</strong> {order.accountId?.email || "N/A"}</div>
-                <div className="detail-row"><strong>Route:</strong> {order.fromAddress?.city} → {order.toAddress?.city}</div>
                 <div className="detail-row">
-                  <strong>Moving Date:</strong>{" "}
+                  <strong>Customer:</strong>{" "}
+                  {order.accountId?.name || "Unknown"}
+                </div>
+                <div className="detail-row">
+                  <strong>Email:</strong> {order.accountId?.email || "N/A"}
+                </div>
+                <div className="detail-row">
+                  <strong>Route:</strong> {order.fromAddress?.city} →{" "}
+                  {order.toAddress?.city}
+                </div>
+                <div className="detail-row">
+                  <strong>Moving Date:</strong>&nbsp;
                   {order.confirmedDate ? (
-                    <span className="confirmed-date">Confirmed: {formatDate(order.confirmedDate)}</span>
+                    <span className="confirmed-date">
+                      Confirmed: {formatDate(order.confirmedDate)}
+                    </span>
                   ) : order.preferredDates?.length > 0 ? (
                     <div className="preferred-dates">
                       <div>Customer's preferred dates:</div>
                       <ul>
                         {order.preferredDates.map((date, index) => (
-                          <li key={index}>Option {index + 1}: {formatDate(date)}</li>
+                          <li key={index}>
+                            Option {index + 1}: {formatDate(date)}
+                          </li>
                         ))}
                       </ul>
                     </div>
-                  ) : "Not specified"}
+                  ) : (
+                    "Not specified"
+                  )}
                 </div>
-                <div className="detail-row"><strong>Price:</strong> {formatCurrency(order.totalPrice)}</div>
+                <div className="detail-row">
+                  <strong>Price:</strong> {formatCurrency(order.totalPrice)}
+                </div>
               </div>
 
               <div className="order-actions">
                 {renderOrderActions(order)}
-                <button onClick={() => setSelectedOrder(order)} className="btn-primary">
+                <button
+                  onClick={() => setSelectedOrder(order)}
+                  className="btn-primary"
+                >
                   View Details
                 </button>
               </div>
@@ -350,8 +467,9 @@ export default function CompanyOrders() {
         )}
       </div>
 
-      {/* Details Modal */}
-      {selectedOrder && <Modal order={selectedOrder} onClose={() => setSelectedOrder(null)} />}
+      {selectedOrder && (
+        <Modal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+      )}
     </div>
   );
 }

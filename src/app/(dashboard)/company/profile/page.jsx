@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 
-// Form field configuration
 const FORM_FIELDS = [
   {
     name: "companyName",
@@ -32,7 +33,6 @@ const FORM_FIELDS = [
     placeholder: "12345",
   },
   { name: "country", label: "Country", placeholder: "Germany" },
-
   {
     name: "phone",
     label: "Phone Number",
@@ -45,7 +45,6 @@ const FORM_FIELDS = [
     type: "email",
     placeholder: "contact@company.com",
   },
-
 ];
 
 const INITIAL_FORM_DATA = {
@@ -63,7 +62,6 @@ const INITIAL_FORM_DATA = {
   kisteKlarCertificate: null,
 };
 
-// Extracted FormField component
 const FormField = ({ field, value, onChange, errors }) => {
   const {
     name,
@@ -109,12 +107,12 @@ const FormField = ({ field, value, onChange, errors }) => {
 export default function CompanyProfileEdit() {
   const router = useRouter();
   const { account, loading: authLoading } = useAuth();
-  
+  const profileLoading = useLoading("api", "companyProfile");
+  const submitLoading = useLoading("api", "submitProfile");
+
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState({});
   const [submitMessage, setSubmitMessage] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!authLoading && (!account || account.role !== "company")) {
@@ -128,10 +126,10 @@ export default function CompanyProfileEdit() {
   }, [account, authLoading, router]);
 
   const fetchCompanyProfile = async () => {
+    profileLoading.startLoading();
     try {
-      setLoading(true);
       const response = await fetch("/api/company/me");
-      
+
       if (!response.ok) {
         if (response.status === 404) {
           router.push("/company/setup");
@@ -141,11 +139,10 @@ export default function CompanyProfileEdit() {
       }
 
       const result = await response.json();
-      
+
       if (result.success && result.company) {
         const company = result.company;
-        
-        // Populate form with existing data
+
         setFormData({
           companyName: company.companyName || "",
           taxId: company.taxId || "",
@@ -156,10 +153,11 @@ export default function CompanyProfileEdit() {
           phone: company.phone || "",
           email: company.email || "",
           isKisteKlarCertified: company.isKisteKlarCertified || false,
-          serviceAreas: company.serviceAreas && company.serviceAreas.length > 0 
-            ? company.serviceAreas 
-            : [{ from: "", to: "" }],
-          businessLicense: null, // Files are not pre-loaded
+          serviceAreas:
+            company.serviceAreas && company.serviceAreas.length > 0
+              ? company.serviceAreas
+              : [{ from: "", to: "" }],
+          businessLicense: null,
           kisteKlarCertificate: null,
         });
       }
@@ -167,20 +165,17 @@ export default function CompanyProfileEdit() {
       console.error("Error loading company profile:", error);
       setSubmitMessage("Error loading company profile.");
     } finally {
-      setLoading(false);
+      profileLoading.stopLoading();
     }
   };
 
-  // Generic input handler
   const handleInputChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
-  // Service area handlers
   const updateServiceArea = (index, field, value) => {
     const updatedAreas = formData.serviceAreas.map((area, i) =>
       i === index ? { ...area, [field]: value } : area
@@ -202,42 +197,38 @@ export default function CompanyProfileEdit() {
     }
   };
 
-  // File upload handler
   const handleFileUpload = (name, file) => {
     setFormData((prev) => ({ ...prev, [name]: file }));
   };
 
-  // Form validation
   const validateForm = () => {
     const newErrors = {};
-    
-    // Required field validation
-    const requiredFields = ["companyName", "taxId", "street", "city", "postalCode"];
-    requiredFields.forEach(field => {
+
+    const requiredFields = [
+      "companyName",
+      "taxId",
+      "street",
+      "city",
+      "postalCode",
+    ];
+    requiredFields.forEach((field) => {
       if (!formData[field] || formData[field].trim() === "") {
         newErrors[field] = `${field} is required`;
       }
     });
 
-    // Service areas validation
     const hasEmptyServiceArea = formData.serviceAreas.some(
-      area => !area.from.trim() || !area.to.trim()
+      (area) => !area.from.trim() || !area.to.trim()
     );
     if (hasEmptyServiceArea) {
-      newErrors.serviceAreas = "All service areas must have both from and to cities";
-    }
-
-    // KisteKlar certificate validation
-    if (formData.isKisteKlarCertified && !formData.kisteKlarCertificate) {
-      // Only require certificate if not already uploaded (this is an update)
-      // In a real scenario, you'd check if certificate already exists
+      newErrors.serviceAreas =
+        "All service areas must have both from and to cities";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Create FormData for submission
   const createSubmissionData = () => {
     const data = new FormData();
 
@@ -249,7 +240,6 @@ export default function CompanyProfileEdit() {
       } else if (key === "isKisteKlarCertified") {
         data.append(key, value.toString());
       } else if (key === "businessLicense" || key === "kisteKlarCertificate") {
-        // Only append files if they're actually selected
         if (value instanceof File) {
           data.append(key, value);
         }
@@ -269,7 +259,7 @@ export default function CompanyProfileEdit() {
       return;
     }
 
-    setIsSubmitting(true);
+    submitLoading.startLoading();
     setSubmitMessage("");
 
     try {
@@ -283,7 +273,6 @@ export default function CompanyProfileEdit() {
       if (result.success) {
         setSubmitMessage("Company profile updated successfully!");
         setErrors({});
-        // Optionally redirect back to dashboard
         setTimeout(() => {
           router.push("/company");
         }, 2000);
@@ -301,7 +290,7 @@ export default function CompanyProfileEdit() {
       console.error("Error updating profile:", error);
       setSubmitMessage("Server error. Please try again later.");
     } finally {
-      setIsSubmitting(false);
+      submitLoading.stopLoading();
     }
   };
 
@@ -309,8 +298,12 @@ export default function CompanyProfileEdit() {
     router.push("/company");
   };
 
-  if (authLoading || loading) {
-    return <div className="container"><p>Loading profile...</p></div>;
+  if (authLoading || profileLoading.isLoading) {
+    return (
+      <div className="container">
+        <Loader text="Loading profile..." />
+      </div>
+    );
   }
 
   return (
@@ -321,7 +314,6 @@ export default function CompanyProfileEdit() {
       </div>
 
       <form onSubmit={handleSubmit} encType="multipart/form-data">
-        {/* Basic Company Information */}
         <div className="form-section">
           <h2>Company Information</h2>
           {FORM_FIELDS.map((field) => (
@@ -335,12 +327,11 @@ export default function CompanyProfileEdit() {
           ))}
         </div>
 
-        {/* Service Areas Section */}
         <div className="form-section">
           <h2>Service Areas</h2>
           <div className="form-field">
             <label>
-              Service Areas*{" "}
+              Service Areas*&nbsp;
               <button
                 type="button"
                 className="btn-secondary"
@@ -354,7 +345,9 @@ export default function CompanyProfileEdit() {
                 <input
                   type="text"
                   value={area.from}
-                  onChange={(e) => updateServiceArea(index, "from", e.target.value)}
+                  onChange={(e) =>
+                    updateServiceArea(index, "from", e.target.value)
+                  }
                   placeholder="Starting city"
                   required
                 />
@@ -362,7 +355,9 @@ export default function CompanyProfileEdit() {
                 <input
                   type="text"
                   value={area.to}
-                  onChange={(e) => updateServiceArea(index, "to", e.target.value)}
+                  onChange={(e) =>
+                    updateServiceArea(index, "to", e.target.value)
+                  }
                   placeholder="Destination city"
                   required
                 />
@@ -383,11 +378,9 @@ export default function CompanyProfileEdit() {
           </div>
         </div>
 
-        {/* Certification Section */}
         <div className="form-section">
           <h2>Certifications</h2>
-          
-          {/* KisteKlar certification checkbox */}
+
           <div className="checkbox-field">
             <input
               type="checkbox"
@@ -400,7 +393,6 @@ export default function CompanyProfileEdit() {
             <label>KisteKlar Certified Company</label>
           </div>
 
-          {/* File upload fields */}
           <div className="form-field">
             <label>
               Business License (Upload new file to replace current)
@@ -441,20 +433,19 @@ export default function CompanyProfileEdit() {
           )}
         </div>
 
-        {/* Action Buttons */}
         <div className="form-actions">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn-primary"
-            disabled={isSubmitting}
+            disabled={submitLoading.isLoading}
           >
-            {isSubmitting ? "Updating..." : "Update Profile"}
+            {submitLoading.isLoading ? "Updating..." : "Update Profile"}
           </button>
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="btn-secondary"
             onClick={handleCancel}
-            disabled={isSubmitting}
+            disabled={submitLoading.isLoading}
           >
             Cancel
           </button>
