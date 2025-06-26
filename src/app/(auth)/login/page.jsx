@@ -82,7 +82,7 @@ const LoginContent = () => {
   return (
     <div className="container">
       {loginError && (
-        <div>
+        <>
           <div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +101,7 @@ const LoginContent = () => {
             </svg>
           </div>
           <p>{loginError}</p>
-        </div>
+        </>
       )}
 
       <form onSubmit={handleSubmit}>
