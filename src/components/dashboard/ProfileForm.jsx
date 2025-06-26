@@ -1,13 +1,16 @@
-// src/components/dashboard/ProfileForm.jsx (continued)
 "use client";
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/context/AuthContext";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 
 const ProfileForm = () => {
   const { account, loading: authLoading } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const updateLoading = useLoading('api', 'updateProfile');
+  const deleteLoading = useLoading('api', 'deleteProfile');
+
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -29,7 +32,6 @@ const ProfileForm = () => {
     },
   });
 
-  // Set form values when account data is available
   useEffect(() => {
     if (account) {
       setValue("name", account.name || "");
@@ -39,22 +41,20 @@ const ProfileForm = () => {
   }, [account, setValue]);
 
   const onSubmit = async (data) => {
-    setLoading(true);
+    updateLoading.startLoading();
     setSuccess(false);
     setError(null);
 
     try {
-      // Only include password fields if the account is trying to change password
       const payload = {
         name: data.name,
         phone: data.phone,
       };
 
-      // Only include password fields if current password is provided
       if (data.currentPassword) {
         if (data.newPassword !== data.confirmPassword) {
           setError("New passwords do not match");
-          setLoading(false);
+          updateLoading.stopLoading();
           return;
         }
 
@@ -75,7 +75,6 @@ const ProfileForm = () => {
       if (result.success) {
         setSuccess(true);
 
-        // Clear password fields
         setValue("currentPassword", "");
         setValue("newPassword", "");
         setValue("confirmPassword", "");
@@ -86,12 +85,12 @@ const ProfileForm = () => {
       console.error("Error updating profile:", err);
       setError("An error occurred. Please try again later.");
     } finally {
-      setLoading(false);
+      updateLoading.stopLoading();
     }
   };
 
   const handleDeleteAccount = async () => {
-    setLoading(true);
+    deleteLoading.startLoading();
 
     try {
       const response = await fetch("/api/auth/delete", {
@@ -111,7 +110,7 @@ const ProfileForm = () => {
       setError("An error occurred. Please try again later.");
       setShowDeleteModal(false);
     } finally {
-      setLoading(false);
+      deleteLoading.stopLoading();
     }
   };
 
@@ -122,8 +121,7 @@ const ProfileForm = () => {
   if (authLoading) {
     return (
       <div>
-        <div></div>
-        <p>Loading profile data...</p>
+        <Loader text="Loading profile data..." />
       </div>
     );
   }
@@ -249,8 +247,8 @@ const ProfileForm = () => {
             </div>
 
             <div>
-              <button type="submit" disabled={loading}>
-                {loading ? "Saving..." : "Save Changes"}
+              <button type="submit" disabled={updateLoading.isLoading}>
+                {updateLoading.isLoading ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </form>
@@ -270,7 +268,6 @@ const ProfileForm = () => {
         </div>
       </div>
 
-      {/* Delete Account Confirmation Modal */}
       {showDeleteModal && (
         <div>
           <div>
@@ -286,8 +283,8 @@ const ProfileForm = () => {
             </div>
             <div>
               <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
-              <button onClick={handleDeleteAccount} disabled={loading}>
-                {loading ? "Deleting..." : "Delete Account"}
+              <button onClick={handleDeleteAccount} disabled={deleteLoading.isLoading}>
+                {deleteLoading.isLoading ? "Deleting..." : "Delete Account"}
               </button>
             </div>
           </div>

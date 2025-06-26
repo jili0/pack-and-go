@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLoading } from "@/context/LoadingContext";
 import "@/app/styles/styles.css";
 
 export default function SearchForm() {
   const [fromLocation, setFromLocation] = useState("");
   const [toLocation, setToLocation] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchLoading = useLoading("api", "searchCompanies");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,28 +19,26 @@ export default function SearchForm() {
       return;
     }
 
-    setLoading(true);
+    searchLoading.startLoading();
 
     try {
-      // Create form data with default values
       const formData = {
         fromAddress: {
           city: fromLocation.trim(),
-          postalCode: "00000", // Default postal code
+          postalCode: "00000",
           street: "Address not specified",
         },
         toAddress: {
           city: toLocation.trim(),
-          postalCode: "00000", // Default postal code
+          postalCode: "00000",
           street: "Address not specified",
         },
-        moveDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-        estimatedHours: 4, // Default 4 hours
-        helpersCount: 2, // Default 2 helpers
-        additionalServices: [], // Empty by default
+        moveDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        estimatedHours: 4,
+        helpersCount: 2,
+        additionalServices: [],
       };
 
-      // Search for companies based on locations
       const response = await fetch("/api/search-companies", {
         method: "POST",
         headers: {
@@ -57,17 +56,15 @@ export default function SearchForm() {
 
       const companies = await response.json();
 
-      // Save to session storage
       sessionStorage.setItem("movingFormData", JSON.stringify(formData));
       sessionStorage.setItem("searchResults", JSON.stringify(companies));
 
-      // Navigate to search results
       router.push("/search-results");
     } catch (error) {
       console.error("Search failed:", error);
       alert("Search failed. Please try again.");
     } finally {
-      setLoading(false);
+      searchLoading.stopLoading();
     }
   };
 
@@ -84,7 +81,7 @@ export default function SearchForm() {
               onChange={(e) => setFromLocation(e.target.value)}
               placeholder="Your current city"
               required
-              disabled={loading}
+              disabled={searchLoading.isLoading}
             />
           </div>
 
@@ -114,13 +111,17 @@ export default function SearchForm() {
               onChange={(e) => setToLocation(e.target.value)}
               placeholder="Your destination city"
               required
-              disabled={loading}
+              disabled={searchLoading.isLoading}
             />
           </div>
         </div>
 
-        <button type="submit" disabled={loading} className="btn-primary">
-          {loading ? "Searching..." : "Find companies"}
+        <button
+          type="submit"
+          disabled={searchLoading.isLoading}
+          className="btn-primary"
+        >
+          {searchLoading.isLoading ? "Searching..." : "Find companies"}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"

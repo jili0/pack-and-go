@@ -2,14 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 import "@/app/styles/styles.css";
 
 export default function EditPage() {
   const params = useParams();
   const router = useRouter();
   const accountId = params.id;
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+
+  const accountLoading = useLoading("api", "account");
+  const saveLoading = useLoading("api", "save");
+  const resetPasswordLoading = useLoading("api", "resetPassword");
+
   const [account, setAccount] = useState(null);
   const [companyData, setCompanyData] = useState(null);
   const [error, setError] = useState("");
@@ -41,8 +46,8 @@ export default function EditPage() {
   }, [accountId]);
 
   const fetchAccountData = async () => {
+    accountLoading.startLoading();
     try {
-      setLoading(true);
       const response = await fetch(`/api/admin/accounts/${accountId}`);
 
       if (!response.ok) {
@@ -62,10 +67,8 @@ export default function EditPage() {
         role: accountData.role || "user",
       }));
 
-      // Handle company data - always initialize companyFormData for company accounts
       if (accountData.role === "company") {
         if (companyDetails) {
-          // Company profile exists - populate with existing data
           setCompanyData(companyDetails);
           setCompanyFormData({
             companyName: companyDetails.companyName || "",
@@ -82,7 +85,6 @@ export default function EditPage() {
           });
           setServiceAreas(companyDetails.serviceAreas || []);
         } else {
-          // No company profile exists - initialize with empty data
           setCompanyData(null);
           setCompanyFormData({
             companyName: "",
@@ -98,7 +100,7 @@ export default function EditPage() {
     } catch (err) {
       setError("Failed to load account data: " + err.message);
     } finally {
-      setLoading(false);
+      accountLoading.stopLoading();
     }
   };
 
@@ -147,8 +149,8 @@ export default function EditPage() {
   };
 
   const handleResetPassword = async () => {
+    resetPasswordLoading.startLoading();
     try {
-      setSaving(true);
       setError("");
       setSuccess("");
 
@@ -173,7 +175,7 @@ export default function EditPage() {
     } catch (err) {
       setError("Failed to reset password: " + err.message);
     } finally {
-      setSaving(false);
+      resetPasswordLoading.stopLoading();
     }
   };
 
@@ -181,10 +183,9 @@ export default function EditPage() {
     e.preventDefault();
     setError("");
     setSuccess("");
-    setSaving(true);
+    saveLoading.startLoading();
 
     try {
-      // Validate password if provided
       if (formData.newPassword && formData.newPassword.trim() !== "") {
         if (formData.newPassword.length < 6) {
           setError("New password must be at least 6 characters long");
@@ -196,7 +197,6 @@ export default function EditPage() {
         }
       }
 
-      // Update account profile
       const response = await fetch(`/api/admin/accounts/${accountId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -209,7 +209,6 @@ export default function EditPage() {
 
       if (!response.ok) throw new Error("Failed to update account profile");
 
-      // Update password if provided
       if (formData.newPassword && formData.newPassword.trim() !== "") {
         const passwordResponse = await fetch(
           `/api/admin/accounts/${accountId}`,
@@ -226,7 +225,6 @@ export default function EditPage() {
         if (!passwordResponse.ok) throw new Error("Failed to update password");
       }
 
-      // Update role if changed
       if (formData.role !== account.role) {
         const roleResponse = await fetch(`/api/admin/accounts/${accountId}`, {
           method: "PATCH",
@@ -240,10 +238,8 @@ export default function EditPage() {
         if (!roleResponse.ok) throw new Error("Failed to update account role");
       }
 
-      // Handle company data - create or update
       if (formData.role === "company") {
         if (companyData && companyData._id) {
-          // Update existing company profile
           const companyResponse = await fetch(
             `/api/admin/companies/${companyData._id}`,
             {
@@ -256,14 +252,13 @@ export default function EditPage() {
           if (!companyResponse.ok)
             throw new Error("Failed to update company data");
         } else {
-          // Create new company profile
           const companyResponse = await fetch(`/api/admin/companies`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              ...companyFormData, 
+            body: JSON.stringify({
+              ...companyFormData,
               serviceAreas,
-              accountId: accountId 
+              accountId: accountId,
             }),
           });
 
@@ -288,13 +283,25 @@ export default function EditPage() {
     } catch (err) {
       setError("Failed to update account: " + err.message);
     } finally {
-      setSaving(false);
+      saveLoading.stopLoading();
     }
   };
 
-  if (loading) return <p>Loading account data...</p>;
+  if (accountLoading.isLoading) {
+    return (
+      <div className="container">
+        <Loader text="Loading account data..." />
+      </div>
+    );
+  }
 
-  if (!loading && !account) return <p>Account not found</p>;
+  if (!accountLoading.isLoading && !account) {
+    return (
+      <div className="container">
+        <p>Account not found</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
@@ -421,23 +428,25 @@ export default function EditPage() {
           </div>
         )}
 
-        {/* Company Information - Show for all company accounts */}
         {formData.role === "company" && (
           <section>
             <h2>Company Information</h2>
-            
-            {/* Notice when no company profile exists */}
+
             {!companyData && (
-              <div className="info-notice" style={{
-                background: '#f0f8ff',
-                border: '1px solid #b3d9ff',
-                borderRadius: '4px',
-                padding: '12px',
-                marginBottom: '20px',
-                color: '#0066cc'
-              }}>
-                <strong>Notice:</strong> This company account has not created a profile yet. 
-                You can create and manage their company profile below.
+              <div
+                className="info-notice"
+                style={{
+                  background: "#f0f8ff",
+                  border: "1px solid #b3d9ff",
+                  borderRadius: "4px",
+                  padding: "12px",
+                  marginBottom: "20px",
+                  color: "#0066cc",
+                }}
+              >
+                <strong>Notice:</strong> This company account has not created a
+                profile yet. You can create and manage their company profile
+                below.
               </div>
             )}
 
@@ -510,7 +519,6 @@ export default function EditPage() {
               />
             </div>
 
-            {/* Service Areas */}
             <div className="form-field">
               <label>Service Areas</label>
               <div className="service-areas">
@@ -557,7 +565,6 @@ export default function EditPage() {
               </div>
             </div>
 
-            {/* Verification Status */}
             <div className="checkbox-group">
               <div className="checkbox-field">
                 <input
@@ -579,7 +586,6 @@ export default function EditPage() {
               </div>
             </div>
 
-            {/* Company Statistics - only show if company profile exists */}
             {companyData && (
               <div className="stats-grid">
                 <div>Average Rating: {companyData.averageRating || 0}</div>
@@ -588,8 +594,7 @@ export default function EditPage() {
             )}
           </section>
         )}
-        
-        {/* Form Actions */}
+
         <div className="form-actions">
           <button
             type="button"
@@ -598,8 +603,12 @@ export default function EditPage() {
           >
             Cancel
           </button>
-          <button type="submit" className="btn-primary" disabled={saving}>
-            {saving ? "Saving..." : "Save Changes"}
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={saveLoading.isLoading}
+          >
+            {saveLoading.isLoading ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </form>

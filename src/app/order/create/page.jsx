@@ -3,11 +3,16 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 import Link from "next/link";
 
 export default function CreateOrder() {
   const router = useRouter();
   const { account, loading: authLoading } = useAuth();
+  const sessionLoading = useLoading("api", "sessionData");
+  const submitLoading = useLoading("api", "createOrder");
+
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [formData, setFormData] = useState({
     fromAddress: {},
@@ -17,8 +22,6 @@ export default function CreateOrder() {
     preferredDates: ["", "", ""],
     notes: "",
   });
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -28,34 +31,39 @@ export default function CreateOrder() {
       return;
     }
 
-    const savedCompany = sessionStorage.getItem("selectedCompany");
-    const savedFormData = sessionStorage.getItem("movingFormData");
+    const loadSessionData = async () => {
+      sessionLoading.startLoading();
+      try {
+        const savedCompany = sessionStorage.getItem("selectedCompany");
+        const savedFormData = sessionStorage.getItem("movingFormData");
 
-    if (!savedCompany || !savedFormData) {
-      router.push("/");
-      return;
-    }
+        if (!savedCompany || !savedFormData) {
+          router.push("/");
+          return;
+        }
 
-    try {
-      const parsedCompany = JSON.parse(savedCompany);
-      const parsedFormData = JSON.parse(savedFormData);
+        const parsedCompany = JSON.parse(savedCompany);
+        const parsedFormData = JSON.parse(savedFormData);
 
-      setSelectedCompany(parsedCompany);
-      setFormData({
-        ...parsedFormData,
-        helpersCount: parsedFormData.helpersCount || 2,
-        estimatedHours: parsedFormData.estimatedHours || 4,
-        preferredDates: parsedFormData.preferredDates?.length
-          ? [...parsedFormData.preferredDates, "", "", ""].slice(0, 3)
-          : ["", "", ""],
-        notes: parsedFormData.notes || "",
-      });
-      setLoading(false);
-    } catch (error) {
-      console.error("Error loading order data:", error);
-      setError("Failed to load order data. Please try again.");
-      setLoading(false);
-    }
+        setSelectedCompany(parsedCompany);
+        setFormData({
+          ...parsedFormData,
+          helpersCount: parsedFormData.helpersCount || 2,
+          estimatedHours: parsedFormData.estimatedHours || 4,
+          preferredDates: parsedFormData.preferredDates?.length
+            ? [...parsedFormData.preferredDates, "", "", ""].slice(0, 3)
+            : ["", "", ""],
+          notes: parsedFormData.notes || "",
+        });
+      } catch (error) {
+        console.error("Error loading order data:", error);
+        setError("Failed to load order data. Please try again.");
+      } finally {
+        sessionLoading.stopLoading();
+      }
+    };
+
+    loadSessionData();
   }, [account, router, authLoading]);
 
   const AddressInputs = ({ type, address, onChange }) => (
@@ -128,7 +136,7 @@ export default function CreateOrder() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    setSubmitting(true);
+    submitLoading.startLoading();
     setError(null);
 
     try {
@@ -165,13 +173,27 @@ export default function CreateOrder() {
       console.error("Error creating order:", error);
       setError("An error occurred. Please try again later.");
     } finally {
-      setSubmitting(false);
+      submitLoading.stopLoading();
     }
   };
 
-  if (authLoading) return <p>Authenticating...</p>;
-  if (loading) return <p>Loading order details...</p>;
-  if (!selectedCompany) return <p>No company selected. Redirecting...</p>;
+  if (authLoading || sessionLoading.isLoading) {
+    return (
+      <div className="container">
+        <Loader
+          text={authLoading ? "Authenticating..." : "Loading order details..."}
+        />
+      </div>
+    );
+  }
+
+  if (!selectedCompany) {
+    return (
+      <div className="container">
+        <p>No company selected. Redirecting...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
@@ -324,8 +346,12 @@ export default function CreateOrder() {
           <Link href="/search-results" className="btn-primary">
             Back to Results
           </Link>
-          <button type="submit" disabled={submitting} className="btn-primary">
-            {submitting ? "Submitting..." : "Confirm and Book Now"}
+          <button
+            type="submit"
+            disabled={submitLoading.isLoading}
+            className="btn-primary"
+          >
+            {submitLoading.isLoading ? "Submitting..." : "Confirm and Book Now"}
           </button>
         </div>
       </form>

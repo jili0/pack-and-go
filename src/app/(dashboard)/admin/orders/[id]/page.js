@@ -2,30 +2,35 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 import Link from "next/link";
 import "@/app/styles/styles.css";
 
 export default function OrderDetail() {
   const router = useRouter();
   const { id } = useParams();
+
+  const orderLoading = useLoading('api', 'order');
+  const updateLoading = useLoading('api', 'updateOrder');
+
   const [order, setOrder] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
+    orderLoading.startLoading();
     fetch(`/api/admin/orders/${id}`)
       .then((res) => res.json())
       .then((data) =>
         data.success ? setOrder(data.order) : setMessage("Order not found")
       )
       .catch(() => setMessage("Failed to load"))
-      .finally(() => setLoading(false));
+      .finally(() => orderLoading.stopLoading());
   }, [id]);
 
   const update = async (data) => {
-    setSaving(true);
+    updateLoading.startLoading();
     const res = await fetch(`/api/admin/orders/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -38,7 +43,7 @@ export default function OrderDetail() {
       setMessage("Updated!");
       setTimeout(() => setMessage(""), 2000);
     }
-    setSaving(false);
+    updateLoading.stopLoading();
   };
 
   const deleteOrder = async () => {
@@ -48,14 +53,22 @@ export default function OrderDetail() {
     data.success ? router.push("/admin/orders") : setMessage("Delete failed");
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (!order)
+  if (orderLoading.isLoading) {
     return (
-      <div>
+      <div className="container">
+        <Loader text="Loading..." />
+      </div>
+    );
+  }
+
+  if (!order) {
+    return (
+      <div className="container">
         <h1>Order Not Found</h1>
         <Link href="/admin">← Back</Link>
       </div>
     );
+  }
 
   return (
     <div className="container">
@@ -66,19 +79,20 @@ export default function OrderDetail() {
 
       {message && <p>{message}</p>}
 
-      {/* Buttons */}
       <div>
         {order.status === "pending" && (
           <>
             <button
               className="btn-primary"
               onClick={() => update({ status: "confirmed" })}
+              disabled={updateLoading.isLoading}
             >
               Confirm
             </button>
             <button
               className="btn-primary"
               onClick={() => update({ status: "declined" })}
+              disabled={updateLoading.isLoading}
             >
               Decline
             </button>
@@ -88,6 +102,7 @@ export default function OrderDetail() {
           <button
             className="btn-primary"
             onClick={() => update({ status: "completed" })}
+            disabled={updateLoading.isLoading}
           >
             Complete
           </button>
@@ -105,8 +120,9 @@ export default function OrderDetail() {
               update(order);
               setEditing(false);
             }}
+            disabled={updateLoading.isLoading}
           >
-            Save
+            {updateLoading.isLoading ? "Saving..." : "Save"}
           </button>
         )}
       </div>
