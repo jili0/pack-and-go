@@ -1,20 +1,21 @@
-// src/context/AuthContext.js
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useLoading } from "./LoadingContext";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [account, setAccount] = useState(null);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
-
   const [authInitialized, setAuthInitialized] = useState(false);
 
+  const authCheck = useLoading("auth", "check");
+  const authLogin = useLoading("auth", "login");
+  const authRegister = useLoading("auth", "register");
+
   useEffect(() => {
-    // 给 AuthContext 一些时间来初始化
     const timer = setTimeout(() => {
       setAuthInitialized(true);
     }, 100);
@@ -22,20 +23,17 @@ export const AuthProvider = ({ children }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Benutzer beim ersten Laden prüfen
   useEffect(() => {
     checkAccountLoggedIn();
   }, []);
 
-  // Benutzer-Status überprüfen
   const checkAccountLoggedIn = async () => {
+    authCheck.setLoading(true);
     try {
       const res = await fetch("/api/auth/me");
 
       if (res.status === 401) {
-        // Nicht authentifiziert
         setAccount(null);
-        setLoading(false);
         return;
       }
 
@@ -55,13 +53,12 @@ export const AuthProvider = ({ children }) => {
       console.error("Auth check error:", error);
       setAccount(null);
     } finally {
-      setLoading(false);
+      authCheck.setLoading(false);
     }
   };
 
-  // Registrierung
   const register = async (accountData) => {
-    setLoading(true);
+    authRegister.setLoading(true);
 
     try {
       const res = await fetch("/api/auth/register", {
@@ -91,13 +88,12 @@ export const AuthProvider = ({ children }) => {
           "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
       };
     } finally {
-      setLoading(false);
+      authRegister.setLoading(false);
     }
   };
 
-  // Login
   const login = async (email, password) => {
-    setLoading(true);
+    authLogin.setLoading(true);
 
     try {
       const res = await fetch("/api/auth/login", {
@@ -127,11 +123,10 @@ export const AuthProvider = ({ children }) => {
           "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
       };
     } finally {
-      setLoading(false);
+      authLogin.setLoading(false);
     }
   };
 
-  // Logout
   const logout = async () => {
     try {
       const res = await fetch("/api/auth/logout", {
@@ -146,13 +141,11 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Logout error:", error);
-      // Selbst wenn der Server-Logout fehlschlägt, wollen wir den Client-Zustand zurücksetzen
       setAccount(null);
       router.push("/");
     }
   };
 
-  // Benutzer löschen
   const deleteAccount = async () => {
     if (
       !confirm(
@@ -193,7 +186,11 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         account,
-        loading,
+        loading:
+          authCheck.isLoading || authLogin.isLoading || authRegister.isLoading,
+        checkLoading: authCheck.isLoading,
+        loginLoading: authLogin.isLoading,
+        registerLoading: authRegister.isLoading,
         register,
         login,
         logout,
@@ -205,5 +202,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook für einfachen Zugriff auf den Auth-Kontext
 export const useAuth = () => useContext(AuthContext);

@@ -2,7 +2,8 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/context/AuthContext";
-import "@/app/styles/styles.css"
+import { LoadingProvider } from "@/context/LoadingContext"; // NEU
+import "@/app/styles/styles.css";
 
 export const metadata = {
   title: "Pack & Go - Einfach umziehen mit transparenten Preisen",
@@ -14,11 +15,14 @@ export default function RootLayout({ children }) {
   return (
     <html lang="de">
       <body>
-        <AuthProvider>
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </AuthProvider>
+        <LoadingProvider>
+          <AuthProvider>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+          </AuthProvider>
+        </LoadingProvider>
+        {/* NEU */}
       </body>
     </html>
   );

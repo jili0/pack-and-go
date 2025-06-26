@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 import "@/app/styles/styles.css";
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const dashboardLoading = useLoading("api", "dashboard");
+  const deleteLoading = useLoading("api", "deleteAccount");
+
   const [accounts, setAccounts] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [actionLoading, setActionLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const USER_ROLES = ["user", "company", "admin"];
 
@@ -19,6 +22,7 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchDashboardData = async () => {
+    dashboardLoading.startLoading();
     try {
       const [accountsRes, ordersRes] = await Promise.all([
         fetch("/api/admin/accounts"),
@@ -37,13 +41,11 @@ export default function AdminDashboard() {
     } catch (error) {
       setError("Failed to load dashboard data");
     } finally {
-      setLoading(false);
+      dashboardLoading.stopLoading();
     }
   };
 
-  // Reusable AccountSection component
   const AccountSection = ({ role }) => {
-    // Search and filter
     const filteredAccounts = accounts.filter((account) => {
       const searchLower = searchTerm?.toLowerCase();
       const matchesSearch =
@@ -85,9 +87,9 @@ export default function AdminDashboard() {
                   <button
                     className="btn-primary"
                     onClick={() => handleDeleteAccount(accountData._id)}
-                    disabled={actionLoading}
+                    disabled={deleteLoading.isLoading}
                   >
-                    {actionLoading ? "Deleting..." : "Delete"}
+                    {deleteLoading.isLoading ? "Deleting..." : "Delete"}
                   </button>
                 </div>
               </div>
@@ -98,7 +100,6 @@ export default function AdminDashboard() {
     );
   };
 
-  // Reusable OrderCard component
   const OrderCard = ({ order, onViewOrder, formatCurrency, formatDate }) => {
     return (
       <div
@@ -136,14 +137,13 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteAccount = async (accountId) => {
-    // confirm delete
     const confirmed = window.confirm(
       "Are you sure you want to delete this account? This action cannot be undone."
     );
     if (!confirmed) return;
 
+    deleteLoading.startLoading();
     try {
-      setActionLoading(true);
       const response = await fetch(`/api/admin/accounts/${accountId}`, {
         method: "DELETE",
       });
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
     } catch (error) {
       setError("An error occurred. Please try again later.");
     } finally {
-      setActionLoading(false);
+      deleteLoading.stopLoading();
     }
   };
 
@@ -202,11 +202,14 @@ export default function AdminDashboard() {
     };
   };
 
-  if (loading) {
-    return <p>Loading dashboard...</p>;
+  if (dashboardLoading.isLoading) {
+    return (
+      <div className="container">
+        <Loader text="Loading dashboard..." />
+      </div>
+    );
   }
 
-  // Calculate account statistics directly
   const totalAccounts = accounts.length;
   const customerCount = accounts.filter((u) => u.role === "user").length;
   const companyCount = accounts.filter((u) => u.role === "company").length;
@@ -251,13 +254,11 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        {/* Account Management Sections */}
         {USER_ROLES.map((role) => (
           <AccountSection key={role} role={role} />
         ))}
       </div>
 
-      {/* Order Management Section */}
       <div>
         <h3>Recent Orders</h3>
         {recentOrders.length === 0 ? (

@@ -4,22 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-
-const LOADING_ICON = (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-    <circle
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="4"
-    ></circle>
-    <path
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    ></path>
-  </svg>
-);
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 
 const ERROR_ICON = (
   <svg
@@ -54,9 +40,9 @@ const EMPTY_STATE_ICON = (
 export default function AccountDashboard() {
   const router = useRouter();
   const { account, loading } = useAuth();
+  const ordersLoading = useLoading("api", "orders");
   const [orders, setOrders] = useState([]);
   const [upcomingOrders, setUpcomingOrders] = useState([]);
-  const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const formatDate = (dateString) => {
@@ -104,6 +90,7 @@ export default function AccountDashboard() {
     if (!account) return;
 
     const fetchOrders = async () => {
+      ordersLoading.startLoading();
       try {
         const response = await fetch("/api/account/orders");
         const data = await response.json();
@@ -127,7 +114,7 @@ export default function AccountDashboard() {
           "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut."
         );
       } finally {
-        setDataLoading(false);
+        ordersLoading.stopLoading();
       }
     };
 
@@ -137,8 +124,7 @@ export default function AccountDashboard() {
   if (loading || (!account && !loading)) {
     return (
       <div className="container">
-        {LOADING_ICON}
-        <h2>Loading...</h2>
+        <Loader text="Loading..." />
       </div>
     );
   }
@@ -204,8 +190,8 @@ export default function AccountDashboard() {
       <section>
         <h2>View Orders</h2>
 
-        {dataLoading ? (
-          <p>Loading orders...</p>
+        {ordersLoading.isLoading ? (
+          <Loader text="Loading orders..." />
         ) : upcomingOrders.length > 0 ? (
           <div>
             {upcomingOrders.map((order) => (

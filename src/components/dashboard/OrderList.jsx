@@ -1,18 +1,21 @@
-// src/components/dashboard/OrderList.jsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 
 const OrderList = () => {
   const router = useRouter();
+  const ordersLoading = useLoading('api', 'orderList');
+
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
     const fetchOrders = async () => {
+      ordersLoading.startLoading();
       try {
         const response = await fetch("/api/account/orders");
         const data = await response.json();
@@ -26,7 +29,7 @@ const OrderList = () => {
         console.error("Error fetching orders:", error);
         setError("An error occurred. Please try again later.");
       } finally {
-        setLoading(false);
+        ordersLoading.stopLoading();
       }
     };
 
@@ -69,11 +72,10 @@ const OrderList = () => {
     router.push(`/account/orders/${orderId}`);
   };
 
-  if (loading) {
+  if (ordersLoading.isLoading) {
     return (
       <div>
-        <div></div>
-        <p>Loading orders...</p>
+        <Loader text="Loading orders..." />
       </div>
     );
   }

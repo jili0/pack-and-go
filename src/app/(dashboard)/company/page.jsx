@@ -4,14 +4,16 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 
 export default function CompanyDashboard() {
   const router = useRouter();
   const { account, loading: authLoading } = useAuth();
+  const dashboardLoading = useLoading("api", "companyDashboard");
 
   const [company, setCompany] = useState(null);
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -26,9 +28,8 @@ export default function CompanyDashboard() {
   }, [account, authLoading, router]);
 
   const fetchCompanyData = async () => {
+    dashboardLoading.startLoading();
     try {
-      setLoading(true);
-
       const [companyRes, ordersRes] = await Promise.all([
         fetch("/api/company/me"),
         fetch("/api/orders"),
@@ -56,7 +57,7 @@ export default function CompanyDashboard() {
       console.error("Error loading data:", error);
       setError("An error occurred while loading dashboard data.");
     } finally {
-      setLoading(false);
+      dashboardLoading.stopLoading();
     }
   };
 
@@ -76,7 +77,6 @@ export default function CompanyDashboard() {
     });
   };
 
-  // Calculate stats directly
   const totalOrders = orders.length;
   const pendingOrders = orders.filter(
     (order) => order.status === "pending"
@@ -94,8 +94,12 @@ export default function CompanyDashboard() {
   }).length;
   const recentOrders = orders.slice(0, 5);
 
-  if (authLoading || loading) {
-    return <p>Loading dashboard...</p>;
+  if (authLoading || dashboardLoading.isLoading) {
+    return (
+      <div className="container">
+        <Loader text="Loading dashboard..." />
+      </div>
+    );
   }
 
   if (error) {
@@ -109,7 +113,7 @@ export default function CompanyDashboard() {
 
   if (!company) {
     return (
-      <div>
+      <div className="container">
         <h3>Company Profile Not Found</h3>
         <p>You need to set up your company profile first.</p>
         <Link href="/company/setup" className="btn-primary">
@@ -121,13 +125,11 @@ export default function CompanyDashboard() {
 
   return (
     <div className="container">
-      {/* Header */}
       <div>
         <h1>Welcome, {company.companyName}!</h1>
         <p>Manage your moving requests and company profile</p>
       </div>
 
-      {/* Verification Status */}
       {!company.isVerified && (
         <div className="verification-warning">
           <h3>Verification Pending</h3>
@@ -138,7 +140,6 @@ export default function CompanyDashboard() {
         </div>
       )}
 
-      {/* Statistics */}
       <div className="admin-stats">
         <div>
           <h3>Total Requests</h3>
@@ -158,7 +159,6 @@ export default function CompanyDashboard() {
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div>
         <h2>Quick Access</h2>
         <div className="quick-actions">
@@ -174,7 +174,6 @@ export default function CompanyDashboard() {
         </div>
       </div>
 
-      {/* Company Info */}
       <div className="user-card">
         <div>
           <h3>{company.companyName}</h3>
@@ -195,7 +194,6 @@ export default function CompanyDashboard() {
         </Link>
       </div>
 
-      {/* Recent Orders */}
       <div>
         <div className="section-header">
           <h2>Recent Requests</h2>
@@ -255,7 +253,6 @@ export default function CompanyDashboard() {
         )}
       </div>
 
-      {/* Service Areas */}
       {company.serviceAreas && company.serviceAreas.length > 0 && (
         <div>
           <div className="section-header">

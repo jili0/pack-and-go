@@ -1,16 +1,19 @@
-// src/app/order/create/page.jsx
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
-import Link from 'next/link';
-import Image from '@/components/ui/Image';
-import AddressForm from '@/components/forms/AddressForm';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
+import Link from "next/link";
+import Image from "@/components/ui/Image";
+import AddressForm from "@/components/forms/AddressForm";
 
 export default function CreateOrder() {
   const router = useRouter();
   const { account, loading: authLoading } = useAuth();
+  const sessionLoading = useLoading("api", "sessionData");
+  const submitLoading = useLoading("api", "createOrder");
 
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [formData, setFormData] = useState({
@@ -18,30 +21,28 @@ export default function CreateOrder() {
     toAddress: {},
     helpersCount: 2,
     estimatedHours: 4,
-    preferredDates: ['', '', ''],
-    notes: ''
+    preferredDates: ["", "", ""],
+    notes: "",
   });
 
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (authLoading) return;
 
     if (!account) {
-      router.push('/login?redirect=order/create');
+      router.push("/login?redirect=order/create");
       return;
     }
 
     const loadSessionData = async () => {
+      sessionLoading.startLoading();
       try {
-        const savedCompany = sessionStorage.getItem('selectedCompany');
-        const savedFormData = sessionStorage.getItem('movingFormData');
+        const savedCompany = sessionStorage.getItem("selectedCompany");
+        const savedFormData = sessionStorage.getItem("movingFormData");
 
-        // debugger;
         if (!savedCompany || !savedFormData) {
-          router.push('/');
+          router.push("/");
           return;
         }
 
@@ -53,17 +54,18 @@ export default function CreateOrder() {
           ...parsedFormData,
           helpersCount: parsedFormData.helpersCount || 2,
           estimatedHours: parsedFormData.estimatedHours || 4,
-          preferredDates: parsedFormData.preferredDates && Array.isArray(parsedFormData.preferredDates)
-            ? [...parsedFormData.preferredDates, '', '', ''].slice(0, 3)
-            : ['', '', ''],
-          notes: parsedFormData.notes || ''
+          preferredDates:
+            parsedFormData.preferredDates &&
+            Array.isArray(parsedFormData.preferredDates)
+              ? [...parsedFormData.preferredDates, "", "", ""].slice(0, 3)
+              : ["", "", ""],
+          notes: parsedFormData.notes || "",
         });
-
-        setLoading(false);
       } catch (error) {
-        console.error('Error loading order data:', error);
-        setError('Failed to load order data. Please try again.');
-        setLoading(false);
+        console.error("Error loading order data:", error);
+        setError("Failed to load order data. Please try again.");
+      } finally {
+        sessionLoading.stopLoading();
       }
     };
 
@@ -71,53 +73,60 @@ export default function CreateOrder() {
   }, [account, router, authLoading]);
 
   const handleFromAddressChange = (address) => {
-    setFormData(prev => ({ ...prev, fromAddress: address }));
+    setFormData((prev) => ({ ...prev, fromAddress: address }));
   };
 
   const handleToAddressChange = (address) => {
-    setFormData(prev => ({ ...prev, toAddress: address }));
+    setFormData((prev) => ({ ...prev, toAddress: address }));
   };
 
   const handleDateChange = (index, e) => {
-    setFormData(prev => {
-      const newDates = [...(prev.preferredDates || ['', '', ''])];
+    setFormData((prev) => {
+      const newDates = [...(prev.preferredDates || ["", "", ""])];
       newDates[index] = e.target.value;
       return { ...prev, preferredDates: newDates };
     });
   };
 
   const handleHelpersChange = (e) => {
-    setFormData(prev => ({ ...prev, helpersCount: Number(e.target.value) }));
+    setFormData((prev) => ({ ...prev, helpersCount: Number(e.target.value) }));
   };
 
   const handleHoursChange = (e) => {
-    setFormData(prev => ({ ...prev, estimatedHours: Number(e.target.value) }));
+    setFormData((prev) => ({
+      ...prev,
+      estimatedHours: Number(e.target.value),
+    }));
   };
 
   const handleNotesChange = (e) => {
-    setFormData(prev => ({ ...prev, notes: e.target.value }));
+    setFormData((prev) => ({ ...prev, notes: e.target.value }));
   };
-  
-    const validateForm = () => {
-    // Check if from address is complete
-    if (!formData.fromAddress?.street || !formData.fromAddress?.city || !formData.fromAddress?.postalCode) {
-      setError('Please complete the origin address.');
+
+  const validateForm = () => {
+    if (
+      !formData.fromAddress?.street ||
+      !formData.fromAddress?.city ||
+      !formData.fromAddress?.postalCode
+    ) {
+      setError("Please complete the origin address.");
       return false;
     }
 
-    // Check if to address is complete
-    if (!formData.toAddress?.street || !formData.toAddress?.city || !formData.toAddress?.postalCode) {
-      setError('Please complete the destination address.');
+    if (
+      !formData.toAddress?.street ||
+      !formData.toAddress?.city ||
+      !formData.toAddress?.postalCode
+    ) {
+      setError("Please complete the destination address.");
       return false;
     }
 
-    // Check if at least one preferred date is selected
     if (!formData.preferredDates?.[0]) {
-      setError('Please select at least one preferred date.');
+      setError("Please select at least one preferred date.");
       return false;
     }
 
-    // Validate that dates are in the future
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -125,7 +134,7 @@ export default function CreateOrder() {
       if (date) {
         const selectedDate = new Date(date);
         if (selectedDate < today) {
-          setError('Selected dates must be in the future.');
+          setError("Selected dates must be in the future.");
           return false;
         }
       }
@@ -134,10 +143,12 @@ export default function CreateOrder() {
     return true;
   };
 
-
-  const totalPrice = selectedCompany && formData.helpersCount && formData.estimatedHours
-    ? (selectedCompany.hourlyRate || 50) * formData.helpersCount * formData.estimatedHours
-    : 0;
+  const totalPrice =
+    selectedCompany && formData.helpersCount && formData.estimatedHours
+      ? (selectedCompany.hourlyRate || 50) *
+        formData.helpersCount *
+        formData.estimatedHours
+      : 0;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -146,30 +157,29 @@ export default function CreateOrder() {
       return;
     }
 
-    setSubmitting(true);
+    submitLoading.startLoading();
     setError(null);
 
     try {
       const hourlyRate = selectedCompany.hourlyRate || 50;
-      const calculatedPrice = hourlyRate * formData.helpersCount * formData.estimatedHours;
-      // Prepare order data
+      const calculatedPrice =
+        hourlyRate * formData.helpersCount * formData.estimatedHours;
+
       const orderData = {
         companyId: selectedCompany._id,
         fromAddress: formData.fromAddress,
         toAddress: formData.toAddress,
-        preferredDates: (formData.preferredDates || []).filter(date => date),
+        preferredDates: (formData.preferredDates || []).filter((date) => date),
         helpersCount: formData.helpersCount,
         estimatedHours: formData.estimatedHours,
-        //  totalPrice: totalPrice,
         totalPrice: calculatedPrice,
-        notes: formData.notes
+        notes: formData.notes,
       };
 
-      // Send request to create order
-      const response = await fetch('/api/orders', {
-        method: 'POST',
+      const response = await fetch("/api/orders", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(orderData),
       });
@@ -177,45 +187,39 @@ export default function CreateOrder() {
       const data = await response.json();
 
       if (data.success) {
-        // Clear session storage data
-        sessionStorage.removeItem('selectedCompany');
-        sessionStorage.removeItem('movingFormData');
-        sessionStorage.removeItem('searchResults');
+        sessionStorage.removeItem("selectedCompany");
+        sessionStorage.removeItem("movingFormData");
+        sessionStorage.removeItem("searchResults");
 
-        // Redirect to order confirmation page
         router.push(`/order/${data.order._id}/confirmation`);
       } else {
-        setError(data.message || 'Failed to create order. Please try again.');
+        setError(data.message || "Failed to create order. Please try again.");
       }
     } catch (error) {
-      console.error('Error creating order:', error);
-      setError('An error occurred. Please try again later.');
+      console.error("Error creating order:", error);
+      setError("An error occurred. Please try again later.");
     } finally {
-      setSubmitting(false);
+      submitLoading.stopLoading();
     }
   };
 
-  // Format date for display
- const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return new Date(dateString).toLocaleDateString("en-US", options);
   };
 
-  if (authLoading) {
+  if (authLoading || sessionLoading.isLoading) {
     return (
       <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Authenticating...</p>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Loading order details...</p>
+        <Loader
+          text={authLoading ? "Authenticating..." : "Loading order details..."}
+        />
       </div>
     );
   }
@@ -244,7 +248,6 @@ export default function CreateOrder() {
         )}
 
         <form onSubmit={handleSubmit}>
-          {/* Company Information */}
           <div className="card">
             <div className="card-header">
               <h2>Selected Moving Company</h2>
@@ -258,20 +261,37 @@ export default function CreateOrder() {
                       {[...Array(5)].map((_, i) => (
                         <span
                           key={i}
-                          className={i < Math.round(selectedCompany.averageRating || 0) ? 'star-filled' : 'star-empty'}
+                          className={
+                            i < Math.round(selectedCompany.averageRating || 0)
+                              ? "star-filled"
+                              : "star-empty"
+                          }
                         >
                           ★
                         </span>
                       ))}
                     </div>
                     <span className="review-count">
-                      ({selectedCompany.reviewsCount || 0} {selectedCompany.reviewsCount === 1 ? 'review' : 'reviews'})
+                      ({selectedCompany.reviewsCount || 0}{" "}
+                      {selectedCompany.reviewsCount === 1
+                        ? "review"
+                        : "reviews"}
+                      )
                     </span>
                   </div>
                   {selectedCompany.isKisteKlarCertified && (
                     <div className="certified-badge">
-                      <svg className="certified-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      <svg
+                        className="certified-icon"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       KisteKlar Certified
                     </div>
@@ -288,7 +308,6 @@ export default function CreateOrder() {
             </div>
           </div>
 
-          {/* Address Information */}
           <div className="card">
             <div className="card-header">
               <h2>Moving Addresses</h2>
@@ -314,7 +333,6 @@ export default function CreateOrder() {
             </div>
           </div>
 
-          {/* Moving Details */}
           <div className="card">
             <div className="card-header">
               <h2>Moving Details</h2>
@@ -359,7 +377,8 @@ export default function CreateOrder() {
               <div className="date-picker">
                 <h3>Preferred Dates</h3>
                 <p className="date-info">
-                  Please select up to three preferred dates for your move. The company will confirm one of these dates.
+                  Please select up to three preferred dates for your move. The
+                  company will confirm one of these dates.
                 </p>
 
                 <div className="date-inputs">
@@ -374,9 +393,13 @@ export default function CreateOrder() {
                       </label>
                       <input
                         type="date"
-                        value={(formData.preferredDates && formData.preferredDates[index]) || ''}
+                        value={
+                          (formData.preferredDates &&
+                            formData.preferredDates[index]) ||
+                          ""
+                        }
                         onChange={(e) => handleDateChange(index, e)}
-                        min={new Date().toISOString().split('T')[0]}
+                        min={new Date().toISOString().split("T")[0]}
                         required={index === 0}
                         className="date-input"
                       />
@@ -388,7 +411,7 @@ export default function CreateOrder() {
               <div className="notes-section">
                 <h3>Additional Notes</h3>
                 <textarea
-                  value={formData.notes || ''}
+                  value={formData.notes || ""}
                   onChange={handleNotesChange}
                   placeholder="Add any special instructions or information for the moving company..."
                   className="notes-input"
@@ -398,7 +421,6 @@ export default function CreateOrder() {
             </div>
           </div>
 
-          {/* Price Summary */}
           <div className="card">
             <div className="card-header">
               <h2>Price Summary</h2>
@@ -425,12 +447,12 @@ export default function CreateOrder() {
               </div>
 
               <p className="price-note">
-                Note: The final price may vary based on the actual duration of the move.
+                Note: The final price may vary based on the actual duration of
+                the move.
               </p>
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="action-buttons">
             <Link href="/search-results" className="back-button">
               Back to Results
@@ -438,15 +460,15 @@ export default function CreateOrder() {
             <button
               type="submit"
               className="submit-button"
-              disabled={submitting}
+              disabled={submitLoading.isLoading}
             >
-              {submitting ? (
+              {submitLoading.isLoading ? (
                 <>
                   <div className="button-spinner"></div>
                   Submitting...
                 </>
               ) : (
-                'Confirm and Book Now'
+                "Confirm and Book Now"
               )}
             </button>
           </div>
