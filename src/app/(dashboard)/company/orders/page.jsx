@@ -30,13 +30,13 @@ export default function CompanyOrders() {
     try {
       setLoading(true);
       const response = await fetch("/api/orders");
-      
+
       if (!response.ok) {
         throw new Error("Error loading orders");
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         setOrders(result.orders);
       } else {
@@ -57,9 +57,9 @@ export default function CompanyOrders() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           status: "confirmed",
-          confirmedDate: selectedDate
+          confirmedDate: selectedDate,
         }),
       });
 
@@ -67,15 +67,15 @@ export default function CompanyOrders() {
 
       if (result.success) {
         // Update the order in the local state
-        setOrders(prevOrders =>
-          prevOrders.map(order =>
-            order._id === orderId 
-              ? { ...order, status: "confirmed", confirmedDate: selectedDate } 
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId
+              ? { ...order, status: "confirmed", confirmedDate: selectedDate }
               : order
           )
         );
         // Clear the selected date for this order
-        setSelectedDates(prev => {
+        setSelectedDates((prev) => {
           const updated = { ...prev };
           delete updated[orderId];
           return updated;
@@ -103,8 +103,8 @@ export default function CompanyOrders() {
 
       if (result.success) {
         // Update the order in the local state
-        setOrders(prevOrders =>
-          prevOrders.map(order =>
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
             order._id === orderId ? { ...order, status: newStatus } : order
           )
         );
@@ -117,10 +117,39 @@ export default function CompanyOrders() {
     }
   };
 
+  const deleteOrder = async (orderId) => {
+    if (!window.confirm("Are you sure you want to delete this order? This action cannot be undone.")) return;
+
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: "DELETE",
+        cache: 'no-store',
+        headers: { "Content-Type": "application/json",
+          'Cache-Control': 'no-cache'
+         },
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        setOrders(prev => prev.filter(order => order._id !== orderId));
+        setSelectedDates(prev => {
+          const updated = { ...prev };
+          delete updated[orderId];
+          return updated;
+        });
+      } else {
+        alert(result.message || "Error deleting order");
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      alert("Error deleting order. Please try again.");
+    }
+  };
+
   const handleDateSelection = (orderId, selectedDate) => {
-    setSelectedDates(prev => ({
+    setSelectedDates((prev) => ({
       ...prev,
-      [orderId]: selectedDate
+      [orderId]: selectedDate,
     }));
   };
 
@@ -151,16 +180,21 @@ export default function CompanyOrders() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "pending": return "status-pending";
-      case "confirmed": return "status-confirmed";
-      case "completed": return "status-completed";
-      case "cancelled": return "status-cancelled";
-      default: return "";
+      case "pending":
+        return "status-pending";
+      case "confirmed":
+        return "status-confirmed";
+      case "completed":
+        return "status-completed";
+      case "cancelled":
+        return "status-cancelled";
+      default:
+        return "";
     }
   };
 
   // Filter orders based on selected filter
-  const filteredOrders = orders.filter(order => {
+  const filteredOrders = orders.filter((order) => {
     if (filter === "all") return true;
     return order.status === filter;
   });
@@ -168,14 +202,18 @@ export default function CompanyOrders() {
   // Group orders by status for stats
   const orderStats = {
     total: orders.length,
-    pending: orders.filter(o => o.status === "pending").length,
-    confirmed: orders.filter(o => o.status === "confirmed").length,
-    completed: orders.filter(o => o.status === "completed").length,
-    cancelled: orders.filter(o => o.status === "cancelled").length,
+    pending: orders.filter((o) => o.status === "pending").length,
+    confirmed: orders.filter((o) => o.status === "confirmed").length,
+    completed: orders.filter((o) => o.status === "completed").length,
+    cancelled: orders.filter((o) => o.status === "cancelled").length,
   };
 
   if (authLoading || loading) {
-    return <div className="container"><p>Loading orders...</p></div>;
+    return (
+      <div className="container">
+        <p>Loading orders...</p>
+      </div>
+    );
   }
 
   if (error) {
@@ -227,31 +265,31 @@ export default function CompanyOrders() {
 
       {/* Filter Buttons */}
       <div className="filter-buttons">
-        <button 
+        <button
           className={filter === "all" ? "btn-primary" : "btn-secondary"}
           onClick={() => setFilter("all")}
         >
           All ({orderStats.total})
         </button>
-        <button 
+        <button
           className={filter === "pending" ? "btn-primary" : "btn-secondary"}
           onClick={() => setFilter("pending")}
         >
           Pending ({orderStats.pending})
         </button>
-        <button 
+        <button
           className={filter === "confirmed" ? "btn-primary" : "btn-secondary"}
           onClick={() => setFilter("confirmed")}
         >
           Confirmed ({orderStats.confirmed})
         </button>
-        <button 
+        <button
           className={filter === "completed" ? "btn-primary" : "btn-secondary"}
           onClick={() => setFilter("completed")}
         >
           Completed ({orderStats.completed})
         </button>
-        <button 
+        <button
           className={filter === "cancelled" ? "btn-primary" : "btn-secondary"}
           onClick={() => setFilter("cancelled")}
         >
@@ -265,10 +303,9 @@ export default function CompanyOrders() {
           <div className="empty-state">
             <h3>No Orders Found</h3>
             <p>
-              {filter === "all" 
-                ? "You currently have no moving requests." 
-                : `No ${filter} orders found.`
-              }
+              {filter === "all"
+                ? "You currently have no moving requests."
+                : `No ${filter} orders found.`}
             </p>
           </div>
         ) : (
@@ -277,7 +314,9 @@ export default function CompanyOrders() {
               <div className="order-header">
                 <div>
                   <h3>Order #{order._id.slice(-6)}</h3>
-                  <span className={`status-badge ${getStatusColor(order.status)}`}>
+                  <span
+                    className={`status-badge ${getStatusColor(order.status)}`}
+                  >
                     {order.status.toUpperCase()}
                   </span>
                 </div>
@@ -288,16 +327,18 @@ export default function CompanyOrders() {
 
               <div className="order-details">
                 <div className="detail-row">
-                  <strong>Customer:</strong> {order.accountId?.name || "Unknown"}
+                  <strong>Customer:</strong>{" "}
+                  {order.accountId?.name || "Unknown"}
                 </div>
                 <div className="detail-row">
                   <strong>Email:</strong> {order.accountId?.email || "N/A"}
                 </div>
                 <div className="detail-row">
-                  <strong>Route:</strong> {order.fromAddress?.city} → {order.toAddress?.city}
+                  <strong>Route:</strong> {order.fromAddress?.city} →{" "}
+                  {order.toAddress?.city}
                 </div>
                 <div className="detail-row">
-                  <strong>Moving Date:</strong>{" "}
+                  <strong>Moving Date:</strong>&nbsp;
                   {order.confirmedDate ? (
                     <span className="confirmed-date">
                       Confirmed: {formatDate(order.confirmedDate)}
@@ -334,9 +375,11 @@ export default function CompanyOrders() {
                       <div className="date-selection-group">
                         <div className="date-selection">
                           <label>Select moving date:</label>
-                          <select 
+                          <select
                             value={selectedDates[order._id] || ""}
-                            onChange={(e) => handleDateSelection(order._id, e.target.value)}
+                            onChange={(e) =>
+                              handleDateSelection(order._id, e.target.value)
+                            }
                           >
                             <option value="">Choose a date</option>
                             {order.preferredDates.map((date, index) => (
@@ -356,7 +399,9 @@ export default function CompanyOrders() {
                       </div>
                     ) : (
                       <button
-                        onClick={() => updateOrderStatus(order._id, "confirmed")}
+                        onClick={() =>
+                          updateOrderStatus(order._id, "confirmed")
+                        }
                         className="btn-success"
                       >
                         Confirm Order
@@ -370,7 +415,7 @@ export default function CompanyOrders() {
                     </button>
                   </>
                 )}
-                
+
                 {order.status === "confirmed" && (
                   <button
                     onClick={() => updateOrderStatus(order._id, "completed")}
@@ -386,6 +431,13 @@ export default function CompanyOrders() {
                 >
                   View Details
                 </Link>
+
+                <button
+                  onClick={() => deleteOrder(order._id)}
+                  className="btn-danger"
+                >
+                  Delete Order
+                </button>
               </div>
             </div>
           ))
