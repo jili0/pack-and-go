@@ -21,13 +21,13 @@ export default function Home() {
       </section>
 
       {/* Price Calculator */}
-      <section id="pricing">
+      <section id="pricing" className="container">
         <h2>Calculate your moving price</h2>
         <MovingCalculator />
       </section>
 
       {/* Search Section */}
-      <section id="companies">
+      <section id="companies" className="container">
         <div>
           <h2>Find moving companies</h2>
           <p>
@@ -39,7 +39,7 @@ export default function Home() {
       </section>
 
       {/* Contact Info */}
-      <section id="contact">
+      <section id="contact" className="container">
         <div className="container">
           <h2>Contact Information</h2>
           <p>

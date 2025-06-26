@@ -151,10 +151,9 @@ export async function PUT(request, { params }) {
       updateData.status = status;
     }
 
-    
-  if (status === "confirmed" && confirmedDate) {
-  updateData.confirmedDate = confirmedDate;
-  }
+    if (status === "confirmed" && confirmedDate) {
+      updateData.confirmedDate = confirmedDate;
+    }
 
     if (notes) {
       updateData.notes = notes;
@@ -227,11 +226,21 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // Nur Administratoren und der Benutzer selbst können Bestellungen stornieren
-    if (
-      session.role !== "admin" &&
-      (session.role !== "user" || order.accountId.toString() !== session.id)
-    ) {
+    // Berechtigungsprüfung für alle Rollen
+    let hasPermission = false;
+
+    if (session.role === "admin") {
+      hasPermission = true;
+    } else if (session.role === "user" && order.accountId.toString() === session.id) {
+      hasPermission = true;
+    } else if (session.role === "company") {
+      const company = await Company.findOne({ accountId: session.id });
+      if (company && order.companyId.toString() === company._id.toString()) {
+        hasPermission = true;
+      }
+    }
+
+    if (!hasPermission) {
       return NextResponse.json(
         { success: false, message: "Keine Berechtigung" },
         { status: 403 }

@@ -68,6 +68,7 @@ export default function CompanyOrders() {
       const result = await response.json();
 
       if (result.success) {
+        // Update the order in the local state
         setOrders((prevOrders) =>
           prevOrders.map((order) =>
             order._id === orderId
@@ -75,6 +76,7 @@ export default function CompanyOrders() {
               : order
           )
         );
+        // Clear the selected date for this order
         setSelectedDates((prev) => {
           const updated = { ...prev };
           delete updated[orderId];
@@ -102,6 +104,7 @@ export default function CompanyOrders() {
       const result = await response.json();
 
       if (result.success) {
+        // Update the order in the local state
         setOrders((prevOrders) =>
           prevOrders.map((order) =>
             order._id === orderId ? { ...order, status: newStatus } : order
@@ -113,6 +116,41 @@ export default function CompanyOrders() {
     } catch (error) {
       console.error("Error updating order:", error);
       alert("Error updating order status. Please try again.");
+    }
+  };
+
+  const deleteOrder = async (orderId) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this order? This action cannot be undone."
+      )
+    )
+      return;
+
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: "DELETE",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        setOrders((prev) => prev.filter((order) => order._id !== orderId));
+        setSelectedDates((prev) => {
+          const updated = { ...prev };
+          delete updated[orderId];
+          return updated;
+        });
+      } else {
+        alert(result.message || "Error deleting order");
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      alert("Error deleting order. Please try again.");
     }
   };
 
@@ -163,6 +201,7 @@ export default function CompanyOrders() {
     }
   };
 
+  // Filter orders based on selected filter
   const filteredOrders = orders.filter((order) => {
     if (filter === "all") return true;
     return order.status === filter;
@@ -395,6 +434,13 @@ export default function CompanyOrders() {
                 >
                   View Details
                 </Link>
+
+                <button
+                  onClick={() => deleteOrder(order._id)}
+                  className="btn-danger"
+                >
+                  Delete Order
+                </button>
               </div>
             </div>
           ))
