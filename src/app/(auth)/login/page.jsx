@@ -67,8 +67,8 @@ const LoginContent = () => {
       const result = await login(formData.email, formData.password);
 
       if (result.success) {
-          // router.push(`/${result.account.role}`);
-          router.push(result.account.role === "user" ? "/account" : "/company");
+        // router.push(`/${result.account.role}`);
+        router.push(result.account.role === "user" ? "/account" : "/company");
       } else {
         setLoginError(result.message || "Login failed");
       }
@@ -80,7 +80,7 @@ const LoginContent = () => {
   };
 
   return (
-    <div className="form-container">
+    <div className="container">
       {loginError && (
         <div>
           <div>

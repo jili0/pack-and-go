@@ -119,7 +119,6 @@ form {
   border-radius: 8px;
   padding: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
   margin: auto;
 }
 
@@ -708,6 +707,53 @@ footer a:hover {
 .edit-header {
   display: flex;
   justify-content: space-between;
+}
+
+/* CreateOrder */
+.company-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0 2rem 0;
+  flex-wrap: wrap;
+}
+
+.company-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.certified-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #007bff;
+  font-weight: 500;
+}
+
+.form-row {
+  display: flex;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.form-row .input-field {
+  flex: 1;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.pricing-info p {
+  margin: 0.25rem 0;
+  text-align: right;
 }
 
 /* Media Queries */
