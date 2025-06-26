@@ -200,25 +200,25 @@ export default function CreateOrder() {
   if (!selectedCompany) {
     return <p>No company selected. Redirecting...</p>;
   }
-
+  console.log("authLoading:", authLoading);
+  console.log("account:", account);
+  console.log("selectedCompany:", selectedCompany);
   return (
     <div className="container">
       <h1>Create Order</h1>
       {error && <p className="error">{error}</p>}
 
-      <div className="company-info">
-        <p>
-          {selectedCompany.companyName} •{" "}
-          {[...Array(5)].map((_, i) => (
-            <span key={i}>
-              {i < Math.round(selectedCompany.averageRating || 0) ? "★" : "☆"}
-            </span>
-          ))}{" "}
-          ({selectedCompany.reviewsCount || 0}{" "}
-          {selectedCompany.reviewsCount === 1 ? "review" : "reviews"})
-          {selectedCompany.isKisteKlarCertified && " • KisteKlar Certified"}
-        </p>
-      </div>
+      <p>
+        {selectedCompany.companyName} •{" "}
+        {[...Array(5)].map((_, i) => (
+          <span key={i}>
+            {i < Math.round(selectedCompany.averageRating || 0) ? "★" : "☆"}
+          </span>
+        ))}{" "}
+        ({selectedCompany.reviewsCount || 0}{" "}
+        {selectedCompany.reviewsCount === 1 ? "review" : "reviews"})
+        {selectedCompany.isKisteKlarCertified && " • KisteKlar Certified"}
+      </p>
 
       <form onSubmit={handleSubmit}>
         <AddressInputs
