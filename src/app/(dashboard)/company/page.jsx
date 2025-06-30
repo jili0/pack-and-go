@@ -17,6 +17,7 @@ export default function CompanyDashboard() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
   const [selectedDates, setSelectedDates] = useState({});
+  const [confirmingOrderId, setConfirmingOrderId] = useState(null);
 
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("de-DE", {
@@ -136,13 +137,15 @@ export default function CompanyDashboard() {
     }
   };
 
-  const handleConfirmWithDate = (orderId) => {
+  const handleConfirmWithDate = async (orderId) => {
     const selectedDate = selectedDates[orderId];
     if (selectedDate) {
-      updateOrder(orderId, {
+      setConfirmingOrderId(orderId);
+      await updateOrder(orderId, {
         status: "confirmed",
         confirmedDate: selectedDate,
       });
+      setConfirmingOrderId(null);
     } else {
       alert("Please select a date first");
     }
@@ -178,9 +181,11 @@ export default function CompanyDashboard() {
               <button
                 className="btn-primary"
                 onClick={() => handleConfirmWithDate(order._id)}
-                disabled={!selectedDates[order._id]}
+                disabled={
+                  !selectedDates[order._id] || confirmingOrderId === order._id
+                }
               >
-                Confirm with Selected Date
+                {confirmingOrderId === order._id ? "Confirming..." : "Confirm"}
               </button>
             </div>
           ) : (
@@ -316,7 +321,22 @@ export default function CompanyDashboard() {
                 <>
                   {order.preferredDates.map((date, index) => (
                     <span key={index}>
-                      {formatDate(date)}&nbsp;{index < 2 && "|"} &nbsp;
+                      <button
+                        className="btn-secondary"
+                        onClick={() =>
+                          setSelectedDates((prev) => ({
+                            ...prev,
+                            [order._id]: date,
+                          }))
+                        }
+                      >
+                        {selectedDates[order._id] === date ? (
+                          <b>{formatDate(date)}</b>
+                        ) : (
+                          formatDate(date)
+                        )}
+                      </button>
+                      {index < order.preferredDates.length - 1 && " | "}
                     </span>
                   ))}
                   &nbsp;(click to select)
