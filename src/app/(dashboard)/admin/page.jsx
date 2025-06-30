@@ -222,6 +222,14 @@ export default function AdminDashboard() {
     <div className="container">
       {error && <p className="error">{error}</p>}
 
+      <div className="review-admin-link" style={{ marginTop: "1rem" }}>
+          <button
+            className="btn-primary"
+            onClick={() => router.push("/admin/reviews")}
+          >
+            Moderate Reviews
+          </button>
+          </div>
       <div>
         <div className="admin-stats">
           <p>Total Accounts: {totalAccounts}</p>
@@ -229,8 +237,7 @@ export default function AdminDashboard() {
           <p>Companies: {companyCount}</p>
           <p>Admins: {adminCount}</p>
         </div>
-
-        <div className="order-stats">
+      <div className="order-stats">
           <p>Total Orders: {orderStats.total}</p>
           <p>Pending: {orderStats.pending}</p>
           <p>Active: {orderStats.confirmed}</p>

@@ -6,6 +6,27 @@ import Order from '@/models/Order';
 import Company from '@/models/Company';
 import { getSession } from '@/lib/auth'; // Using your existing auth function
 
+export async function GET() {
+  try {
+    const session = await getSession();
+    if (!session || session.role !== "admin") {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    await connectDB();
+
+    const reviews = await Review.find({})
+      .populate("accountId", "name email")
+      .populate("companyId", "companyName")
+      .sort({ createdAt: -1 });
+
+    return NextResponse.json({ success: true, reviews }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+  }
+}
+
 export async function POST(request) {
   try {
     // Check authentication using your existing session function
