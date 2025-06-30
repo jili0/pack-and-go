@@ -201,17 +201,9 @@ export default function OrderConfirmation() {
         </div>
       </div>
 
-      <div className="form-footer">
-        <Link href={`/account/orders/${order._id}`} className="btn-primary">
-          View Order Details
-        </Link>
-        <Link href="/account/orders" className="btn-primary">
-          View All Orders
-        </Link>
-        <Link href="/" className="btn-primary">
-          Back to Home
-        </Link>
-      </div>
+      <Link href="/" className="btn-primary">
+        Back to Home
+      </Link>
     </div>
   );
 }
