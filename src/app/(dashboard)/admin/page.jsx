@@ -111,8 +111,8 @@ export default function AdminDashboard() {
           <b>ID:</b> #{order._id}
         </p>
         <p>
-          <b>CustomerName:</b> {order.customerName || "Unknown"}
-        </p>
+          <b>Customer Name:</b> {order.accountId?.name || "Unknown"}
+          </p>
         <p>
           <b>From: </b>
           {order.fromAddress?.city}
@@ -122,10 +122,10 @@ export default function AdminDashboard() {
           {order.toAddress?.city}
         </p>
         <p>
-          <b>TotalPrice:</b> {formatCurrency(order.totalPrice)}
+          <b>Total Price:</b> {formatCurrency(order.totalPrice)}
         </p>
         <p>
-          <b>CreatedAt: </b>
+          <b>Created At: </b>
           {formatDate(order.createdAt)}
         </p>
       </div>
