@@ -202,6 +202,7 @@ export async function PUT(request, { params }) {
   }
 }
 
+
 export async function DELETE(request, { params }) {
   try {
     const { id } = await params;
@@ -228,11 +229,13 @@ export async function DELETE(request, { params }) {
 
     // Berechtigungsprüfung für alle Rollen
     let hasPermission = false;
+    let isUser = false;
 
     if (session.role === "admin") {
       hasPermission = true;
     } else if (session.role === "user" && order.accountId.toString() === session.id) {
       hasPermission = true;
+      isUser = true; 
     } else if (session.role === "company") {
       const company = await Company.findOne({ accountId: session.id });
       if (company && order.companyId.toString() === company._id.toString()) {
@@ -247,43 +250,71 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // Storniere die Bestellung (nicht löschen)
-    const cancelledOrder = await Order.findByIdAndUpdate(
-      id,
-      { status: "cancelled" },
-      { new: true }
-    );
-
-    // Sende E-Mail-Benachrichtigung über die Stornierung
+    // get the account and company details
     const account = await Account.findById(order.accountId);
     const company = await Company.findById(order.companyId);
 
-    await sendOrderStatusUpdateEmail({
-      email: account.email,
-      name: account.name,
-      orderId: order._id,
-      oldStatus: order.status,
-      newStatus: "cancelled",
-      companyName: company.companyName,
-      fromCity: order.fromAddress.city,
-      toCity: order.toAddress.city,
-    });
+    let result;
+    let message;
+
+    // unter company and admin roles, we really delete the order
+    if (isUser) {
+      // user: only cancel the order
+      result = await Order.findByIdAndUpdate(
+        id,
+        { status: "cancelled" },
+        { new: true }
+      );
+
+      message = "Bestellung erfolgreich storniert";
+
+      // send order cancellation email
+      await sendOrderStatusUpdateEmail({
+        email: account.email,
+        name: account.name,
+        orderId: order._id,
+        oldStatus: order.status,
+        newStatus: "cancelled",
+        companyName: company.companyName,
+        fromCity: order.fromAddress.city,
+        toCity: order.toAddress.city,
+      });
+
+    } else {
+      // company and admin：really delete order
+      await Order.findByIdAndDelete(id);
+      result = null; 
+      message = "Bestellung erfolgreich gelöscht";
+
+      // // send order deletion email
+      // await sendOrderDeletionEmail({
+      //   email: account.email,
+      //   name: account.name,
+      //   orderId: order._id,
+      //   companyName: company.companyName,
+      //   fromCity: order.fromAddress.city,
+      //   toCity: order.toAddress.city,
+      //   deletedBy: session.role, // who deleted the order
+      // });
+    }
 
     return NextResponse.json(
       {
         success: true,
-        message: "Bestellung erfolgreich storniert",
-        order: cancelledOrder,
+        message: message,
+        order: result,
+        action: isUser ? "cancelled" : "deleted" // indicate the action taken
       },
       { status: 200 }
     );
+
   } catch (error) {
-    console.error("Fehler beim Stornieren der Bestellung:", error);
+    console.error("Fehler beim Verarbeiten der Bestellung:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Serverfehler beim Stornieren der Bestellung",
+        message: "Serverfehler beim Verarbeiten der Bestellung",
       },
       { status: 500 }
     );

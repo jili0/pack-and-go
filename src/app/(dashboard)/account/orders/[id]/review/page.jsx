@@ -96,8 +96,12 @@ export default function ReviewPage() {
       });
 
       if (response.ok) {
+        alert('Review submitted successfully!');
+        setRating(0);
+        setComment('');
+        setError('');
         // Redirect back to orders page with success message
-        router.push('/account/orders?reviewSubmitted=true');
+        router.push('/account');
       } else {
         const errorData = await response.json();
         setError(errorData.message || 'Failed to submit review');
