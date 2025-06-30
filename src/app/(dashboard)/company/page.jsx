@@ -15,6 +15,25 @@ export default function CompanyDashboard() {
   const [company, setCompany] = useState(null);
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
+  const [filter, setFilter] = useState("all");
+  const [selectedDates, setSelectedDates] = useState({});
+
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("de-DE", {
+      style: "currency",
+      currency: "EUR",
+    }).format(amount);
+
+  const formatDate = (dateString) =>
+    dateString
+      ? new Date(dateString).toLocaleDateString("de-DE", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "No date";
+
+  const getStatusColor = (status) => `status-${status}` || "";
 
   useEffect(() => {
     if (!authLoading && (!account || account.role !== "company")) {
@@ -61,38 +80,139 @@ export default function CompanyDashboard() {
     }
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("de-DE", {
-      style: "currency",
-      currency: "EUR",
-    }).format(amount);
+  const updateOrder = async (orderId, updates) => {
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      const result = await response.json();
+      if (result.success) {
+        setOrders((prev) =>
+          prev.map((order) =>
+            order._id === orderId ? { ...order, ...updates } : order
+          )
+        );
+        if (updates.status === "confirmed" && updates.confirmedDate) {
+          setSelectedDates((prev) => {
+            const updated = { ...prev };
+            delete updated[orderId];
+            return updated;
+          });
+        }
+      } else {
+        alert(result.message || "Error updating order");
+      }
+    } catch (error) {
+      alert("Error updating order. Please try again.");
+    }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "No date";
-    return new Date(dateString).toLocaleDateString("de-DE", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+  const deleteOrder = async (orderId) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this order? This action cannot be undone."
+      )
+    )
+      return;
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: "DELETE",
+      });
+      const result = await response.json();
+      if (result.success) {
+        setOrders((prev) => prev.filter((order) => order._id !== orderId));
+        setSelectedDates((prev) => {
+          const updated = { ...prev };
+          delete updated[orderId];
+          return updated;
+        });
+      } else {
+        alert(result.message || "Error deleting order");
+      }
+    } catch (error) {
+      alert("Error deleting order. Please try again.");
+    }
   };
 
-  const totalOrders = orders.length;
-  const pendingOrders = orders.filter(
-    (order) => order.status === "pending"
-  ).length;
-  const completedOrders = orders.filter(
-    (order) => order.status === "completed"
-  ).length;
-  const revenue = orders
-    .filter((order) => order.status === "completed")
-    .reduce((sum, order) => sum + (order.totalPrice || 0), 0);
-  const thisMonthOrders = orders.filter((order) => {
-    const now = new Date();
-    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    return new Date(order.createdAt) >= thisMonth;
-  }).length;
-  const recentOrders = orders.slice(0, 5);
+  const handleConfirmWithDate = (orderId) => {
+    const selectedDate = selectedDates[orderId];
+    if (selectedDate) {
+      updateOrder(orderId, {
+        status: "confirmed",
+        confirmedDate: selectedDate,
+      });
+    } else {
+      alert("Please select a date first");
+    }
+  };
+
+  const filteredOrders = orders.filter(
+    (order) => filter === "all" || order.status === filter
+  );
+
+  const orderStats = {
+    total: orders.length,
+    pending: orders.filter((o) => o.status === "pending").length,
+    confirmed: orders.filter((o) => o.status === "confirmed").length,
+    completed: orders.filter((o) => o.status === "completed").length,
+    cancelled: orders.filter((o) => o.status === "cancelled").length,
+  };
+
+  const StatusButton = ({ status, count }) => (
+    <button className="btn-secondary" onClick={() => setFilter(status)}>
+      {status === "all"
+        ? "All"
+        : status.charAt(0).toUpperCase() + status.slice(1)}
+      &nbsp; ({count})
+    </button>
+  );
+
+  const OrderActions = ({ order }) => (
+    <>
+      {order.status === "pending" && (
+        <>
+          {order.preferredDates?.length > 0 ? (
+            <div>
+              <button
+                className="btn-primary"
+                onClick={() => handleConfirmWithDate(order._id)}
+                disabled={!selectedDates[order._id]}
+              >
+                Confirm with Selected Date
+              </button>
+            </div>
+          ) : (
+            <button
+              className="btn-primary"
+              onClick={() => updateOrder(order._id, { status: "confirmed" })}
+            >
+              Confirm Order
+            </button>
+          )}
+          <button
+            className="btn-primary"
+            onClick={() => updateOrder(order._id, { status: "cancelled" })}
+          >
+            Decline Order
+          </button>
+        </>
+      )}
+      {order.status === "confirmed" && (
+        <button
+          className="btn-primary"
+          onClick={() => updateOrder(order._id, { status: "completed" })}
+        >
+          Mark as Completed
+        </button>
+      )}
+
+      <button className="btn-primary" onClick={() => deleteOrder(order._id)}>
+        Delete
+      </button>
+    </>
+  );
 
   if (authLoading || dashboardLoading.isLoading) {
     return (
@@ -107,6 +227,9 @@ export default function CompanyDashboard() {
       <div className="error">
         <h3>Error</h3>
         <p>{error}</p>
+        <button className="btn-primary" onClick={fetchCompanyData}>
+          Retry
+        </button>
       </div>
     );
   }
@@ -125,148 +248,103 @@ export default function CompanyDashboard() {
 
   return (
     <div className="container">
-      <div>
-        <h1>Welcome, {company.companyName}!</h1>
-        <p>Manage your moving requests and company profile</p>
-      </div>
+      <h1>Welcome, {company.companyName}! </h1>
+      <Link href="/company/profile" className="btn-primary">
+        Edit Profile
+      </Link>
+      <Link href="/company/reviews" className="btn-primary">
+        View Reviews
+      </Link>
 
       {!company.isVerified && (
-        <div className="verification-warning">
-          <h3>Verification Pending</h3>
-          <p>
-            Your company profile is currently being reviewed. You can only
-            receive moving requests after verification.
-          </p>
-        </div>
+        <p className="verification-warning">
+          Your company profile is currently being reviewed. You can only receive
+          moving requests after verification.
+        </p>
       )}
 
-      <div className="admin-stats">
-        <div>
-          <h3>Total Requests</h3>
-          <p>{totalOrders}</p>
-        </div>
-        <div>
-          <h3>Pending</h3>
-          <p>{pendingOrders}</p>
-        </div>
-        <div>
-          <h3>This Month</h3>
-          <p>{thisMonthOrders}</p>
-        </div>
-        <div>
-          <h3>Revenue</h3>
-          <p>{formatCurrency(revenue)}</p>
-        </div>
-      </div>
-
       <div>
-        <h2>Quick Access</h2>
-        <div className="quick-actions">
-          <Link href="/company/orders" className="btn-primary">
-            Manage All Requests
-          </Link>
-          <Link href="/company/profile" className="btn-primary">
-            Edit Company Profile
-          </Link>
-          <Link href="/company/reviews" className="btn-primary">
-            View Reviews
-          </Link>
-        </div>
+        <StatusButton status="all" count={orderStats.total} />
+        <StatusButton status="pending" count={orderStats.pending} />
+        <StatusButton status="confirmed" count={orderStats.confirmed} />
+        <StatusButton status="completed" count={orderStats.completed} />
+        <StatusButton status="cancelled" count={orderStats.cancelled} />
       </div>
 
-      <div className="user-card">
-        <div>
-          <h3>{company.companyName}</h3>
-          <p>
-            {company.address?.street}, {company.address?.postalCode}&nbsp;
-            {company.address?.city}
-          </p>
-          <p>
-            Rating: {(company.averageRating || 0).toFixed(1)} / 5.0 (
-            {company.reviewsCount || 0} reviews)
-          </p>
-          <p>
-            Status: {company.isVerified ? "Verified" : "Verification Pending"}
-          </p>
-        </div>
-        <Link href="/company/profile" className="btn-primary">
-          Edit
-        </Link>
-      </div>
-
-      <div>
-        <div className="section-header">
-          <h2>Recent Requests</h2>
-          <Link href="/company/orders">View All →</Link>
-        </div>
-
-        {recentOrders.length === 0 ? (
-          <div className="empty-state">
-            <h3>No Requests Available</h3>
-            <p>You currently have no moving requests.</p>
-          </div>
-        ) : (
-          <div>
-            {recentOrders.map((order) => (
-              <div key={order._id} className="order-card">
-                <p>
-                  <strong>Customer:</strong>&nbsp;
-                  {order.accountId?.name || "Unknown"}
-                </p>
-                <p>
-                  <strong>Route:</strong> {order.fromAddress.city} →&nbsp;
-                  {order.toAddress.city}
-                </p>
-                <p>
-                  <strong>Date:</strong>&nbsp;
-                  {order.confirmedDate ? (
-                    <span>Confirmed: {formatDate(order.confirmedDate)}</span>
-                  ) : order.preferredDates?.length > 0 ? (
-                    <span>
-                      Preferred:{" "}
-                      {order.preferredDates.map((date, index) => (
-                        <span key={index}>
-                          {index > 0 && ", "}
-                          {formatDate(date)}
-                        </span>
-                      ))}
-                    </span>
-                  ) : (
-                    "No date specified"
-                  )}
-                </p>
-                <p>
-                  <strong>Status:</strong> {order.status}
-                </p>
-                <p>
-                  <strong>Price:</strong> {formatCurrency(order.totalPrice)}
-                </p>
-                <Link
-                  href={`/company/orders/${order._id}`}
-                  className="btn-primary"
-                >
-                  Details
-                </Link>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {company.serviceAreas && company.serviceAreas.length > 0 && (
-        <div>
-          <div className="section-header">
-            <h2>Your Service Areas</h2>
-            <Link href="/company/profile">Edit →</Link>
-          </div>
-          <div className="service-areas">
-            {company.serviceAreas.map((area, index) => (
-              <span key={index} className="service-area-tag">
-                {area.from} → {area.to}
+      {filteredOrders.length === 0 ? (
+        <p className="error">
+          {filter === "all"
+            ? "You currently have no moving requests."
+            : `No ${filter} orders found.`}
+        </p>
+      ) : (
+        filteredOrders.map((order) => (
+          <div key={order._id} className="order-card">
+            <p>
+              <strong>OrderID:</strong>
+              {order._id.slice(-6)}
+            </p>
+            <p>
+              <strong>Status: </strong>
+              <span className={getStatusColor(order.status)}>
+                {order.status.toUpperCase()}
               </span>
-            ))}
+            </p>
+            <p>
+              <strong>Request created: </strong>
+              {formatDate(order.createdAt)}
+            </p>
+            <p>
+              <strong>Customer:</strong> {order.accountId?.name || "Unknown"}
+            </p>
+            <p>
+              <strong>Email:</strong> {order.accountId?.email || "N/A"}
+            </p>
+            <p>
+              <strong>From:</strong> {order.fromAddress?.street},&nbsp;
+              {order.fromAddress?.postalCode} {order.fromAddress?.city}
+            </p>
+            <p>
+              <strong>To:</strong> {order.toAddress?.street},&nbsp;
+              {order.toAddress?.postalCode} {order.toAddress?.city}
+            </p>
+            <p>
+              <strong>Moving Date:</strong>
+              {order.confirmedDate ? (
+                <span> {formatDate(order.confirmedDate)}</span>
+              ) : order.preferredDates?.length > 0 ? (
+                <>
+                  {order.preferredDates.map((date, index) => (
+                    <span key={index}>
+                      {formatDate(date)}&nbsp;{index < 2 && "|"} &nbsp;
+                    </span>
+                  ))}
+                  &nbsp;(click to select)
+                </>
+              ) : (
+                "Not specified"
+              )}
+            </p>
+            <p>
+              <strong>Helpers:</strong> {order.helpersCount}
+            </p>
+            <p>
+              <strong>Estimated Hours:</strong> {order.estimatedHours}
+            </p>
+            <p>
+              <strong>Price:</strong> {formatCurrency(order.totalPrice)}
+            </p>
+
+            <p>
+              <strong>Notes:</strong> {order.notes || "none"}
+            </p>
+
+            <div>
+              {" "}
+              <OrderActions order={order} />
+            </div>
           </div>
-        </div>
+        ))
       )}
     </div>
   );
