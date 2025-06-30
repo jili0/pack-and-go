@@ -8,6 +8,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [account, setAccount] = useState(null);
+  const [initialCheckDone, setInitialCheckDone] = useState(false); // NEU: Track ob initial check fertig ist
   const router = useRouter();
   const [authInitialized, setAuthInitialized] = useState(false);
 
@@ -30,10 +31,13 @@ export const AuthProvider = ({ children }) => {
   const checkAccountLoggedIn = async () => {
     authCheck.setLoading(true);
     try {
-      const res = await fetch("/api/auth/me");
+      const res = await fetch("/api/auth/me", {
+        credentials: 'include' // Wichtig: Cookies mitsenden
+      });
 
       if (res.status === 401) {
         setAccount(null);
+        setInitialCheckDone(true); // Check ist fertig
         return;
       }
 
@@ -45,13 +49,16 @@ export const AuthProvider = ({ children }) => {
 
       if (data.success) {
         setAccount(data.account);
+        setInitialCheckDone(true); // Check ist fertig
         return { success: true, account: data.account };
       } else {
         setAccount(null);
+        setInitialCheckDone(true); // Check ist fertig
       }
     } catch (error) {
       console.error("Auth check error:", error);
       setAccount(null);
+      setInitialCheckDone(true); // Check ist fertig, auch bei Fehler
     } finally {
       authCheck.setLoading(false);
     }
@@ -67,6 +74,7 @@ export const AuthProvider = ({ children }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(accountData),
+        credentials: 'include'
       });
 
       const data = await res.json();
@@ -102,6 +110,7 @@ export const AuthProvider = ({ children }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include'
       });
 
       const data = await res.json();
@@ -131,6 +140,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await fetch("/api/auth/logout", {
         method: "POST",
+        credentials: 'include'
       });
 
       const data = await res.json();
@@ -158,6 +168,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await fetch("/api/auth/delete", {
         method: "DELETE",
+        credentials: 'include'
       });
 
       const data = await res.json();
@@ -191,10 +202,12 @@ export const AuthProvider = ({ children }) => {
         checkLoading: authCheck.isLoading,
         loginLoading: authLogin.isLoading,
         registerLoading: authRegister.isLoading,
+        initialCheckDone, // NEU: Gibt an ob der initiale Auth-Check fertig ist
         register,
         login,
         logout,
         deleteAccount,
+        checkAccountLoggedIn, // Für manuellen Re-Check
       }}
     >
       {children}
