@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/context/LoadingContext";
 import Loader from "@/components/ui/Loader";
 import Link from "next/link";
+import { OrderInfo } from "@/app/(dashboard)/account/orders/[id]/page";
 
 export default function OrderConfirmation() {
   const params = useParams();
@@ -46,17 +47,6 @@ export default function OrderConfirmation() {
 
     fetchOrderDetails();
   }, [id, account, router]);
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "No date specified";
-    const options = {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    };
-    return new Date(dateString).toLocaleDateString("en-US", options);
-  };
 
   if (orderLoading.isLoading) {
     return <Loader text="Loading order details..." />;
@@ -107,74 +97,7 @@ export default function OrderConfirmation() {
 
       <div className="order-overview">
         <h1>Order Overview</h1>
-        <div className="order-details-card">
-          <div className="order-detail">
-            <span>Order ID:</span>
-            <span>{order._id}</span>
-          </div>
-          <div className="order-detail">
-            <span>Order Status:</span>
-            <span>Request Sent</span>
-          </div>
-          <div className="order-detail">
-            <span>Moving Company:</span>
-            <span>
-              {company.companyName}&nbsp;
-              {[...Array(5)].map((_, i) => (
-                <span
-                  key={i}
-                  className={
-                    i < Math.round(company.averageRating) ? "yellow" : ""
-                  }
-                >
-                  ★
-                </span>
-              ))}
-              &nbsp;{company.reviewsCount}{" "}
-              {company.reviewsCount === 1 ? "review" : "reviews"}
-              &nbsp;
-              {company.isKisteKlarCertified && (
-                <span className="certified-badge">KisteKlar Certified</span>
-              )}
-            </span>
-          </div>
-          <div className="order-detail">
-            <span>From:</span>
-            <span>
-              {order.fromAddress.street}, {order.fromAddress.postalCode}&nbsp;
-              {order.fromAddress.city}
-            </span>
-          </div>
-          <div className="order-detail">
-            <span>To:</span>
-            <span>
-              {order.toAddress.street}, {order.toAddress.postalCode}&nbsp;
-              {order.toAddress.city}
-            </span>
-          </div>
-          <div className="order-detail">
-            <span>Preferred Date:</span>
-            <span>{formatDate(order.preferredDates[0])}</span>
-          </div>
-          <div className="order-detail">
-            <span>Helpers:</span>
-            <span>{order.helpersCount}</span>
-          </div>
-          <div className="order-detail">
-            <span>Estimated Hours:</span>
-            <span>{order.estimatedHours}</span>
-          </div>
-          <div className="order-detail">
-            <span>Estimated Total Price:</span>
-            <span>{order.totalPrice} €</span>
-          </div>
-          {order.notes && (
-            <div className="order-detail">
-              <span>Additional Notes:</span>
-              <span>{order.notes}</span>
-            </div>
-          )}
-        </div>
+        <OrderInfo order={order} company={company} />
       </div>
 
       <div className="email-notification">

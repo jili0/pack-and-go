@@ -5,6 +5,88 @@ import { useRouter, useParams } from "next/navigation";
 import { useLoading } from "@/context/LoadingContext";
 import Loader from "@/components/ui/Loader";
 
+export const OrderInfo = ({ order, company }) => {
+  const formatDate = (dateString) => {
+    if (!dateString) return "No date specified";
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return new Date(dateString).toLocaleDateString("en-US", options);
+  };
+
+  return (
+    <div className="order-details-card">
+      <div className="order-detail">
+        <span>Order ID:</span>
+        <span>{order._id}</span>
+      </div>
+      <div className="order-detail">
+        <span>Order Status:</span>
+        <span>Request Sent</span>
+      </div>
+      <div className="order-detail">
+        <span>Moving Company:</span>
+        <span>
+          {company.companyName}&nbsp;
+          {[...Array(5)].map((_, i) => (
+            <span
+              key={i}
+              className={i < Math.round(company.averageRating) ? "yellow" : ""}
+            >
+              ★
+            </span>
+          ))}
+          &nbsp;{company.reviewsCount}{" "}
+          {company.reviewsCount === 1 ? "review" : "reviews"}
+          &nbsp;
+          {company.isKisteKlarCertified && (
+            <span className="certified-badge">KisteKlar Certified</span>
+          )}
+        </span>
+      </div>
+      <div className="order-detail">
+        <span>From:</span>
+        <span>
+          {order.fromAddress.street}, {order.fromAddress.postalCode}&nbsp;
+          {order.fromAddress.city}
+        </span>
+      </div>
+      <div className="order-detail">
+        <span>To:</span>
+        <span>
+          {order.toAddress.street}, {order.toAddress.postalCode}&nbsp;
+          {order.toAddress.city}
+        </span>
+      </div>
+      <div className="order-detail">
+        <span>Preferred Date:</span>
+        <span>{formatDate(order.preferredDates[0])}</span>
+      </div>
+      <div className="order-detail">
+        <span>Helpers:</span>
+        <span>{order.helpersCount}</span>
+      </div>
+      <div className="order-detail">
+        <span>Estimated Hours:</span>
+        <span>{order.estimatedHours}</span>
+      </div>
+      <div className="order-detail">
+        <span>Estimated Total Price:</span>
+        <span>{order.totalPrice} €</span>
+      </div>
+      {order.notes && (
+        <div className="order-detail">
+          <span>Additional Notes:</span>
+          <span>{order.notes}</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const OrderDetails = () => {
   const router = useRouter();
   const params = useParams();
@@ -48,26 +130,6 @@ const OrderDetails = () => {
     fetchOrderDetails();
   }, [orderId]);
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "No date specified";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const getStatusBadge = (status) => {
-    const statusMap = {
-      pending: "Request Sent",
-      confirmed: "Confirmed",
-      declined: "Declined",
-      completed: "Completed",
-      cancelled: "Cancelled",
-    };
-    return statusMap[status] || status;
-  };
-
   const handleCancelOrder = async () => {
     cancelLoading.startLoading();
     try {
@@ -89,12 +151,6 @@ const OrderDetails = () => {
       cancelLoading.stopLoading();
     }
   };
-
-  const renderDetailRow = (label, value) => (
-    <div className="order-detail">
-      <strong>{label}:</strong> {value}
-    </div>
-  );
 
   if (orderDetailsLoading.isLoading) {
     return (
@@ -136,51 +192,9 @@ const OrderDetails = () => {
 
   return (
     <div className="container">
-      <div className="order-details-card">
-        <h2>Order Details</h2>
+      <h1>Order Details</h1>
 
-        {renderDetailRow("Order ID", order._id)}
-        {renderDetailRow("Order Date", formatDate(order.createdAt))}
-        {renderDetailRow("Status", getStatusBadge(order.status))}
-
-        {renderDetailRow(
-          "Moving Company",
-          <p>
-            {company.companyName} •{" "}
-            {[...Array(5)].map((_, i) => (
-              <span key={i}>★</span>
-            ))}{" "}
-            ({company.reviewsCount}{" "}
-            {company.reviewsCount === 1 ? "review" : "reviews"}){" "}
-            {company.isKisteKlarCertified && "• KisteKlar Certified"}
-          </p>
-        )}
-
-        {renderDetailRow(
-          "From",
-          `${order.fromAddress.street}, ${order.fromAddress.postalCode} ${order.fromAddress.city}, ${order.fromAddress.country}`
-        )}
-        {renderDetailRow(
-          "To",
-          `${order.toAddress.street}, ${order.toAddress.postalCode} ${order.toAddress.city}, ${order.toAddress.country}`
-        )}
-        {renderDetailRow(
-          "Moving Date",
-          order.confirmedDate ? (
-            formatDate(order.confirmedDate)
-          ) : (
-            <span>
-              Preferred: {formatDate(order.preferredDates[0])}{" "}
-              <small>(Waiting for confirmation)</small>
-            </span>
-          )
-        )}
-        {renderDetailRow("Helpers", order.helpersCount)}
-        {renderDetailRow("Estimated Hours", order.estimatedHours)}
-        {renderDetailRow("Total Price", `${order.totalPrice} €`)}
-
-        {order.notes && renderDetailRow("Additional Notes", order.notes)}
-      </div>
+      <OrderInfo order={order} company={company} />
 
       <div className="form-footer">
         <button className="btn-primary" onClick={() => router.back()}>
