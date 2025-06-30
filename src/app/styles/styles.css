@@ -55,6 +55,13 @@ button:hover {
   color: #007bff;
 }
 
+.icon {
+  width: 48px;
+  height: 48px;
+  color: #007bff;
+  flex-shrink: 0;
+}
+
 button {
   cursor: pointer;
 }
@@ -72,11 +79,12 @@ button {
   border: none;
   cursor: pointer;
   background: #007bff;
-  color: white;
+  color: white !important;
 }
 
 .btn-primary:hover {
   background: #0056b3;
+  text-decoration: none;
 }
 
 .btn-secondary {
@@ -780,6 +788,33 @@ footer a:hover {
   gap: 1rem;
   align-items: center;
   flex-wrap: wrap;
+}
+
+/* OrderConfirmation */
+
+.success-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+}
+
+.order-overview {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.email-notification {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #e7f3ff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 2rem 0;
 }
 
 /* Media Queries */
