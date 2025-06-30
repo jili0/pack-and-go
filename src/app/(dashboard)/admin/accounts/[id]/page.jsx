@@ -373,12 +373,7 @@ export default function EditPage() {
           </label>
         </div>
 
-        <div className="form-field">
-          <label>
-            Current Password
-            <input type="password" value="••••••••••••" disabled />
-          </label>
-        </div>
+       
         <div className="form-field">
           <label>
             New Password (Optional)
