@@ -711,6 +711,15 @@ footer a:hover {
   align-items: center;
   gap: 0.5rem;
 }
+
+/* CompanyProfileEdit */
+
+.three-columns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 /* OrderDetails */
 
 .order-details-card .order-detail {

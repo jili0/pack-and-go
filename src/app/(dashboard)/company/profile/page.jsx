@@ -6,111 +6,26 @@ import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/context/LoadingContext";
 import Loader from "@/components/ui/Loader";
 
-const FORM_FIELDS = [
-  {
-    name: "companyName",
-    label: "Company Name",
-    required: true,
-    placeholder: "Enter your company name",
-  },
-  {
-    name: "taxId",
-    label: "Tax ID Number",
-    required: true,
-    placeholder: "Enter your tax identification number",
-  },
-  {
-    name: "street",
-    label: "Street Address",
-    required: true,
-    placeholder: "Street and house number",
-  },
-  { name: "city", label: "City", required: true, placeholder: "City name" },
-  {
-    name: "postalCode",
-    label: "Postal Code",
-    required: true,
-    placeholder: "12345",
-  },
-  { name: "country", label: "Country", placeholder: "Germany" },
-  {
-    name: "phone",
-    label: "Phone Number",
-    type: "tel",
-    placeholder: "+49 123 456789",
-  },
-  {
-    name: "email",
-    label: "Contact Email",
-    type: "email",
-    placeholder: "contact@company.com",
-  },
-];
-
-const INITIAL_FORM_DATA = {
-  companyName: "",
-  taxId: "",
-  street: "",
-  city: "",
-  postalCode: "",
-  country: "Germany",
-  phone: "",
-  email: "",
-  isKisteKlarCertified: false,
-  serviceAreas: [{ from: "", to: "" }],
-  businessLicense: null,
-  kisteKlarCertificate: null,
-};
-
-const FormField = ({ field, value, onChange, errors }) => {
-  const {
-    name,
-    label,
-    type = "text",
-    required = false,
-    placeholder,
-    rows,
-    ...props
-  } = field;
-
-  return (
-    <div className="form-field">
-      <label>
-        {label}
-        {required && "*"}
-        {type === "textarea" ? (
-          <textarea
-            name={name}
-            value={value || ""}
-            onChange={(e) => onChange(name, e.target.value)}
-            placeholder={placeholder}
-            rows={rows}
-            {...props}
-          />
-        ) : (
-          <input
-            type={type}
-            name={name}
-            value={value || ""}
-            onChange={(e) => onChange(name, e.target.value)}
-            required={required}
-            placeholder={placeholder}
-            {...props}
-          />
-        )}
-        {errors[name] && <div className="error">{errors[name]}</div>}
-      </label>
-    </div>
-  );
-};
-
 export default function CompanyProfileEdit() {
   const router = useRouter();
   const { account, loading: authLoading } = useAuth();
   const profileLoading = useLoading("api", "companyProfile");
   const submitLoading = useLoading("api", "submitProfile");
 
-  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  const [formData, setFormData] = useState({
+    companyName: "",
+    taxId: "",
+    street: "",
+    city: "",
+    postalCode: "",
+    country: "Germany",
+    phone: "",
+    email: "",
+    isKisteKlarCertified: false,
+    serviceAreas: [{ from: "", to: "" }],
+    businessLicense: null,
+    kisteKlarCertificate: null,
+  });
   const [errors, setErrors] = useState({});
   const [submitMessage, setSubmitMessage] = useState("");
 
@@ -119,17 +34,13 @@ export default function CompanyProfileEdit() {
       router.push("/login");
       return;
     }
-
-    if (!authLoading && account) {
-      fetchCompanyProfile();
-    }
+    if (!authLoading && account) fetchCompanyProfile();
   }, [account, authLoading, router]);
 
   const fetchCompanyProfile = async () => {
     profileLoading.startLoading();
     try {
       const response = await fetch("/api/company/me");
-
       if (!response.ok) {
         if (response.status === 404) {
           router.push("/company/setup");
@@ -137,12 +48,9 @@ export default function CompanyProfileEdit() {
         }
         throw new Error("Error loading company profile");
       }
-
       const result = await response.json();
-
       if (result.success && result.company) {
         const company = result.company;
-
         setFormData({
           companyName: company.companyName || "",
           taxId: company.taxId || "",
@@ -154,7 +62,7 @@ export default function CompanyProfileEdit() {
           email: company.email || "",
           isKisteKlarCertified: company.isKisteKlarCertified || false,
           serviceAreas:
-            company.serviceAreas && company.serviceAreas.length > 0
+            company.serviceAreas?.length > 0
               ? company.serviceAreas
               : [{ from: "", to: "" }],
           businessLicense: null,
@@ -169,92 +77,35 @@ export default function CompanyProfileEdit() {
     }
   };
 
-  const handleInputChange = (name, value) => {
+  const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const updateServiceArea = (index, field, value) => {
-    const updatedAreas = formData.serviceAreas.map((area, i) =>
-      i === index ? { ...area, [field]: value } : area
-    );
-    setFormData((prev) => ({ ...prev, serviceAreas: updatedAreas }));
-  };
-
-  const addServiceArea = () => {
-    setFormData((prev) => ({
-      ...prev,
-      serviceAreas: [...prev.serviceAreas, { from: "", to: "" }],
-    }));
-  };
-
-  const removeServiceArea = (index) => {
-    if (formData.serviceAreas.length > 1) {
-      const updatedAreas = formData.serviceAreas.filter((_, i) => i !== index);
-      setFormData((prev) => ({ ...prev, serviceAreas: updatedAreas }));
-    }
-  };
-
-  const handleFileUpload = (name, file) => {
-    setFormData((prev) => ({ ...prev, [name]: file }));
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    const requiredFields = [
-      "companyName",
-      "taxId",
-      "street",
-      "city",
-      "postalCode",
-    ];
-    requiredFields.forEach((field) => {
-      if (!formData[field] || formData[field].trim() === "") {
-        newErrors[field] = `${field} is required`;
-      }
-    });
-
-    const hasEmptyServiceArea = formData.serviceAreas.some(
-      (area) => !area.from.trim() || !area.to.trim()
-    );
-    if (hasEmptyServiceArea) {
-      newErrors.serviceAreas =
-        "All service areas must have both from and to cities";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const createSubmissionData = () => {
-    const data = new FormData();
-
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value === null || value === undefined) return;
-
-      if (key === "serviceAreas") {
-        data.append(key, JSON.stringify(value));
-      } else if (key === "isKisteKlarCertified") {
-        data.append(key, value.toString());
-      } else if (key === "businessLicense" || key === "kisteKlarCertificate") {
-        if (value instanceof File) {
-          data.append(key, value);
-        }
-      } else {
-        data.append(key, value);
-      }
-    });
-
-    return data;
+    const areas = [...formData.serviceAreas];
+    areas[index][field] = value;
+    setFormData((prev) => ({ ...prev, serviceAreas: areas }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    const newErrors = {};
+    ["companyName", "taxId", "street", "city", "postalCode"].forEach(
+      (field) => {
+        if (!formData[field]?.trim()) newErrors[field] = `${field} is required`;
+      }
+    );
+    if (
+      formData.serviceAreas.some((area) => !area.from.trim() || !area.to.trim())
+    ) {
+      newErrors.serviceAreas =
+        "All service areas must have both from and to cities";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       setSubmitMessage("Please fix the errors below.");
       return;
     }
@@ -263,27 +114,39 @@ export default function CompanyProfileEdit() {
     setSubmitMessage("");
 
     try {
-      const response = await fetch("/api/company/profile", {
-        method: "PUT",
-        body: createSubmissionData(),
+      const data = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value === null || value === undefined) return;
+        if (key === "serviceAreas") data.append(key, JSON.stringify(value));
+        else if (key === "isKisteKlarCertified")
+          data.append(key, value.toString());
+        else if (
+          (key === "businessLicense" || key === "kisteKlarCertificate") &&
+          value instanceof File
+        )
+          data.append(key, value);
+        else data.append(key, value);
       });
 
+      const response = await fetch("/api/company/profile", {
+        method: "PUT",
+        body: data,
+      });
       const result = await response.json();
 
       if (result.success) {
         setSubmitMessage("Company profile updated successfully!");
         setErrors({});
-        setTimeout(() => {
-          router.push("/company");
-        }, 2000);
+        setTimeout(() => router.push("/company"), 2000);
       } else {
         setSubmitMessage(result.message || "Error updating profile.");
         if (result.errors) {
-          const errorMap = result.errors.reduce(
-            (acc, err) => ({ ...acc, [err.field]: err.message }),
-            {}
+          setErrors(
+            result.errors.reduce(
+              (acc, err) => ({ ...acc, [err.field]: err.message }),
+              {}
+            )
           );
-          setErrors(errorMap);
         }
       }
     } catch (error) {
@@ -294,13 +157,9 @@ export default function CompanyProfileEdit() {
     }
   };
 
-  const handleCancel = () => {
-    router.push("/company");
-  };
-
   if (authLoading || profileLoading.isLoading) {
     return (
-      <div className="container">
+      <div>
         <Loader text="Loading profile..." />
       </div>
     );
@@ -308,130 +167,212 @@ export default function CompanyProfileEdit() {
 
   return (
     <div className="container">
-      <div className="page-header">
-        <h1>Edit Company Profile</h1>
-        <p>Update your company information and settings</p>
-      </div>
-
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <div className="form-section">
-          <h2>Company Information</h2>
-          {FORM_FIELDS.map((field) => (
-            <FormField
-              key={field.name}
-              field={field}
-              value={formData[field.name]}
-              onChange={handleInputChange}
-              errors={errors}
-            />
-          ))}
-        </div>
-
-        <div className="form-section">
-          <h2>Service Areas</h2>
-          <div className="form-field">
-            <label>
-              Service Areas*&nbsp;
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={addServiceArea}
-              >
-                Add New Area
-              </button>
-            </label>
-            {formData.serviceAreas.map((area, index) => (
-              <div key={index} className="service-area">
-                <input
-                  type="text"
-                  value={area.from}
-                  onChange={(e) =>
-                    updateServiceArea(index, "from", e.target.value)
-                  }
-                  placeholder="Starting city"
-                  required
-                />
-                <span>→</span>
-                <input
-                  type="text"
-                  value={area.to}
-                  onChange={(e) =>
-                    updateServiceArea(index, "to", e.target.value)
-                  }
-                  placeholder="Destination city"
-                  required
-                />
-                {formData.serviceAreas.length > 1 && (
-                  <button
-                    className="btn-danger"
-                    type="button"
-                    onClick={() => removeServiceArea(index)}
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-            {errors.serviceAreas && (
-              <div className="error">{errors.serviceAreas}</div>
-            )}
-          </div>
-        </div>
-
-        <div className="form-section">
-          <h2>Certifications</h2>
-
-          <div className="checkbox-field">
+      <h1>Edit Company Profile</h1>
+      <form onSubmit={handleSubmit}>
+        <div className="form-field">
+          <label>
+            Company Name*
             <input
-              type="checkbox"
-              name="isKisteKlarCertified"
-              checked={formData.isKisteKlarCertified}
-              onChange={(e) =>
-                handleInputChange("isKisteKlarCertified", e.target.checked)
-              }
+              value={formData.companyName}
+              onChange={(e) => handleChange("companyName", e.target.value)}
+              placeholder="Enter your company name"
+              required
             />
-            <label>KisteKlar Certified Company</label>
-          </div>
+            {errors.companyName && (
+              <div className="error">{errors.companyName}</div>
+            )}
+          </label>
+        </div>
 
-          <div className="form-field">
+        <div className="form-field">
+          <label>
+            Tax ID Number*
+            <input
+              value={formData.taxId}
+              onChange={(e) => handleChange("taxId", e.target.value)}
+              placeholder="Enter your tax identification number"
+              required
+            />
+            {errors.taxId && <div className="error">{errors.taxId}</div>}
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label>
+            Street Address*
+            <input
+              value={formData.street}
+              onChange={(e) => handleChange("street", e.target.value)}
+              placeholder="Street and house number"
+              required
+            />
+            {errors.street && <div className="error">{errors.street}</div>}
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label>
+            City*
+            <input
+              value={formData.city}
+              onChange={(e) => handleChange("city", e.target.value)}
+              placeholder="City name"
+              required
+            />
+            {errors.city && <div className="error">{errors.city}</div>}
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label>
+            Postal Code*
+            <input
+              value={formData.postalCode}
+              onChange={(e) => handleChange("postalCode", e.target.value)}
+              placeholder="12345"
+              required
+            />
+            {errors.postalCode && (
+              <div className="error">{errors.postalCode}</div>
+            )}
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label>
+            Country
+            <input
+              value={formData.country}
+              onChange={(e) => handleChange("country", e.target.value)}
+              placeholder="Germany"
+            />
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label>
+            Phone Number
+            <input
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => handleChange("phone", e.target.value)}
+              placeholder="+49 123 456789"
+            />
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label>
+            Contact Email
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+              placeholder="contact@company.com"
+            />
+          </label>
+        </div>
+
+        <div className="form-field">
+          <div className="three-columns">
+            <label htmlFor="service-area">Service Areas*</label>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  serviceAreas: [...prev.serviceAreas, { from: "", to: "" }],
+                }))
+              }
+            >
+              Add New Area
+            </button>
             <label>
-              Business License (Upload new file to replace current)
               <input
-                type="file"
-                name="businessLicense"
-                accept=".pdf,.jpg,.jpeg,.png"
+                type="checkbox"
+                checked={formData.isKisteKlarCertified}
                 onChange={(e) =>
-                  handleFileUpload("businessLicense", e.target.files[0] || null)
+                  handleChange("isKisteKlarCertified", e.target.checked)
                 }
               />
-              {errors.businessLicense && (
-                <div className="error">{errors.businessLicense}</div>
+              KisteKlar Certified Company
+            </label>
+          </div>
+          {formData.serviceAreas.map((area, index) => (
+            <div key={index} className="service-area" id="service-area">
+              <input
+                value={area.from}
+                onChange={(e) =>
+                  updateServiceArea(index, "from", e.target.value)
+                }
+                placeholder="Starting city"
+                required
+              />
+              <span>→</span>
+              <input
+                value={area.to}
+                onChange={(e) => updateServiceArea(index, "to", e.target.value)}
+                placeholder="Destination city"
+                required
+              />
+              {formData.serviceAreas.length > 1 && (
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={() => {
+                    const areas = formData.serviceAreas.filter(
+                      (_, i) => i !== index
+                    );
+                    setFormData((prev) => ({ ...prev, serviceAreas: areas }));
+                  }}
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+          {errors.serviceAreas && (
+            <div className="error">{errors.serviceAreas}</div>
+          )}
+        </div>
+
+        <div className="form-field">
+          <label>
+            Business License (Upload new file to replace current)
+            <input
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={(e) =>
+                handleChange("businessLicense", e.target.files[0] || null)
+              }
+            />
+            {errors.businessLicense && (
+              <div className="error">{errors.businessLicense}</div>
+            )}
+          </label>
+        </div>
+
+        {formData.isKisteKlarCertified && (
+          <div className="form-field">
+            <label>
+              KisteKlar Certificate (Upload new file to replace current)
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) =>
+                  handleChange(
+                    "kisteKlarCertificate",
+                    e.target.files[0] || null
+                  )
+                }
+              />
+              {errors.kisteKlarCertificate && (
+                <div className="error">{errors.kisteKlarCertificate}</div>
               )}
             </label>
           </div>
-
-          {formData.isKisteKlarCertified && (
-            <div className="form-field">
-              <label>
-                KisteKlar Certificate (Upload new file to replace current)
-                <input
-                  type="file"
-                  name="kisteKlarCertificate"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) =>
-                    handleFileUpload(
-                      "kisteKlarCertificate",
-                      e.target.files[0] || null
-                    )
-                  }
-                />
-                {errors.kisteKlarCertificate && (
-                  <div className="error">{errors.kisteKlarCertificate}</div>
-                )}
-              </label>
-            </div>
-          )}
-        </div>
+        )}
 
         <div className="form-actions">
           <button
@@ -443,8 +384,8 @@ export default function CompanyProfileEdit() {
           </button>
           <button
             type="button"
-            className="btn-secondary"
-            onClick={handleCancel}
+            className="btn-primary"
+            onClick={() => router.push("/company")}
             disabled={submitLoading.isLoading}
           >
             Cancel
