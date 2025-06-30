@@ -7,24 +7,32 @@ import Loader from "@/components/ui/Loader";
 
 export default function AdminReviewsPage() {
   const router = useRouter();
-  const { account, loading: authLoading } = useAuth();
+  const { account, loading: authLoading, initialCheckDone } = useAuth(); // NEU: initialCheckDone verwenden
 
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!authLoading && (!account || account.role !== "admin")) {
-      router.push("/login");
-    } else if (account) {
-      fetchReviews();
+    // Warte bis der initiale Auth-Check fertig ist
+    if (initialCheckDone) {
+      if (!account) {
+        router.push("/login");
+      } else if (account.role !== "admin") {
+        router.push("/"); // Oder eine "Access Denied" Seite
+      } else {
+        // Nur wenn alles OK ist, lade die Reviews
+        fetchReviews();
+      }
     }
-  }, [account, authLoading]);
+  }, [account, initialCheckDone, router]); // initialCheckDone in dependencies
 
   const fetchReviews = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/reviews");
+      const response = await fetch("/api/reviews", {
+        credentials: 'include'
+      });
       const result = await response.json();
       if (result.success) {
         setReviews(result.reviews);
@@ -38,7 +46,6 @@ export default function AdminReviewsPage() {
     }
   };
 
-  // NEUE VERBESSERTE DELETE FUNKTION
   const deleteReview = async (id) => {
     if (!id) {
       alert("Invalid review ID");
@@ -89,8 +96,18 @@ export default function AdminReviewsPage() {
       day: "numeric",
     });
 
-  // Rest deines Codes bleibt gleich...
-  if (authLoading || loading) {
+  // Zeige Loading bis Auth-Check fertig ist
+  if (!initialCheckDone || authLoading) {
+    return <Loader text="Checking authentication..." />;
+  }
+
+  // Wenn nicht eingeloggt oder kein Admin, zeige nichts (Redirect läuft)
+  if (!account || account.role !== "admin") {
+    return <Loader text="Redirecting..." />;
+  }
+
+  // Zeige Loading für Reviews
+  if (loading) {
     return <Loader text="Loading reviews..." />;
   }
 
