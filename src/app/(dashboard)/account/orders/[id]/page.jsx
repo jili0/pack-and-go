@@ -209,13 +209,16 @@ const OrderDetails = () => {
           </button>
         )}
         {order.status === "completed" && !order.review && (
-          <button
-            className="btn-primary"
-            onClick={() => router.push(`/account/orders/${orderId}/review`)}
-          >
-            Leave Review
-          </button>
-        )}
+        <div className="review-prompt">
+        <p>We'd love your feedback on this move!</p>
+        <button
+          className="btn-primary"
+          onClick={() => router.push(`/account/orders/${orderId}/review`)}
+        >
+      Leave a Review
+    </button>
+  </div>
+)}
       </div>
 
       {showCancelModal && (

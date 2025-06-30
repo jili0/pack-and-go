@@ -117,7 +117,7 @@ export default function OrderConfirmation() {
         <div>
           <h1>Check Your Email</h1>
           <p>
-            We've sent a confirmation email to <strong>{account.email}</strong>{" "}
+            We've sent a confirmation email to <strong>{account?.email}</strong>{" "}
             with all the details of your order.
           </p>
           <p>If you don't see it, please check your spam folder.</p>
