@@ -38,20 +38,47 @@ export default function AdminReviewsPage() {
     }
   };
 
+  // NEUE VERBESSERTE DELETE FUNKTION
   const deleteReview = async (id) => {
+    if (!id) {
+      alert("Invalid review ID");
+      return;
+    }
+
     if (!window.confirm("Are you sure you want to delete this review?")) return;
+    
     try {
+      console.log("Deleting review with ID:", id);
+      console.log("Current user:", account);
+      
       const response = await fetch(`/api/reviews/${id}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: 'include',
       });
+
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log("Error response:", errorData);
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
       const result = await response.json();
+      console.log("Delete result:", result);
+      
       if (result.success) {
         setReviews((prev) => prev.filter((r) => r._id !== id));
+        alert("Review deleted successfully!");
       } else {
         alert(result.message || "Failed to delete review");
       }
     } catch (err) {
-      alert("Failed to delete review");
+      console.error("Delete error:", err);
+      alert(`Failed to delete review: ${err.message}`);
     }
   };
 
@@ -62,6 +89,7 @@ export default function AdminReviewsPage() {
       day: "numeric",
     });
 
+  // Rest deines Codes bleibt gleich...
   if (authLoading || loading) {
     return <Loader text="Loading reviews..." />;
   }
