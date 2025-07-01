@@ -1,4 +1,3 @@
-// src/app/api/company/me/route.js
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Company from "@/models/Company";
@@ -11,24 +10,24 @@ export async function GET() {
 
     if (!session || session.role !== "company") {
       return NextResponse.json(
-        { success: false, message: "Nicht autorisiert" },
+        { success: false, message: "Not authorized" },
         { status: 401 }
       );
     }
 
     await connectDB();
 
-    // Suche das Unternehmen basierend auf der Benutzer-ID
+    // Find the company based on user ID
     const company = await Company.findOne({ accountId: session.id });
 
     if (!company) {
       return NextResponse.json(
-        { success: false, message: "Firmenprofil nicht gefunden" },
+        { success: false, message: "Company profile not found" },
         { status: 404 }
       );
     }
 
-    // Hole auch die Benutzerdaten
+    // Also get the user data
     const account = await Account.findById(session.id).select("-password");
 
     return NextResponse.json(
@@ -40,12 +39,12 @@ export async function GET() {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Fehler beim Abrufen des Firmenprofils:", error);
+    console.error("Error retrieving company profile:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Serverfehler beim Abrufen des Firmenprofils",
+        message: "Server error while retrieving company profile",
       },
       { status: 500 }
     );
@@ -58,7 +57,7 @@ export async function PUT(request) {
 
     if (!session || session.role !== "company") {
       return NextResponse.json(
-        { success: false, message: "Nicht autorisiert" },
+        { success: false, message: "Not authorized" },
         { status: 401 }
       );
     }
@@ -67,17 +66,17 @@ export async function PUT(request) {
 
     const updateData = await request.json();
 
-    // Suche das Unternehmen
+    // Find the company
     const company = await Company.findOne({ accountId: session.id });
 
     if (!company) {
       return NextResponse.json(
-        { success: false, message: "Firmenprofil nicht gefunden" },
+        { success: false, message: "Company profile not found" },
         { status: 404 }
       );
     }
 
-    // Erlaubte Felder für Updates
+    // Allowed fields for updates
     const allowedFields = [
       "companyName",
       "description",
@@ -85,7 +84,7 @@ export async function PUT(request) {
       "serviceAreas",
     ];
 
-    // Filtere nur erlaubte Felder
+    // Filter only allowed fields
     const filteredUpdate = {};
     Object.keys(updateData).forEach((key) => {
       if (allowedFields.includes(key)) {
@@ -93,7 +92,7 @@ export async function PUT(request) {
       }
     });
 
-    // Aktualisiere das Unternehmen
+    // Update the company
     const updatedCompany = await Company.findByIdAndUpdate(
       company._id,
       { $set: filteredUpdate },
@@ -103,18 +102,18 @@ export async function PUT(request) {
     return NextResponse.json(
       {
         success: true,
-        message: "Firmenprofil erfolgreich aktualisiert",
+        message: "Company profile successfully updated",
         company: updatedCompany.toObject(),
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Fehler beim Aktualisieren des Firmenprofils:", error);
+    console.error("Error updating company profile:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Serverfehler beim Aktualisieren des Firmenprofils",
+        message: "Server error while updating company profile",
       },
       { status: 500 }
     );
