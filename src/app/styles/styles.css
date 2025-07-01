@@ -28,7 +28,7 @@ body {
 h1,
 h2,
 h3 {
-  margin-bottom: clamp(10px, 2vw, 16px);
+  margin-bottom: clamp(12px, 2vw, 18px);
 }
 
 h1 {
@@ -817,6 +817,29 @@ footer a:hover {
   padding: 1.5rem;
   border-radius: 8px;
   margin: 2rem 0;
+}
+
+/* ReviewPage */
+.review-form p {
+  text-align: left;
+  height: 36px;
+}
+
+.star-active,
+.star-inactive {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding-inline: 0.2rem;
+  padding-block: none;
+}
+
+.star-active {
+  color: #ffc107;
+}
+
+.star-inactive {
+  color: #ddd;
 }
 
 /* Media Queries */

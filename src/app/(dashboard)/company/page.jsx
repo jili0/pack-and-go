@@ -286,7 +286,7 @@ export default function CompanyDashboard() {
         filteredOrders.map((order) => (
           <div key={order._id} className="order-card">
             <p>
-              <strong>OrderID:</strong>
+              <strong>OrderID:&nbsp;</strong>
               {order._id}
             </p>
             <p>
