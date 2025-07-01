@@ -16,7 +16,7 @@ const PriceCalculator = () => {
       <form className="calculator">
         <h2>Price Calculator</h2>
 
-        <div className="calculator-row">
+        <div className="row">
           <label>Helpers</label>
           <div className="input-group">
             <button
@@ -39,7 +39,7 @@ const PriceCalculator = () => {
           </div>
         </div>
 
-        <div className="calculator-row">
+        <div className="row">
           <label>Hours</label>
           <div className="input-group">
             <button

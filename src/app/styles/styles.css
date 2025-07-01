@@ -310,7 +310,7 @@ section {
 }
 
 /* Price Calculator */
-.calculator-row {
+.row {
   display: flex;
   justify-content: space-between;
   align-items: center;

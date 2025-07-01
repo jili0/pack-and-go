@@ -360,7 +360,6 @@ export default function CompanyDashboard() {
             </p>
 
             <div>
-              {" "}
               <OrderActions order={order} />
             </div>
           </div>

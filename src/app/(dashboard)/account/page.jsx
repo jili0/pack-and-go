@@ -7,36 +7,6 @@ import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/context/LoadingContext";
 import Loader from "@/components/ui/Loader";
 
-const ERROR_ICON = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 20 20"
-    fill="currentColor"
-  >
-    <path
-      fillRule="evenodd"
-      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-      clipRule="evenodd"
-    />
-  </svg>
-);
-
-const EMPTY_STATE_ICON = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-    />
-  </svg>
-);
-
 export default function AccountDashboard() {
   const router = useRouter();
   const { account, loading } = useAuth();
@@ -104,15 +74,11 @@ export default function AccountDashboard() {
           });
           setUpcomingOrders(upcoming);
         } else {
-          setError(
-            data.message || "Die Bestellungen konnten nicht geladen werden."
-          );
+          setError(data.message || "Orders could not be loaded.");
         }
       } catch (error) {
-        console.error("Fehler beim Laden der Bestellungen:", error);
-        setError(
-          "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut."
-        );
+        console.error("Error loading orders:", error);
+        setError("An error occurred. Please try again later.");
       } finally {
         ordersLoading.stopLoading();
       }
@@ -134,7 +100,7 @@ export default function AccountDashboard() {
       <h1>Hello, {account.name}</h1>
       <p>Welcome to your personal dashboard</p>
 
-      <div className="quick-actions">
+      <div className="row">
         <a href="/" className="contact-item quick-action-link">
           <div className="contact-icon">
             <svg
@@ -179,13 +145,7 @@ export default function AccountDashboard() {
         </a>
       </div>
 
-      {error && (
-        <div className="error">
-          {ERROR_ICON}
-          <h3>An error has occurred</h3>
-          <p>{error}</p>
-        </div>
-      )}
+      {error && <p className="error">{error}</p>}
 
       <section>
         <h2>View Orders</h2>
@@ -234,14 +194,7 @@ export default function AccountDashboard() {
             ))}
           </div>
         ) : (
-          <div className="empty-state">
-            {EMPTY_STATE_ICON}
-            <h3>No Upcoming Moves</h3>
-            <p>You currently have no planned moves.</p>
-            <Link href="/" className="btn-primary">
-              Plan a Move Now
-            </Link>
-          </div>
+          <p>You currently have no planned moves.</p>
         )}
       </section>
     </div>
