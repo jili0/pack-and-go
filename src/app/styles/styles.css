@@ -71,6 +71,10 @@ button:disabled {
   opacity: 0.6;
 }
 
+.underlined {
+  text-decoration: underline;
+}
+
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -490,26 +494,27 @@ section {
   margin-bottom: -0.4rem;
 }
 
-/* Company Dashboard */
+/* CompanyDashboard */
+.company-order-card {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.company-order-card .row {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
 .verification-warning {
   background: #fff3cd;
   border: 1px solid #ffc107;
   padding: 1rem;
   border-radius: 6px;
-  margin: 1rem 0;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 1.5rem 0 1rem 0;
-}
-
-.service-areas {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
   margin: 1rem 0;
 }
 
@@ -696,14 +701,6 @@ footer a:hover {
   margin: 0.5rem 0;
   border: 1px solid #eee;
   border-radius: 6px;
-}
-
-/* Company Setup Page */
-
-.service-area {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 /* CompanyProfileEdit */
