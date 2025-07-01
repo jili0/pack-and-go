@@ -9,7 +9,7 @@ import Loader from "@/components/ui/Loader";
 
 export default function AccountDashboard() {
   const router = useRouter();
-  const { account, loading } = useAuth();
+  const { account, loading, initialCheckDone } = useAuth();
   const ordersLoading = useLoading("api", "orders");
   const [orders, setOrders] = useState([]);
   const [upcomingOrders, setUpcomingOrders] = useState([]);
@@ -52,42 +52,42 @@ export default function AccountDashboard() {
   };
 
   useEffect(() => {
-    if (!loading && !account) {
+    if (!initialCheckDone) return;
+
+    if (!account) {
       router.push("/login?redirect=/account");
       return;
     }
 
-    if (!account) return;
-
-    const fetchOrders = async () => {
-      ordersLoading.startLoading();
-      try {
-        const response = await fetch("/api/account/orders");
-        const data = await response.json();
-
-        if (data.success) {
-          setOrders(data.orders);
-          const now = new Date();
-          const upcoming = data.orders.filter((order) => {
-            const orderDate = getOrderDate(order);
-            return orderDate && new Date(orderDate) >= now;
-          });
-          setUpcomingOrders(upcoming);
-        } else {
-          setError(data.message || "Orders could not be loaded.");
-        }
-      } catch (error) {
-        console.error("Error loading orders:", error);
-        setError("An error occurred. Please try again later.");
-      } finally {
-        ordersLoading.stopLoading();
-      }
-    };
-
     fetchOrders();
-  }, [account, loading, router]);
+  }, [initialCheckDone, account]);
 
-  if (loading || (!account && !loading)) {
+  const fetchOrders = async () => {
+    ordersLoading.startLoading();
+    try {
+      const response = await fetch("/api/account/orders");
+      const data = await response.json();
+
+      if (data.success) {
+        setOrders(data.orders);
+        const now = new Date();
+        const upcoming = data.orders.filter((order) => {
+          const orderDate = getOrderDate(order);
+          return orderDate && new Date(orderDate) >= now;
+        });
+        setUpcomingOrders(upcoming);
+      } else {
+        setError(data.message || "Orders could not be loaded.");
+      }
+    } catch (error) {
+      console.error("Error loading orders:", error);
+      setError("An error occurred. Please try again later.");
+    } finally {
+      ordersLoading.stopLoading();
+    }
+  };
+
+  if (!initialCheckDone || loading) {
     return (
       <div className="container">
         <Loader text="Loading..." />
@@ -103,16 +103,8 @@ export default function AccountDashboard() {
       <div className="row">
         <a href="/" className="contact-item quick-action-link">
           <div className="contact-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
               />
             </svg>
@@ -122,18 +114,11 @@ export default function AccountDashboard() {
             <p>Receive offers from moving companies</p>
           </div>
         </a>
+
         <a href="/#contact" className="contact-item quick-action-link">
           <div className="contact-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
               />
             </svg>
