@@ -70,7 +70,7 @@ export default function CompanyDashboard() {
 
       if (!companyRes.ok) {
         if (companyRes.status === 404) {
-          router.push("/company/setup");
+          router.push("/company/profile");
           return;
         }
         throw new Error("Error loading company data");
@@ -276,7 +276,7 @@ export default function CompanyDashboard() {
       <div className="container">
         <h3>Company Profile Not Found</h3>
         <p>You need to set up your company profile first.</p>
-        <Link href="/company/setup" className="btn-primary">
+        <Link href="/company/profile" className="btn-primary">
           Set Up Company Profile
         </Link>
       </div>

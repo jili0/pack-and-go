@@ -58,7 +58,7 @@ const RegisterPage = () => {
     try {
       const result = await register(registrationData);
       if (result.success) {
-        router.push(formData.role === "user" ? "/account" : "/company/setup");
+        router.push(formData.role === "user" ? "/account" : "/company/profile");
       } else {
         setRegisterError(result.message || "Registration failed");
         setIsSubmitting(false);

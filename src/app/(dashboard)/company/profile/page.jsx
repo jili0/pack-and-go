@@ -40,10 +40,9 @@ export default function CompanyProfileEdit() {
   const fetchCompanyProfile = async () => {
     profileLoading.startLoading();
     try {
-      const response = await fetch("/api/company/me");
+      const response = await fetch("/api/company/profile");
       if (!response.ok) {
         if (response.status === 404) {
-          router.push("/company/setup");
           return;
         }
         throw new Error("Error loading company profile");
@@ -129,7 +128,7 @@ export default function CompanyProfileEdit() {
       });
 
       const response = await fetch("/api/company/profile", {
-        method: "PUT",
+        method: "POST",
         body: data,
       });
       const result = await response.json();

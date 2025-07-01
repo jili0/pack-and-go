@@ -1,10 +1,54 @@
-// src/app/api/company/setup/route.js
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Company from "@/models/Company";
 import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
 import saveUploadedFile from "@/lib/fileUpload";
+
+export async function GET() {
+  try {
+    const session = await getSession();
+
+    if (!session || session.role !== "company") {
+      return NextResponse.json(
+        { success: false, message: "Not authorized" },
+        { status: 401 }
+      );
+    }
+
+    await connectDB();
+
+    const company = await Company.findOne({ accountId: session.id });
+
+    if (!company) {
+      return NextResponse.json(
+        { success: false, message: "Company profile not found" },
+        { status: 404 }
+      );
+    }
+
+    const account = await Account.findById(session.id).select("-password");
+
+    return NextResponse.json(
+      {
+        success: true,
+        company: company.toObject(),
+        account: account.toObject(),
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error fetching company profile:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Server error while fetching company profile",
+      },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request) {
   try {
@@ -19,31 +63,19 @@ export async function POST(request) {
 
     await connectDB();
 
-    // Check if company profile already exists
-    const existingCompany = await Company.findOne({ accountId: session.id });
-
-    if (existingCompany) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "A company profile already exists for this user",
-        },
-        { status: 400 }
-      );
-    }
-
     const formData = await request.formData();
 
-    // Extract form data
     const companyName = formData.get("companyName");
     const taxId = formData.get("taxId");
     const street = formData.get("street");
     const city = formData.get("city");
     const postalCode = formData.get("postalCode");
     const country = formData.get("country") || "Germany";
-    const isKisteKlarCertified = formData.get("isKisteKlarCertified") === "true";
+    const phone = formData.get("phone") || "";
+    const email = formData.get("email") || "";
+    const isKisteKlarCertified =
+      formData.get("isKisteKlarCertified") === "true";
 
-    // Extract service areas
     const serviceAreasData = formData.get("serviceAreas");
     let serviceAreas = [];
 
@@ -68,12 +100,15 @@ export async function POST(request) {
       );
     }
 
-    // Process uploaded files
     const businessLicenseFile = formData.get("businessLicense");
     const kisteKlarCertificateFile = formData.get("kisteKlarCertificate");
 
-    let businessLicenseUrl = null;
-    let kisteKlarCertificateUrl = null;
+    const existingCompany = await Company.findOne({ accountId: session.id });
+
+    let businessLicenseUrl =
+      existingCompany?.documents?.businessLicense?.url || null;
+    let kisteKlarCertificateUrl =
+      existingCompany?.documents?.kisteKlarCertificate?.url || null;
 
     if (businessLicenseFile) {
       businessLicenseUrl = await saveUploadedFile(
@@ -81,7 +116,7 @@ export async function POST(request) {
         "businessLicense",
         session.id
       );
-    } else {
+    } else if (!existingCompany) {
       return NextResponse.json(
         { success: false, message: "Business license is required" },
         { status: 400 }
@@ -94,7 +129,7 @@ export async function POST(request) {
         "kisteKlarCertificate",
         session.id
       );
-    } else if (isKisteKlarCertified) {
+    } else if (isKisteKlarCertified && !existingCompany) {
       return NextResponse.json(
         {
           success: false,
@@ -105,8 +140,7 @@ export async function POST(request) {
       );
     }
 
-    // Create company profile
-    const newCompany = await Company.create({
+    const companyData = {
       accountId: session.id,
       companyName,
       address: {
@@ -116,43 +150,56 @@ export async function POST(request) {
         country,
       },
       taxId,
+      phone,
+      email,
       serviceAreas,
-      isVerified: false, // Must be confirmed by an administrator
       isKisteKlarCertified,
       documents: {
         businessLicense: {
           url: businessLicenseUrl,
-          verified: false,
+          verified:
+            existingCompany?.documents?.businessLicense?.verified || false,
         },
         ...(kisteKlarCertificateUrl
           ? {
               kisteKlarCertificate: {
                 url: kisteKlarCertificateUrl,
-                verified: false,
+                verified:
+                  existingCompany?.documents?.kisteKlarCertificate?.verified ||
+                  false,
               },
             }
           : {}),
       },
-    });
+    };
 
-    const account = await Account.findById(session.id);
+    if (!existingCompany) {
+      companyData.isVerified = false;
+    }
+
+    const updatedCompany = await Company.findOneAndUpdate(
+      { accountId: session.id },
+      { $set: companyData },
+      { new: true, upsert: true }
+    );
 
     return NextResponse.json(
       {
         success: true,
-        message:
-          "Company profile successfully created and submitted for review",
-        company: newCompany,
+        message: existingCompany
+          ? "Company profile updated successfully"
+          : "Company profile created successfully and submitted for review",
+        company: updatedCompany,
       },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (error) {
-    console.error("Error creating company profile:", error);
+    console.error("Error updating company profile:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Server error while creating company profile",
+        message: "Server error while updating company profile",
       },
       { status: 500 }
     );
