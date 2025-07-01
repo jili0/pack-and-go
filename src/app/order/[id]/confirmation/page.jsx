@@ -12,7 +12,7 @@ export default function OrderConfirmation() {
   const params = useParams();
   const { id } = params;
   const router = useRouter();
-  const { account } = useAuth();
+  const { account, initialCheckDone } = useAuth();
   const orderLoading = useLoading("api", "orderConfirmation");
 
   const [order, setOrder] = useState(null);
@@ -20,6 +20,7 @@ export default function OrderConfirmation() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!initialCheckDone) return;
     if (!account) {
       router.push("/login");
       return;
@@ -46,9 +47,9 @@ export default function OrderConfirmation() {
     };
 
     fetchOrderDetails();
-  }, [id, account, router]);
+  }, [id, initialCheckDone, account, router]);
 
-  if (orderLoading.isLoading) {
+  if (!initialCheckDone || orderLoading.isLoading) {
     return <Loader text="Loading order details..." />;
   }
 

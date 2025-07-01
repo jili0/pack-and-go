@@ -9,7 +9,7 @@ import Link from "next/link";
 
 export default function CreateOrder() {
   const router = useRouter();
-  const { account, loading: authLoading } = useAuth();
+  const { account, initialCheckDone } = useAuth();
   const sessionLoading = useLoading("api", "sessionData");
   const submitLoading = useLoading("api", "createOrder");
 
@@ -25,7 +25,7 @@ export default function CreateOrder() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (authLoading) return;
+    if (!initialCheckDone) return;
     if (!account) {
       router.push("/login?redirect=order/create");
       return;
@@ -64,7 +64,7 @@ export default function CreateOrder() {
     };
 
     loadSessionData();
-  }, [account, router, authLoading]);
+  }, [account, router, initialCheckDone]);
 
   const AddressInputs = ({ type, address, onChange }) => (
     <>
@@ -189,10 +189,12 @@ export default function CreateOrder() {
     }
   };
 
-  if (authLoading || sessionLoading.isLoading) {
+  if (!initialCheckDone || sessionLoading.isLoading) {
     return (
       <Loader
-        text={authLoading ? "Authenticating..." : "Loading order details..."}
+        text={
+          !initialCheckDone ? "Authenticating..." : "Loading order details..."
+        }
       />
     );
   }
@@ -200,7 +202,7 @@ export default function CreateOrder() {
   if (!selectedCompany) {
     return <p>No company selected. Redirecting...</p>;
   }
-  console.log("authLoading:", authLoading);
+  console.log("initialCheckDone:", initialCheckDone);
   console.log("account:", account);
   console.log("selectedCompany:", selectedCompany);
   return (

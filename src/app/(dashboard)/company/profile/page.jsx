@@ -8,7 +8,7 @@ import Loader from "@/components/ui/Loader";
 
 export default function CompanyProfileEdit() {
   const router = useRouter();
-  const { account, loading: authLoading } = useAuth();
+  const { account, initialCheckDone } = useAuth();
   const profileLoading = useLoading("api", "companyProfile");
   const submitLoading = useLoading("api", "submitProfile");
 
@@ -30,12 +30,20 @@ export default function CompanyProfileEdit() {
   const [submitMessage, setSubmitMessage] = useState("");
 
   useEffect(() => {
-    if (!authLoading && (!account || account.role !== "company")) {
+    if (!initialCheckDone) return;
+
+    if (!account) {
       router.push("/login");
       return;
     }
-    if (!authLoading && account) fetchCompanyProfile();
-  }, [account, authLoading, router]);
+
+    if (account.role !== "company") {
+      router.push("/");
+      return;
+    }
+
+    fetchCompanyProfile();
+  }, [initialCheckDone, account, router]);
 
   const fetchCompanyProfile = async () => {
     profileLoading.startLoading();
@@ -156,7 +164,7 @@ export default function CompanyProfileEdit() {
     }
   };
 
-  if (authLoading || profileLoading.isLoading) {
+  if (!initialCheckDone || profileLoading.isLoading) {
     return (
       <div>
         <Loader text="Loading profile..." />
