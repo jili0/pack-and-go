@@ -11,8 +11,8 @@ export default function OrderDetail() {
   const router = useRouter();
   const { id } = useParams();
 
-  const orderLoading = useLoading('api', 'order');
-  const updateLoading = useLoading('api', 'updateOrder');
+  const orderLoading = useLoading("api", "order");
+  const updateLoading = useLoading("api", "updateOrder");
 
   const [order, setOrder] = useState(null);
   const [message, setMessage] = useState("");
@@ -54,11 +54,7 @@ export default function OrderDetail() {
   };
 
   if (orderLoading.isLoading) {
-    return (
-      <div className="container">
-        <Loader text="Loading..." />
-      </div>
-    );
+    return <Loader text="Loading..." />;
   }
 
   if (!order) {

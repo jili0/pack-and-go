@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import Loader from "@/components/ui/Loader";
 
 const AdminLoginContent = () => {
   const router = useRouter();
@@ -129,14 +130,8 @@ const AdminLoginContent = () => {
 
 const AdminLoginPage = () => {
   return (
-    <div className="form-container">
-      <Suspense
-        fallback={
-          <div className="admin-login">
-            <h1>Loading...</h1>
-          </div>
-        }
-      >
+    <div className="container">
+      <Suspense fallback={<Loader text="Loading..." />}>
         <AdminLoginContent />
       </Suspense>
     </div>

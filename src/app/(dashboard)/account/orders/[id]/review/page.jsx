@@ -3,19 +3,21 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useLoading } from "@/context/LoadingContext";
+import Loader from "@/components/ui/Loader";
 
 export default function ReviewPage() {
   const router = useRouter();
   const params = useParams();
   const { account, checkLoading } = useAuth();
+  const orderLoading = useLoading('api', 'reviewOrder');
+  const submitLoading = useLoading('api', 'submitReview');
   const orderId = params.id;
 
   const [order, setOrder] = useState(null);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (checkLoading) return;
@@ -27,6 +29,7 @@ export default function ReviewPage() {
   }, [orderId, account, checkLoading]);
 
   const fetchOrder = async () => {
+    orderLoading.startLoading();
     try {
       const response = await fetch(`/api/orders/${orderId}`);
       if (response.ok) {
@@ -46,7 +49,7 @@ export default function ReviewPage() {
     } catch (err) {
       setError("Failed to fetch order details");
     } finally {
-      setLoading(false);
+      orderLoading.stopLoading();
     }
   };
 
@@ -58,7 +61,7 @@ export default function ReviewPage() {
     if (comment.length > 500)
       return setError("Comment cannot exceed 500 characters");
 
-    setIsSubmitting(true);
+    submitLoading.startLoading();
     setError("");
 
     try {
@@ -83,15 +86,14 @@ export default function ReviewPage() {
     } catch (err) {
       setError("Failed to submit review");
     } finally {
-      setIsSubmitting(false);
+      submitLoading.stopLoading();
     }
   };
 
-  if (checkLoading || loading) {
+  if (checkLoading || orderLoading.isLoading) {
     return (
       <div className="container">
-        <div className="loader-spinner"></div>
-        <p>Loading...</p>
+        <Loader text="Loading..." />
       </div>
     );
   }
@@ -160,11 +162,11 @@ export default function ReviewPage() {
       <div className="form-actions">
         <button
           type="submit"
-          disabled={isSubmitting || rating === 0 }
+          disabled={submitLoading.isLoading || rating === 0}
           className="btn-primary"
           onClick={handleSubmit}
         >
-          {isSubmitting ? "Submitting..." : "Submit Review"}
+          {submitLoading.isLoading ? "Submitting..." : "Submit Review"}
         </button>
         <button
           type="button"

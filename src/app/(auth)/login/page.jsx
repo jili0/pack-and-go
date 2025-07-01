@@ -4,9 +4,9 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import Loader from "@/components/ui/Loader";
 import "@/app/styles/styles.css";
 
-// Component for the content of the login form
 const LoginContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -27,7 +27,6 @@ const LoginContent = () => {
       ...formData,
       [name]: value,
     });
-    // Clear errors when typing
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -67,7 +66,6 @@ const LoginContent = () => {
       const result = await login(formData.email, formData.password);
 
       if (result.success) {
-        // router.push(`/${result.account.role}`);
         router.push(result.account.role === "user" ? "/account" : "/company");
       } else {
         setLoginError(result.message || "Login failed");
@@ -81,28 +79,7 @@ const LoginContent = () => {
 
   return (
     <div className="container">
-      {loginError && (
-        <>
-          <div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-          </div>
-          <p>{loginError}</p>
-        </>
-      )}
+      {loginError && <p>{loginError}</p>}
 
       <form onSubmit={handleSubmit}>
         <h1>Welcome Back</h1>
@@ -154,14 +131,12 @@ const LoginContent = () => {
   );
 };
 
-// Simple fallback component
 const LoginSkeleton = () => (
-  <div>
-    <h1>Loading...</h1>
+  <div className="container">
+    <Loader text="Loading..." />
   </div>
 );
 
-// Main component with Suspense boundary
 const LoginPage = () => {
   return (
     <div className="container py-8">
