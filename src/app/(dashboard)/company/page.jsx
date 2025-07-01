@@ -9,7 +9,7 @@ import Loader from "@/components/ui/Loader";
 
 export default function CompanyDashboard() {
   const router = useRouter();
-  const { account, loading: authLoading } = useAuth();
+  const { account, loading: authLoading, initialCheckDone } = useAuth(); // NEU: initialCheckDone hinzufügen
   const dashboardLoading = useLoading("api", "companyDashboard");
 
   const [company, setCompany] = useState(null);
@@ -37,15 +37,28 @@ export default function CompanyDashboard() {
   const getStatusColor = (status) => `status-${status}` || "";
 
   useEffect(() => {
-    if (!authLoading && (!account || account.role !== "company")) {
+    // NEU: Warte bis der initiale Auth-Check fertig ist
+    if (!initialCheckDone) {
+      console.log("Waiting for initial auth check...");
+      return; // Noch nicht bereit, warten
+    }
+
+    if (!account) {
+      console.log("No account found, redirecting to login");
       router.push("/login");
       return;
     }
 
-    if (!authLoading && account) {
-      fetchCompanyData();
+    if (account.role !== "company") {
+      console.log("Not a company account, redirecting to home");
+      router.push("/");
+      return;
     }
-  }, [account, authLoading, router]);
+
+    // Auth ist OK, lade Company Daten
+    console.log("Auth OK, fetching company data");
+    fetchCompanyData();
+  }, [account, initialCheckDone, router]); // NEU: initialCheckDone in dependencies
 
   const fetchCompanyData = async () => {
     dashboardLoading.startLoading();
@@ -219,7 +232,26 @@ export default function CompanyDashboard() {
     </>
   );
 
-  if (authLoading || dashboardLoading.isLoading) {
+  // NEU: Zeige Loading bis Auth-Check fertig ist
+  if (!initialCheckDone || authLoading) {
+    return (
+      <div className="container">
+        <Loader text="Checking authentication..." />
+      </div>
+    );
+  }
+
+  // NEU: Wenn nicht eingeloggt oder kein Company Account, zeige nichts (Redirect läuft)
+  if (!account || account.role !== "company") {
+    return (
+      <div className="container">
+        <Loader text="Redirecting..." />
+      </div>
+    );
+  }
+
+  // Zeige Loading für Dashboard Daten
+  if (dashboardLoading.isLoading) {
     return (
       <div className="container">
         <Loader text="Loading dashboard..." />
