@@ -51,7 +51,7 @@ export default function CompanyDashboard() {
   useEffect(() => {
     if (!initialCheckDone) {
       console.log("Waiting for initial auth check...");
-      return; 
+      return;
     }
 
     if (!account) {
@@ -67,7 +67,7 @@ export default function CompanyDashboard() {
     }
     console.log("Auth OK, fetching company data");
     fetchCompanyData();
-  }, [account, initialCheckDone, router]); 
+  }, [account, initialCheckDone, router]);
 
   const fetchCompanyData = async () => {
     dashboardLoading.startLoading();
@@ -199,17 +199,15 @@ export default function CompanyDashboard() {
       {order.status === "pending" && (
         <>
           {order.preferredDates?.length > 0 ? (
-            <div>
-              <button
-                className="btn-primary"
-                onClick={() => handleConfirmWithDate(order._id)}
-                disabled={
-                  !selectedDates[order._id] || confirmingOrderId === order._id
-                }
-              >
-                {confirmingOrderId === order._id ? "Confirming..." : "Confirm"}
-              </button>
-            </div>
+            <button
+              className="btn-primary"
+              onClick={() => handleConfirmWithDate(order._id)}
+              disabled={
+                !selectedDates[order._id] || confirmingOrderId === order._id
+              }
+            >
+              {confirmingOrderId === order._id ? "Confirming..." : "Confirm"}
+            </button>
           ) : (
             <button
               className="btn-primary"
@@ -222,7 +220,7 @@ export default function CompanyDashboard() {
             className="btn-primary"
             onClick={() => updateOrder(order._id, { status: "cancelled" })}
           >
-            Decline Order
+            Cancel Order
           </button>
         </>
       )}
@@ -322,45 +320,59 @@ export default function CompanyDashboard() {
         </p>
       ) : (
         filteredOrders.map((order) => (
-          <div key={order._id} className="order-card">
+          <div key={order._id} className="company-order-card">
             <p>
-              <strong>OrderID:&nbsp;</strong>
-              {order._id}
-            </p>
-            <p>
-              <strong>Status: </strong>
+              <strong>Order&nbsp;</strong>
+              {order._id}&nbsp;|&nbsp;{formatDate(order.createdAt)}&nbsp;
               <span className={getStatusColor(order.status)}>
-                {order.status.toUpperCase()}
+                ({order.status.toUpperCase()})
               </span>
             </p>
+            <div className="row">
+              <p>
+                <strong>Customer:</strong> {order.accountId?.name}
+              </p>
+              <p>
+                <strong>Email:</strong> {order.accountId?.email}
+              </p>
+            </div>
+
+            <div className="row">
+              <p>
+                <strong>From:</strong> {order.fromAddress?.street},&nbsp;
+                {order.fromAddress?.postalCode} {order.fromAddress?.city}
+              </p>
+              <p>
+                <strong>To:</strong> {order.toAddress?.street},&nbsp;
+                {order.toAddress?.postalCode} {order.toAddress?.city}
+              </p>
+            </div>
+
+            <div className="row">
+              <p>
+                <strong>Helpers:</strong> {order.helpersCount}
+              </p>
+              <p>
+                <strong>Estimated Hours:</strong> {order.estimatedHours}
+              </p>
+            </div>
+
             <p>
-              <strong>Request created: </strong>
-              {formatDate(order.createdAt)}
-            </p>
-            <p>
-              <strong>Customer:</strong> {order.accountId?.name || "Unknown"}
-            </p>
-            <p>
-              <strong>Email:</strong> {order.accountId?.email || "N/A"}
-            </p>
-            <p>
-              <strong>From:</strong> {order.fromAddress?.street},&nbsp;
-              {order.fromAddress?.postalCode} {order.fromAddress?.city}
-            </p>
-            <p>
-              <strong>To:</strong> {order.toAddress?.street},&nbsp;
-              {order.toAddress?.postalCode} {order.toAddress?.city}
-            </p>
-            <p>
-              <strong>Moving Date:</strong>
               {order.confirmedDate ? (
-                <span> {formatDate(order.confirmedDate)}</span>
+                <>
+                  <strong>Moving Date:</strong>
+                  <span> {formatDate(order.confirmedDate)}</span>
+                </>
               ) : order.preferredDates?.length > 0 ? (
                 <>
+                  <strong className="error">
+                    Select and Confirm Moving Date:
+                  </strong>
+
                   {order.preferredDates.map((date, index) => (
                     <span key={index}>
                       <button
-                        className="btn-secondary"
+                        className="btn-secondary underlined"
                         onClick={() =>
                           setSelectedDates((prev) => ({
                             ...prev,
@@ -377,25 +389,17 @@ export default function CompanyDashboard() {
                       {index < order.preferredDates.length - 1 && " | "}
                     </span>
                   ))}
-                  &nbsp;(click to select)
                 </>
               ) : (
                 "Not specified"
               )}
             </p>
-            <p>
-              <strong>Helpers:</strong> {order.helpersCount}
-            </p>
-            <p>
-              <strong>Estimated Hours:</strong> {order.estimatedHours}
-            </p>
-            <p>
-              <strong>Price:</strong> {formatCurrency(order.totalPrice)}
-            </p>
 
-            <p>
-              <strong>Notes:</strong> {order.notes || "none"}
-            </p>
+            {order.notes && (
+              <p>
+                <strong>Notes:</strong> {order.notes}
+              </p>
+            )}
 
             <div>
               <OrderActions order={order} />
