@@ -9,7 +9,7 @@ import Loader from "@/components/ui/Loader";
 export default function ReviewPage() {
   const router = useRouter();
   const params = useParams();
-  const { account, checkLoading } = useAuth();
+  const { account, initialCheckDone } = useAuth(); 
   const orderLoading = useLoading('api', 'reviewOrder');
   const submitLoading = useLoading('api', 'submitReview');
   const orderId = params.id;
@@ -20,13 +20,13 @@ export default function ReviewPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (checkLoading) return;
+    if (!initialCheckDone) return; 
     if (!account) {
       router.push("/login");
       return;
     }
     if (orderId) fetchOrder();
-  }, [orderId, account, checkLoading]);
+  }, [orderId, account, initialCheckDone]);
 
   const fetchOrder = async () => {
     orderLoading.startLoading();
@@ -90,7 +90,7 @@ export default function ReviewPage() {
     }
   };
 
-  if (checkLoading || orderLoading.isLoading) {
+  if (!initialCheckDone || orderLoading.isLoading) { 
     return (
       <div className="container">
         <Loader text="Loading..." />
@@ -108,8 +108,6 @@ export default function ReviewPage() {
       </div>
     );
   }
-
-  const ratingLabels = ["", "Poor", "Fair", "Good", "Very Good", "Excellent"];
 
   return (
     <form className="container review-form">
