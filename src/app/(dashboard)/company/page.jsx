@@ -9,7 +9,7 @@ import Loader from "@/components/ui/Loader";
 
 export default function CompanyDashboard() {
   const router = useRouter();
-  const { account, loading: authLoading, initialCheckDone } = useAuth(); // NEU: initialCheckDone hinzufügen
+  const { account, loading: authLoading, initialCheckDone } = useAuth();
   const dashboardLoading = useLoading("api", "companyDashboard");
 
   const [company, setCompany] = useState(null);
@@ -34,13 +34,24 @@ export default function CompanyDashboard() {
         })
       : "No date";
 
-  const getStatusColor = (status) => `status-${status}` || "";
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "pending":
+        return "yellow";
+      case "confirmed":
+        return "green";
+      case "cancelled":
+        return "error";
+      case "completed":
+      default:
+        return "";
+    }
+  };
 
   useEffect(() => {
-    // NEU: Warte bis der initiale Auth-Check fertig ist
     if (!initialCheckDone) {
       console.log("Waiting for initial auth check...");
-      return; // Noch nicht bereit, warten
+      return; 
     }
 
     if (!account) {
@@ -54,11 +65,9 @@ export default function CompanyDashboard() {
       router.push("/");
       return;
     }
-
-    // Auth ist OK, lade Company Daten
     console.log("Auth OK, fetching company data");
     fetchCompanyData();
-  }, [account, initialCheckDone, router]); // NEU: initialCheckDone in dependencies
+  }, [account, initialCheckDone, router]); 
 
   const fetchCompanyData = async () => {
     dashboardLoading.startLoading();
@@ -232,7 +241,6 @@ export default function CompanyDashboard() {
     </>
   );
 
-  // NEU: Zeige Loading bis Auth-Check fertig ist
   if (!initialCheckDone || authLoading) {
     return (
       <div className="container">
@@ -241,7 +249,6 @@ export default function CompanyDashboard() {
     );
   }
 
-  // NEU: Wenn nicht eingeloggt oder kein Company Account, zeige nichts (Redirect läuft)
   if (!account || account.role !== "company") {
     return (
       <div className="container">
@@ -250,7 +257,6 @@ export default function CompanyDashboard() {
     );
   }
 
-  // Zeige Loading für Dashboard Daten
   if (dashboardLoading.isLoading) {
     return (
       <div className="container">
