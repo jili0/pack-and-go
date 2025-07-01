@@ -75,6 +75,9 @@ export default function CompanyReviewsPage() {
       <div className="container">
         <h2>No reviews yet</h2>
         <p>Customers have not submitted any reviews for your company yet.</p>
+        <button className="btn-primary" onClick={() => router.back()}>
+          Back to Dashboard
+        </button>
       </div>
     );
   }
@@ -94,12 +97,15 @@ export default function CompanyReviewsPage() {
             <strong>Customer:</strong> {review.accountId?.name || "Anonymous"}
           </p>
           <p>
-            <strong>Date:</strong>{" "}
+            <strong>Date:</strong>
             {new Date(review.createdAt).toLocaleDateString()}
           </p>
           <hr />
         </div>
       ))}
+      <button className="btn-primary" onClick={() => router.back()}>
+        Back to Dashboard
+      </button>
     </div>
   );
 }
