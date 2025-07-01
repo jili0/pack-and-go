@@ -83,6 +83,15 @@ export async function POST(request) {
     });
 
     await review.save();
+    // Recalculate averageRating and reviewsCount
+    const reviews = await Review.find({ companyId });
+    const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+
+    await Company.findByIdAndUpdate(companyId, {
+     averageRating: avgRating,
+      reviewsCount: reviews.length,
+    });
+
 
     // Update order to mark as reviewed
     await Order.findByIdAndUpdate(orderId, { review: review._id });

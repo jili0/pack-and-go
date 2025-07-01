@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 export default function ReviewPage() {
   const router = useRouter();
   const params = useParams();
-  const { account, checkLoading } = useAuth();
+  const { account, initialCheckDone } = useAuth(); // ✅ initialCheckDone hinzugefügt
   const orderId = params.id;
 
   const [order, setOrder] = useState(null);
@@ -18,13 +18,13 @@ export default function ReviewPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (checkLoading) return;
+    if (!initialCheckDone) return; // ✅ Warten auf Auth-Check
     if (!account) {
       router.push("/login");
       return;
     }
     if (orderId) fetchOrder();
-  }, [orderId, account, checkLoading]);
+  }, [orderId, account, initialCheckDone]);
 
   const fetchOrder = async () => {
     try {
@@ -87,7 +87,7 @@ export default function ReviewPage() {
     }
   };
 
-  if (checkLoading || loading) {
+  if (!initialCheckDone || loading) {
     return (
       <div className="container">
         <div className="loader-spinner"></div>
@@ -106,8 +106,6 @@ export default function ReviewPage() {
       </div>
     );
   }
-
-  const ratingLabels = ["", "Poor", "Fair", "Good", "Very Good", "Excellent"];
 
   return (
     <form className="container review-form">
@@ -160,7 +158,7 @@ export default function ReviewPage() {
       <div className="form-actions">
         <button
           type="submit"
-          disabled={isSubmitting || rating === 0 }
+          disabled={isSubmitting || rating === 0}
           className="btn-primary"
           onClick={handleSubmit}
         >
