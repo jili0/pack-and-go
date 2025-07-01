@@ -24,13 +24,12 @@ export async function POST(request) {
     // Check if it's same-city moving
     const isSameCity = cleanFromCity.toLowerCase() === cleanToCity.toLowerCase();
 
-    let searchQuery;
+    let matchStage;
 
     if (isSameCity) {
       // Same-city moving: only need to match one city
       console.log('Performing same-city moving search');
-      searchQuery = {
-        // isVerified: true, // Only show verified companies
+      matchStage = {
         $or: [
           // Service areas include this city (as from or to)
           {
@@ -52,8 +51,7 @@ export async function POST(request) {
     } else {
       // Cross-city moving: need to handle moving between two different cities
       console.log('Performing cross-city moving search');
-      searchQuery = {
-        // isVerified: true, // Only show verified companies
+      matchStage = {
         $or: [
           // Exact match: service areas explicitly include this route
           {
@@ -104,26 +102,55 @@ export async function POST(request) {
       };
     }
 
-    // Execute search
-    const companies = await Company.find(searchQuery)
-      .select({
-        companyName: 1,
-        address: 1,
-        description: 1,
-        serviceAreas: 1,
-        isVerified: 1,
-        isKisteKlarCertified: 1,
-        documents: 1,
-        averageRating: 1,
-        reviewsCount: 1,
-        logo: 1,
-        createdAt: 1
-      })
-      .sort({ 
-        isKisteKlarCertified: -1, // KisteKlar certified companies first
-        averageRating: -1,        // Sort by rating descending
-        reviewsCount: -1         // Sort by review count descending
-      });
+    // Execute search with aggregation to get live review count
+    const companies = await Company.aggregate([
+      {
+        $match: matchStage
+      },
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: '_id',
+          foreignField: 'companyId',
+          as: 'reviews'
+        }
+      },
+      {
+        $addFields: {
+          reviewsCount: { $size: '$reviews' },
+          averageRating: {
+            $cond: {
+              if: { $gt: [{ $size: '$reviews' }, 0] },
+              then: { $avg: '$reviews.rating' },
+              else: 0
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          companyName: 1,
+          address: 1,
+          description: 1,
+          serviceAreas: 1,
+          isVerified: 1,
+          isKisteKlarCertified: 1,
+          documents: 1,
+          averageRating: 1,
+          reviewsCount: 1,
+          logo: 1,
+          createdAt: 1,
+          hourlyRate: 1
+        }
+      },
+      {
+        $sort: { 
+          isKisteKlarCertified: -1, // KisteKlar certified companies first
+          averageRating: -1,        // Sort by rating descending
+          reviewsCount: -1         // Sort by review count descending
+        }
+      }
+    ]);
 
     console.log(`Found ${companies.length} matching moving companies`);
 
@@ -134,8 +161,7 @@ export async function POST(request) {
       console.log('No exact matches found, trying relaxed search...');
       
       // Relaxed search: any company that serves either city
-      const relaxedQuery = {
-        // isVerified: true,
+      const relaxedMatchStage = {
         'serviceAreas': {
           $elemMatch: {
             $or: [
@@ -148,41 +174,69 @@ export async function POST(request) {
         }
       };
 
-      finalCompanies = await Company.find(relaxedQuery)
-        .select({
-          companyName: 1,
-          address: 1,
-          description: 1,
-          serviceAreas: 1,
-          hourlyRate: 1,
-          isVerified: 1,
-          isKisteKlarCertified: 1,
-          documents: 1,
-          averageRating: 1,
-          reviewsCount: 1,
-          logo: 1,
-          createdAt: 1
-        })
-        .sort({ 
-          isKisteKlarCertified: -1,
-          averageRating: -1,
-          reviewsCount: -1
-        })
-        .limit(10); // Limit results from relaxed search
+      finalCompanies = await Company.aggregate([
+        {
+          $match: relaxedMatchStage
+        },
+        {
+          $lookup: {
+            from: 'reviews',
+            localField: '_id',
+            foreignField: 'companyId',
+            as: 'reviews'
+          }
+        },
+        {
+          $addFields: {
+            reviewsCount: { $size: '$reviews' },
+            averageRating: {
+              $cond: {
+                if: { $gt: [{ $size: '$reviews' }, 0] },
+                then: { $avg: '$reviews.rating' },
+                else: 0
+              }
+            }
+          }
+        },
+        {
+          $project: {
+            companyName: 1,
+            address: 1,
+            description: 1,
+            serviceAreas: 1,
+            hourlyRate: 1,
+            isVerified: 1,
+            isKisteKlarCertified: 1,
+            documents: 1,
+            averageRating: 1,
+            reviewsCount: 1,
+            logo: 1,
+            createdAt: 1
+          }
+        },
+        {
+          $sort: { 
+            isKisteKlarCertified: -1,
+            averageRating: -1,
+            reviewsCount: -1
+          }
+        },
+        {
+          $limit: 10
+        }
+      ]);
 
       console.log(`Relaxed search found ${finalCompanies.length} companies`);
     }
 
     // Process company data, add default values and match scores
     const processedCompanies = finalCompanies.map(company => {
-      const companyObj = company.toObject();
-      
       // Calculate match score
       let matchScore = 0;
       let matchType = '';
       
-      if (companyObj.serviceAreas && companyObj.serviceAreas.length > 0) {
-        for (const area of companyObj.serviceAreas) {
+      if (company.serviceAreas && company.serviceAreas.length > 0) {
+        for (const area of company.serviceAreas) {
           const fromMatch = area.from && area.from.toLowerCase().includes(cleanFromCity.toLowerCase());
           const toMatch = area.to && area.to.toLowerCase().includes(cleanToCity.toLowerCase());
           
@@ -204,9 +258,9 @@ export async function POST(request) {
       }
 
       // Bonus for address match
-      if (companyObj.address && companyObj.address.city) {
-        const cityMatch = companyObj.address.city.toLowerCase().includes(cleanFromCity.toLowerCase()) ||
-                         companyObj.address.city.toLowerCase().includes(cleanToCity.toLowerCase());
+      if (company.address && company.address.city) {
+        const cityMatch = company.address.city.toLowerCase().includes(cleanFromCity.toLowerCase()) ||
+                         company.address.city.toLowerCase().includes(cleanToCity.toLowerCase());
         if (cityMatch) {
           matchScore += 1;
           if (!matchType) matchType = 'Local company';
@@ -214,27 +268,26 @@ export async function POST(request) {
       }
 
       // Bonus for KisteKlar certification
-      if (companyObj.isKisteKlarCertified) {
+      if (company.isKisteKlarCertified) {
         matchScore += 0.5;
       }
 
       // Bonus for high rating
-      if (companyObj.averageRating >= 4.5) {
+      if (company.averageRating >= 4.5) {
         matchScore += 0.3;
       }
 
       return {
-        ...companyObj,
+        ...company,
         // Ensure required fields have default values
-        averageRating: companyObj.averageRating || 0,
-        reviewsCount: companyObj.reviewsCount || 0,
-        hourlyRate: companyObj.hourlyRate || 25,
-        // isVerified: companyObj.isVerified !== false, // Default true unless explicitly false
-        isVerified: companyObj.isVerified || false, // Default true unless explicitly false
-        isKisteKlarCertified: companyObj.isKisteKlarCertified || false,
-        description: companyObj.description || 'No detailed description available',
-        serviceAreas: companyObj.serviceAreas || [],
-        documents: companyObj.documents || {
+        averageRating: company.averageRating || 0,
+        reviewsCount: company.reviewsCount || 0,
+        hourlyRate: company.hourlyRate || 25,
+        isVerified: company.isVerified || false,
+        isKisteKlarCertified: company.isKisteKlarCertified || false,
+        description: company.description || 'No detailed description available',
+        serviceAreas: company.serviceAreas || [],
+        documents: company.documents || {
           businessLicense: { verified: false },
           kisteKlarCertificate: { verified: false }
         },
