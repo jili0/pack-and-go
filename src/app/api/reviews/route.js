@@ -6,16 +6,33 @@ import Order from '@/models/Order';
 import Company from '@/models/Company';
 import { getSession } from '@/lib/auth'; // Using your existing auth function
 
-export async function GET() {
+export async function GET(request) {
   try {
     const session = await getSession();
-    if (!session || session.role !== "admin") {
+    const { searchParams } = new URL(request.url);
+    const companyId = searchParams.get("companyId");
+
+    if (!session) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     await connectDB();
 
-    const reviews = await Review.find({})
+    let query = {};
+
+    if (session.role === "admin") {
+      // show all
+    } else if (session.role === "company") {
+      const company = await Company.findOne({ accountId: session.id });
+      if (!company || company._id.toString() !== companyId) {
+        return NextResponse.json({ message: "Not authorized for this company" }, { status: 403 });
+      }
+      query.companyId = companyId;
+    } else {
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
+    const reviews = await Review.find(query)
       .populate("accountId", "name email")
       .populate("companyId", "companyName")
       .sort({ createdAt: -1 });
@@ -26,6 +43,7 @@ export async function GET() {
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
+
 
 export async function POST(request) {
   try {
