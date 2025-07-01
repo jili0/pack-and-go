@@ -9,7 +9,7 @@ import Loader from "@/components/ui/Loader";
 
 export default function CompanyDashboard() {
   const router = useRouter();
-  const { account, loading: authLoading, initialCheckDone } = useAuth();
+  const { account, initialCheckDone } = useAuth();
   const dashboardLoading = useLoading("api", "companyDashboard");
 
   const [company, setCompany] = useState(null);
@@ -49,11 +49,13 @@ export default function CompanyDashboard() {
   };
 
   useEffect(() => {
+    // Wait for initial auth check to complete
     if (!initialCheckDone) {
       console.log("Waiting for initial auth check...");
       return;
     }
 
+    // Only decide on redirect after initial check is done
     if (!account) {
       console.log("No account found, redirecting to login");
       router.push("/login");
@@ -65,9 +67,10 @@ export default function CompanyDashboard() {
       router.push("/");
       return;
     }
+
     console.log("Auth OK, fetching company data");
     fetchCompanyData();
-  }, [account, initialCheckDone, router]);
+  }, [initialCheckDone, router]); // Only initialCheckDone as dependency
 
   const fetchCompanyData = async () => {
     dashboardLoading.startLoading();
@@ -239,7 +242,7 @@ export default function CompanyDashboard() {
     </>
   );
 
-  if (!initialCheckDone || authLoading) {
+  if (!initialCheckDone) {
     return (
       <div className="container">
         <Loader text="Checking authentication..." />
