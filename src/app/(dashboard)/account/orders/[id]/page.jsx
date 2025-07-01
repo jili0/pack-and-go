@@ -198,7 +198,7 @@ const OrderDetails = () => {
 
       <div className="form-footer">
         <button className="btn-primary" onClick={() => router.back()}>
-          Back
+          Back to Dashboard
         </button>
         {order.status === "pending" && (
           <button
@@ -209,16 +209,13 @@ const OrderDetails = () => {
           </button>
         )}
         {order.status === "completed" && !order.review && (
-        <div className="review-prompt">
-        <p>We'd love your feedback on this move!</p>
-        <button
-          className="btn-primary"
-          onClick={() => router.push(`/account/orders/${orderId}/review`)}
-        >
-      Leave a Review
-    </button>
-  </div>
-)}
+          <button
+            className="btn-primary"
+            onClick={() => router.push(`/account/orders/${orderId}/review`)}
+          >
+            Leave a Review
+          </button>
+        )}
       </div>
 
       {showCancelModal && (
