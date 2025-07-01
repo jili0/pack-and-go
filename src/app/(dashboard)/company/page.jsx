@@ -287,7 +287,7 @@ export default function CompanyDashboard() {
           <div key={order._id} className="order-card">
             <p>
               <strong>OrderID:</strong>
-              {order._id.slice(-6)}
+              {order._id}
             </p>
             <p>
               <strong>Status: </strong>
