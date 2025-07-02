@@ -3,12 +3,13 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLoading } from "./LoadingContext";
+import { useSocket } from "./useSocket";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [account, setAccount] = useState(null);
-  const [initialCheckDone, setInitialCheckDone] = useState(false); // NEU: Track ob initial check fertig ist
+  const [initialCheckDone, setInitialCheckDone] = useState(false);
   const router = useRouter();
   const [authInitialized, setAuthInitialized] = useState(false);
 
@@ -16,11 +17,13 @@ export const AuthProvider = ({ children }) => {
   const authLogin = useLoading("auth", "login");
   const authRegister = useLoading("auth", "register");
 
+  // ⬇️ Initialize socket connection using your hook
+  const socket = useSocket();
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setAuthInitialized(true);
     }, 100);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -32,33 +35,33 @@ export const AuthProvider = ({ children }) => {
     authCheck.setLoading(true);
     try {
       const res = await fetch("/api/auth/me", {
-        credentials: 'include' // Wichtig: Cookies mitsenden
+        credentials: "include", // Send cookies
       });
 
       if (res.status === 401) {
         setAccount(null);
-        setInitialCheckDone(true); // Check ist fertig
+        setInitialCheckDone(true);
         return;
       }
 
       if (!res.ok) {
-        throw new Error("Fehler beim Abrufen des Benutzers");
+        throw new Error("Failed to fetch user info");
       }
 
       const data = await res.json();
 
       if (data.success) {
         setAccount(data.account);
-        setInitialCheckDone(true); // Check ist fertig
+        setInitialCheckDone(true);
         return { success: true, account: data.account };
       } else {
         setAccount(null);
-        setInitialCheckDone(true); // Check ist fertig
+        setInitialCheckDone(true);
       }
     } catch (error) {
       console.error("Auth check error:", error);
       setAccount(null);
-      setInitialCheckDone(true); // Check ist fertig, auch bei Fehler
+      setInitialCheckDone(true);
     } finally {
       authCheck.setLoading(false);
     }
@@ -66,15 +69,12 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (accountData) => {
     authRegister.setLoading(true);
-
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(accountData),
-        credentials: 'include'
+        credentials: "include",
       });
 
       const data = await res.json();
@@ -85,15 +85,14 @@ export const AuthProvider = ({ children }) => {
       } else {
         return {
           success: false,
-          message: data.message || "Registrierung fehlgeschlagen",
+          message: data.message || "Registration failed",
         };
       }
     } catch (error) {
       console.error("Registration error:", error);
       return {
         success: false,
-        message:
-          "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+        message: "An error occurred. Please try again later.",
       };
     } finally {
       authRegister.setLoading(false);
@@ -102,15 +101,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     authLogin.setLoading(true);
-
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-        credentials: 'include'
+        credentials: "include",
       });
 
       const data = await res.json();
@@ -121,15 +117,14 @@ export const AuthProvider = ({ children }) => {
       } else {
         return {
           success: false,
-          message: data.message || "Anmeldung fehlgeschlagen",
+          message: data.message || "Login failed",
         };
       }
     } catch (error) {
       console.error("Login error:", error);
       return {
         success: false,
-        message:
-          "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+        message: "An error occurred. Please try again later.",
       };
     } finally {
       authLogin.setLoading(false);
@@ -140,7 +135,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await fetch("/api/auth/logout", {
         method: "POST",
-        credentials: 'include'
+        credentials: "include",
       });
 
       const data = await res.json();
@@ -159,7 +154,7 @@ export const AuthProvider = ({ children }) => {
   const deleteAccount = async () => {
     if (
       !confirm(
-        "Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+        "Are you sure you want to delete your account? This action cannot be undone."
       )
     ) {
       return { success: false };
@@ -168,7 +163,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await fetch("/api/auth/delete", {
         method: "DELETE",
-        credentials: 'include'
+        credentials: "include",
       });
 
       const data = await res.json();
@@ -180,15 +175,14 @@ export const AuthProvider = ({ children }) => {
       } else {
         return {
           success: false,
-          message: data.message || "Kontolöschung fehlgeschlagen",
+          message: data.message || "Account deletion failed",
         };
       }
     } catch (error) {
       console.error("Account deletion error:", error);
       return {
         success: false,
-        message:
-          "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+        message: "An error occurred. Please try again later.",
       };
     }
   };
@@ -202,12 +196,12 @@ export const AuthProvider = ({ children }) => {
         checkLoading: authCheck.isLoading,
         loginLoading: authLogin.isLoading,
         registerLoading: authRegister.isLoading,
-        initialCheckDone, // NEU: Gibt an ob der initiale Auth-Check fertig ist
+        initialCheckDone,
         register,
         login,
         logout,
         deleteAccount,
-        checkAccountLoggedIn, // Für manuellen Re-Check
+        checkAccountLoggedIn,
       }}
     >
       {children}
