@@ -5,6 +5,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { LoadingProvider } from "@/context/LoadingContext";
 import { NotificationProvider } from "@/context/NotificationContext";
 import SocketManager from "@/components/SocketManager"; // ✅ Import
+import PhotoInventoryWidget from "@/components/ui/PhotoInventoryWidget";
 
 import "@/app/styles/styles.css";
 
@@ -21,9 +22,11 @@ export default function RootLayout({ children }) {
         <LoadingProvider>
           <AuthProvider>
             <NotificationProvider>
-              <SocketManager /> {/* ✅ Socket wird nach allen Contexts geladen */}
+              <SocketManager />{" "}
+              {/* ✅ Socket wird nach allen Contexts geladen */}
               <Header />
               <main>{children}</main>
+              <PhotoInventoryWidget />
               <Footer />
             </NotificationProvider>
           </AuthProvider>
