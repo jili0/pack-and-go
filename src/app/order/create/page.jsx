@@ -6,9 +6,11 @@ import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/context/LoadingContext";
 import Loader from "@/components/ui/Loader";
 import Link from "next/link";
+import { useSocket } from "@/context/useSocket";
 
 export default function CreateOrder() {
   const router = useRouter();
+  const { notifyOrderCreated } = useSocket();
   const { account, initialCheckDone } = useAuth();
   const sessionLoading = useLoading("api", "sessionData");
   const submitLoading = useLoading("api", "createOrder");
@@ -144,64 +146,54 @@ export default function CreateOrder() {
         formData.estimatedHours
       : 0;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    submitLoading.startLoading();
-    setError(null);
-
-    try {
-      const hourlyRate = selectedCompany.hourlyRate || 50;
-      const calculatedPrice =
-        hourlyRate * formData.helpersCount * formData.estimatedHours;
-
-      const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          companyId: selectedCompany._id,
-          fromAddress: formData.fromAddress,
-          toAddress: formData.toAddress,
-          preferredDates: formData.preferredDates.filter((date) => date),
-          helpersCount: formData.helpersCount,
-          estimatedHours: formData.estimatedHours,
-          totalPrice: calculatedPrice,
-          notes: formData.notes,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        ["selectedCompany", "movingFormData", "searchResults"].forEach((item) =>
-          sessionStorage.removeItem(item)
-        );
-        router.push(`/order/${data.order._id}/confirmation`);
-      } else {
-        setError(data.message || "Failed to create order. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error creating order:", error);
-      setError("An error occurred. Please try again later.");
-    } finally {
-      submitLoading.stopLoading();
-    }
-  };
-
-  if (!initialCheckDone || sessionLoading.isLoading) {
-    return (
-      <Loader
-        text={
-          !initialCheckDone ? "Authenticating..." : "Loading order details..."
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+      
+        submitLoading.startLoading();
+        setError(null);
+      
+        try {
+          const hourlyRate = selectedCompany.hourlyRate || 50;
+          const calculatedPrice =
+            hourlyRate * formData.helpersCount * formData.estimatedHours;
+      
+          const response = await fetch("/api/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              companyId: selectedCompany._id,
+              fromAddress: formData.fromAddress,
+              toAddress: formData.toAddress,
+              preferredDates: formData.preferredDates.filter((date) => date),
+              helpersCount: formData.helpersCount,
+              estimatedHours: formData.estimatedHours,
+              totalPrice: calculatedPrice,
+              notes: formData.notes,
+            }),
+          });
+      
+          const data = await response.json();
+      
+          if (data.success) {
+            // 🔔 Benachrichtigung an Firma senden
+            notifyOrderCreated(data.order._id, selectedCompany._id);
+      
+            ["selectedCompany", "movingFormData", "searchResults"].forEach((item) =>
+              sessionStorage.removeItem(item)
+            );
+            router.push(`/order/${data.order._id}/confirmation`);
+          } else {
+            setError(data.message || "Failed to create order. Please try again.");
+          }
+        } catch (error) {
+          console.error("Error creating order:", error);
+          setError("An error occurred. Please try again later.");
+        } finally {
+          submitLoading.stopLoading();
         }
-      />
-    );
-  }
-
-  if (!selectedCompany) {
-    return <p>No company selected. Redirecting...</p>;
-  }
+      };
+      
   console.log("initialCheckDone:", initialCheckDone);
   console.log("account:", account);
   console.log("selectedCompany:", selectedCompany);
@@ -211,15 +203,15 @@ export default function CreateOrder() {
       {error && <p className="error">{error}</p>}
 
       <p>
-        {selectedCompany.companyName} •{" "}
+        {selectedCompany?.companyName} •{" "}
         {[...Array(5)].map((_, i) => (
           <span key={i}>
-            {i < Math.round(selectedCompany.averageRating || 0) ? "★" : "☆"}
+            {i < Math.round(selectedCompany?.averageRating || 0) ? "★" : "☆"}
           </span>
         ))}{" "}
-        ({selectedCompany.reviewsCount || 0}{" "}
-        {selectedCompany.reviewsCount === 1 ? "review" : "reviews"})
-        {selectedCompany.isKisteKlarCertified && " • KisteKlar Certified"}
+        ({selectedCompany?.reviewsCount || 0}{" "}
+        {selectedCompany?.reviewsCount === 1 ? "review" : "reviews"})
+        {selectedCompany?.isKisteKlarCertified && " • KisteKlar Certified"}
       </p>
 
       <form onSubmit={handleSubmit}>
