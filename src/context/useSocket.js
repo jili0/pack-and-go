@@ -1,31 +1,47 @@
-// src/context/useSocket.js
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "./NotificationContext";
 
 export const useSocket = () => {
-  const { account } = useAuth();
-  const { addNotification } = useNotification();
+  const auth = useAuth();
+  const notify = useNotification();
 
-  const [socket, setSocket] = useState(null);
+  const account = auth?.account;
+  const addNotification = notify?.addNotification;
+
+  const socketRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    if (!account) return;
+    // Ensure context is available
+    if (!account || typeof addNotification !== "function") {
+      console.warn("useSocket: Missing account or notification context.");
+      return;
+    }
 
-    const socketInstance = io(process.env.NODE_ENV === "production" ? "" : "http://localhost:3000", {
-      path: "/api/socket",
-      addTrailingSlash: false,
-    });
+    if (socketRef.current) {
+      console.log("Socket already connected");
+      return;
+    }
+
+    const socketInstance = io(
+      process.env.NODE_ENV === "production" ? "" : "http://localhost:3000",
+      {
+        path: "/api/socket",
+        addTrailingSlash: false,
+      }
+    );
+
+    socketRef.current = socketInstance;
 
     socketInstance.on("connect", () => {
-      console.log("Socket connected:", socketInstance.id);
+      console.log("✅ Socket connected:", socketInstance.id);
       setIsConnected(true);
 
-      // Send user info to server
+      // Register user on server
       socketInstance.emit("register-user", {
         userId: account.id,
         role: account.role,
@@ -33,8 +49,8 @@ export const useSocket = () => {
     });
 
     socketInstance.on("notification", (notification) => {
-      console.log("Notification received:", notification);
-      addNotification({
+      console.log("📨 Notification received:", notification);
+      addNotification?.({
         type: notification.type || "info",
         title: "New Notification",
         message: notification.message,
@@ -44,34 +60,33 @@ export const useSocket = () => {
     });
 
     socketInstance.on("disconnect", () => {
-      console.log("Socket disconnected");
+      console.log("⚠️ Socket disconnected");
       setIsConnected(false);
     });
 
-    setSocket(socketInstance);
-
     return () => {
       socketInstance.disconnect();
-      setSocket(null);
+      socketRef.current = null;
       setIsConnected(false);
+      console.log("🔌 Socket connection cleaned up");
     };
-  }, [account]);
+  }, [account, addNotification]);
 
-  // Optional: emit helper functions
-  const notifyOrderCreated = (orderId, companyId) => {
-    socket?.emit("order-created", { orderId, companyId });
-  };
+  // Emit helpers
+  const notifyOrderCreated = useCallback((orderId, companyId) => {
+    socketRef.current?.emit("order-created", { orderId, companyId });
+  }, []);
 
-  const notifyOrderConfirmed = (orderId, userId) => {
-    socket?.emit("order-confirmed", { orderId, userId });
-  };
+  const notifyOrderConfirmed = useCallback((orderId, userId) => {
+    socketRef.current?.emit("order-confirmed", { orderId, userId });
+  }, []);
 
-  const notifyReviewSubmitted = (companyId, rating) => {
-    socket?.emit("review-submitted", { companyId, rating });
-  };
+  const notifyReviewSubmitted = useCallback((companyId, rating) => {
+    socketRef.current?.emit("review-submitted", { companyId, rating });
+  }, []);
 
   return {
-    socket,
+    socket: socketRef.current,
     isConnected,
     notifyOrderCreated,
     notifyOrderConfirmed,

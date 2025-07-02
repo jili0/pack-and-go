@@ -3,7 +3,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { LoadingProvider } from "@/context/LoadingContext";
-import { NotificationProvider } from "@/context/NotificationContext"; // NEW: Import
+import { NotificationProvider } from "@/context/NotificationContext";
+import SocketManager from "@/components/SocketManager"; // ✅ Import
 
 import "@/app/styles/styles.css";
 
@@ -19,7 +20,8 @@ export default function RootLayout({ children }) {
       <body>
         <LoadingProvider>
           <AuthProvider>
-            <NotificationProvider> {/* NEW: Wrap children with notification context */}
+            <NotificationProvider>
+              <SocketManager /> {/* ✅ Socket wird nach allen Contexts geladen */}
               <Header />
               <main>{children}</main>
               <Footer />
