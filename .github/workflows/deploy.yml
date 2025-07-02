@@ -1,0 +1,25 @@
+name: Deploy to Oracle Cloud
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd pack-and-go
+            git pull origin main
+            docker build -t pack-and-go .
+            docker stop pack-and-go-app || true
+            docker rm pack-and-go-app || true
+            docker run -d -p 3000:3000 --env-file .env --name pack-and-go-app pack-and-go
+            sudo systemctl reload nginx
