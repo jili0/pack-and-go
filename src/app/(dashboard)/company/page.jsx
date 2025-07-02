@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/context/LoadingContext";
 import Loader from "@/components/ui/Loader";
+import { useSocket } from "@/context/useSocket"; 
 
 export default function CompanyDashboard() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function CompanyDashboard() {
   const [selectedDates, setSelectedDates] = useState({});
   const [confirmingOrderId, setConfirmingOrderId] = useState(null);
 
+  const { notifyOrderConfirmed, notifyOrderCancelled } = useSocket()
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("de-DE", {
       style: "currency",
@@ -114,18 +116,32 @@ export default function CompanyDashboard() {
         body: JSON.stringify(updates),
       });
       const result = await response.json();
+  
       if (result.success) {
         setOrders((prev) =>
           prev.map((order) =>
             order._id === orderId ? { ...order, ...updates } : order
           )
         );
+  
         if (updates.status === "confirmed" && updates.confirmedDate) {
           setSelectedDates((prev) => {
             const updated = { ...prev };
             delete updated[orderId];
             return updated;
           });
+        }
+  
+        // ✅ Notify user if confirmed or cancelled
+        const affectedOrder = result.updatedOrder || result.order;
+        const userId = affectedOrder?.accountId?._id || affectedOrder?.accountId;
+  
+        if (updates.status === "confirmed" && userId) {
+          notifyOrderConfirmed(orderId, userId);
+        }
+  
+        if (updates.status === "cancelled" && userId) {
+          notifyOrderCancelled(orderId, userId);
         }
       } else {
         alert(result.message || "Error updating order");
@@ -134,6 +150,7 @@ export default function CompanyDashboard() {
       alert("Error updating order. Please try again.");
     }
   };
+  
 
   const deleteOrder = async (orderId) => {
     if (

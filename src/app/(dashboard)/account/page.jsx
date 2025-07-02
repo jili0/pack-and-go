@@ -6,10 +6,14 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/context/LoadingContext";
 import Loader from "@/components/ui/Loader";
+import { useSocket } from "@/context/useSocket";
+
+
 
 export default function AccountDashboard() {
   const router = useRouter();
   const { account, loading, initialCheckDone } = useAuth();
+  useSocket();
   const ordersLoading = useLoading("api", "orders");
   const [orders, setOrders] = useState([]);
   const [upcomingOrders, setUpcomingOrders] = useState([]);
@@ -97,7 +101,7 @@ export default function AccountDashboard() {
 
   return (
     <div className="container">
-      <h1>Hello, {account.name}</h1>
+      <h1>Hello, {account?.name}</h1>
       <p>Welcome to your personal dashboard</p>
 
       <div className="row">
