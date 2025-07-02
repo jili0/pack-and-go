@@ -29,6 +29,7 @@ ENV ORACLE_CLOUD_REGION=mock-region
 ENV ORACLE_CLOUD_BUCKET_NAME=mock-bucket-name
 ENV ORACLE_CLOUD_NAMESPACE=mock-namespace
 
+ENV GEMINI_API_KEY=mock-gemini-api-key
 
 # Next.js Build für Production
 RUN npm run build

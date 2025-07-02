@@ -93,13 +93,12 @@ export default function PhotoInventoryWidget() {
           >
             ×
           </button>
-          <div className="photo-inventory-title">
-            <strong>Foto-Inventar</strong>
-          </div>
-          <div className="photo-inventory-desc">
+
+          <strong>Foto-Inventar</strong>
+          <p>
             Make a photo of your room and we give you a list of to transported
             items instantly back!
-          </div>
+          </p>
           <label className="photo-inventory-droparea">
             <input
               type="file"
