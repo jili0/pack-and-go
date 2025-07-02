@@ -2,16 +2,13 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Package files kopieren
 COPY package*.json ./
 
-# Dependencies installieren
-RUN npm ci --only=production
+RUN npm install
 
-# App code kopieren
 COPY . .
 
-# Build-Konfiguration (Mock data)
+# Mock/real environment variables for development
 ENV MONGODB_URI="mongodb://localhost:27017/pack-and-go"
 ENV JWT_SECRET="mock-jwt-secret"
 ENV RESEND_API_KEY="re_mock_key_for_build"
@@ -20,7 +17,6 @@ ENV SUPPORT_EMAIL=support@pack-and-go.de
 ENV ADMIN_EMAIL=admin@pack-and-go.de
 ENV ESLINT_NO_DEV_ERRORS=true
 ENV NEXT_LINT=false
-
 ENV ORACLE_CLOUD_TENANCY_OCID=mock-tenancy-ocid
 ENV ORACLE_CLOUD_USER_OCID=mock-user-ocid
 ENV ORACLE_CLOUD_KEY_FINGERPRINT=mock-key-fingerprint
@@ -29,14 +25,8 @@ ENV ORACLE_CLOUD_REGION=mock-region
 ENV ORACLE_CLOUD_BUCKET_NAME=mock-bucket-name
 ENV ORACLE_CLOUD_NAMESPACE=mock-namespace
 
-
-# Next.js Build für Production
-RUN npm run build
-
-# Port exponieren
 EXPOSE 3000
 
-# Environment Variable für Production
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"] 
