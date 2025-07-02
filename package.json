@@ -16,6 +16,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.14.3",
     "next": "^15.3.2",
+    "oci-common": "^2.112.0",
+    "oci-objectstorage": "^2.112.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.56.3",

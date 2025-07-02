@@ -847,41 +847,33 @@ footer a:hover {
   position: fixed;
   right: 24px;
   bottom: 24px;
-  width: 340px;
-  max-width: 90vw;
+  max-width: 340px;
+  height: 280px;
   border-radius: 16px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.13);
   transition:
-    width 0.3s,
-    height 0.3s,
-    box-shadow 0.3s,
-    right 0.3s;
+    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 1rem;
   overflow: hidden;
 }
 
 .photo-inventory-widget.collapsed {
-  width: 48px;
-  height: 120px;
-  min-width: 0;
-  min-height: 0;
+  width: 12px;
+  height: 280px;
   right: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  background: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
 }
 
-.photo-inventory-collapsed {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
+.photo-inventory-collapsed > *:not(span) {
+  display: none !important;
 }
 
 .photo-inventory-content {
@@ -901,8 +893,15 @@ footer a:hover {
   margin-bottom: 6px;
   transition:
     border-color 0.2s,
-    background 0.2s;
+    background 0.2s,
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
   display: block;
+}
+
+.photo-inventory-droparea:active:not(.uploading) {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .photo-inventory-content.drag-active .photo-inventory-droparea {
@@ -922,8 +921,12 @@ footer a:hover {
   background: none;
   border: none;
   font-size: 1.3rem;
+  color: #fff;
   cursor: pointer;
-  z-index: 2;
+  z-index: 10;
+  padding: 4px;
+  min-width: 24px;
+  min-height: 24px;
 }
 
 .photo-inventory-error {
@@ -940,7 +943,6 @@ footer a:hover {
   font-size: 0.98rem;
   color: #222;
 }
-
 
 /* Media Queries */
 @media (min-width: 640px) {
