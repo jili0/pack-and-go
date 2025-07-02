@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { io } from "socket.io-client";
 import { useAuth } from "@/context/AuthContext";
-import { useNotification } from "@/context/NotificationContext";
+import { useNotification } from "./NotificationContext";
 
 export const useSocket = () => {
   const { account } = useAuth();
