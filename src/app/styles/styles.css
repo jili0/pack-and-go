@@ -848,14 +848,16 @@ footer a:hover {
   right: 24px;
   bottom: 24px;
   max-width: 340px;
-  height: 280px;
+  min-height: 280px;
+  max-height: 500px;
+  height: auto;
   border-radius: 16px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.13);
   transition:
     max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1rem;
   overflow: hidden;
 }
 
@@ -914,13 +916,16 @@ footer a:hover {
   font-weight: 500;
 }
 
+.photo-inventory-title {
+  font-size: 1.1rem;
+}
+
 .photo-inventory-close {
   position: absolute;
   top: 8px;
   right: 12px;
   background: none;
   border: none;
-  font-size: 1.3rem;
   color: #fff;
   cursor: pointer;
   z-index: 10;
@@ -930,9 +935,8 @@ footer a:hover {
 }
 
 .photo-inventory-error {
-  color: #c33;
-  font-size: 0.97rem;
-  margin-top: 4px;
+  color: #ff6b6b;
+  margin-top: -12px;
 }
 
 .photo-inventory-result {
@@ -940,8 +944,75 @@ footer a:hover {
   border-radius: 8px;
   padding: 10px 12px;
   margin-top: 6px;
-  font-size: 0.98rem;
   color: #222;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f6f8fa;
+}
+
+.photo-inventory-result::-webkit-scrollbar {
+  width: 6px;
+}
+
+.photo-inventory-result::-webkit-scrollbar-track {
+  background: #f6f8fa;
+  border-radius: 3px;
+}
+
+.photo-inventory-result::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.photo-inventory-result::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+.photo-inventory-result ul {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.photo-inventory-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.photo-inventory-copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.photo-inventory-copy-btn:hover {
+  background-color: #e2e8f0;
+}
+
+.photo-inventory-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.photo-inventory-item-name {
+  font-weight: 500;
+}
+
+.photo-inventory-item-count {
+  color: #667eea;
+  font-weight: 600;
 }
 
 /* Media Queries */

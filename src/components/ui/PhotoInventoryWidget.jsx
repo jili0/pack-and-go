@@ -90,12 +90,15 @@ export default function PhotoInventoryWidget() {
       if (!res.ok) throw new Error("Upload failed");
       const data = await res.json();
       setResult(data);
+
+      // Don't start collapse timer if result section is shown (even with 0 items)
+      // The result section will be shown regardless of item count
     } catch (err) {
       setError("Upload failed. Please try again.");
+      // Only start collapse timer on error
+      if (!collapsed) startCollapseTimer();
     } finally {
       setUploading(false);
-      // Resume auto-collapse timer after upload
-      if (!collapsed) startCollapseTimer();
     }
   };
 
@@ -105,7 +108,8 @@ export default function PhotoInventoryWidget() {
     if (collapsed) setCollapsed(false);
   };
   const handleMouseLeave = () => {
-    if (!collapsed && !uploading) startCollapseTimer();
+    // Don't start collapse timer if result section is shown or uploading
+    if (!collapsed && !uploading && !result) startCollapseTimer();
   };
 
   // Close button
@@ -187,14 +191,54 @@ export default function PhotoInventoryWidget() {
           {error && <div className="photo-inventory-error">{error}</div>}
           {result && result.items && (
             <div className="photo-inventory-result">
-              <div>
-                <strong>Detected items:</strong>
+              <div className="photo-inventory-result-header">
+                <div>
+                  <strong>Detected items:</strong>
+                </div>
+                <button
+                  className="photo-inventory-copy-btn"
+                  onClick={() => {
+                    const text = result.items
+                      .map(
+                        (item) =>
+                          `${item.name} ${item.description} x ${item.count}`
+                      )
+                      .join("\n");
+                    navigator.clipboard.writeText(text);
+                  }}
+                  title="Copy to clipboard"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect
+                      x="9"
+                      y="9"
+                      width="13"
+                      height="13"
+                      rx="2"
+                      ry="2"
+                    ></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
               </div>
               <ul>
                 {result.items.map((item, i) => (
-                  <li key={i}>
-                    {item.name} (x{item.count})
-                    {item.description ? ` – ${item.description}` : ""}
+                  <li key={i} className="photo-inventory-item">
+                    <span className="photo-inventory-item-name">
+                      {item.name} {item.description}
+                    </span>
+                    <span className="photo-inventory-item-count">
+                      x {item.count}
+                    </span>
                   </li>
                 ))}
               </ul>
