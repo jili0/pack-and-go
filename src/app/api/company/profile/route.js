@@ -3,7 +3,7 @@ import connectDB from "@/lib/db";
 import Company from "@/models/Company";
 import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
-import saveUploadedFile from "@/lib/fileUpload";
+import { uploadToOracleObjectStorage } from "@/lib/fileUpload";
 
 export async function GET() {
   try {
@@ -111,7 +111,7 @@ export async function POST(request) {
       existingCompany?.documents?.kisteKlarCertificate?.url || null;
 
     if (businessLicenseFile) {
-      businessLicenseUrl = await saveUploadedFile(
+      businessLicenseUrl = await uploadToOracleObjectStorage(
         businessLicenseFile,
         "businessLicense",
         session.id
@@ -124,7 +124,7 @@ export async function POST(request) {
     }
 
     if (isKisteKlarCertified && kisteKlarCertificateFile) {
-      kisteKlarCertificateUrl = await saveUploadedFile(
+      kisteKlarCertificateUrl = await uploadToOracleObjectStorage(
         kisteKlarCertificateFile,
         "kisteKlarCertificate",
         session.id

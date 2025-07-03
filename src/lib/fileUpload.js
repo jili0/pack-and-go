@@ -210,3 +210,31 @@ export const uploadToOracleObjectStorage = async (
     throw error;
   }
 };
+
+/**
+ * Löscht eine Datei (Object) aus Oracle Object Storage anhand der URL
+ * @param {string} fileUrl - Die vollständige URL des zu löschenden Objekts
+ * @returns {Promise<void>}
+ */
+export const deleteFile = async (fileUrl) => {
+  try {
+    // Extrahiere den Object Key aus der URL
+    // Beispiel-URL: https://objectstorage.eu-frankfurt-1.oraclecloud.com/n/namespace/b/bucket/o/uploads%2Ffilename.pdf
+    const match = fileUrl.match(/\/o\/(.+)$/);
+    if (!match || !match[1]) {
+      throw new Error("Invalid Oracle Object Storage URL: " + fileUrl);
+    }
+    // Oracle encodiert / als %2F im Object Key
+    const objectName = decodeURIComponent(match[1]);
+    const deleteObjectRequest = {
+      namespaceName,
+      bucketName,
+      objectName,
+    };
+    await client.deleteObject(deleteObjectRequest);
+    console.log(`Deleted object from Oracle Object Storage: ${objectName}`);
+  } catch (error) {
+    console.error("Error deleting object from Oracle Object Storage:", error);
+    throw error;
+  }
+};
