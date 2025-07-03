@@ -12,6 +12,7 @@ export default function PhotoInventoryWidget() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [copyFeedback, setCopyFeedback] = useState(false);
   const timerRef = useRef(null);
   const fadeTimerRef = useRef(null);
   const widgetRef = useRef(null);
@@ -128,6 +129,21 @@ export default function PhotoInventoryWidget() {
     }
   };
 
+  // Copy to clipboard with feedback
+  const handleCopy = async () => {
+    const text = result.items
+      .map((item) => `${item.name} ${item.description} x ${item.count}`)
+      .join("\n");
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
   return (
     <div
       className={`photo-inventory-widget${collapsed ? " collapsed" : ""}`}
@@ -197,37 +213,49 @@ export default function PhotoInventoryWidget() {
                 </div>
                 <button
                   className="photo-inventory-copy-btn"
-                  onClick={() => {
-                    const text = result.items
-                      .map(
-                        (item) =>
-                          `${item.name} ${item.description} x ${item.count}`
-                      )
-                      .join("\n");
-                    navigator.clipboard.writeText(text);
-                  }}
-                  title="Copy to clipboard"
+                  onClick={handleCopy}
+                  title={copyFeedback ? "Copied!" : "Copy to clipboard"}
                 >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect
-                      x="9"
-                      y="9"
-                      width="13"
-                      height="13"
-                      rx="2"
-                      ry="2"
-                    ></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                  </svg>
+                  {copyFeedback ? (
+                    <>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="20,6 9,17 4,12"></polyline>
+                      </svg>
+                      <span style={{ marginLeft: "4px", fontSize: "12px" }}>
+                        Copied!
+                      </span>
+                    </>
+                  ) : (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect
+                        x="9"
+                        y="9"
+                        width="13"
+                        height="13"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  )}
                 </button>
               </div>
               <ul>
