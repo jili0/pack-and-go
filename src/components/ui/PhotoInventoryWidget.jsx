@@ -6,7 +6,7 @@ const COLLAPSE_DELAY = 10000; // 10 seconds
 const EXPAND_FADEIN_DELAY = 100; // ms - much faster transition
 
 export default function PhotoInventoryWidget() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [showContent, setShowContent] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -15,6 +15,7 @@ export default function PhotoInventoryWidget() {
   const [copyFeedback, setCopyFeedback] = useState(false);
   const timerRef = useRef(null);
   const fadeTimerRef = useRef(null);
+  const autoExpandTimerRef = useRef(null);
   const widgetRef = useRef(null);
 
   // Collapse after 10s only if mouse is not over widget
@@ -46,7 +47,17 @@ export default function PhotoInventoryWidget() {
     return () => {
       clearTimeout(timerRef.current);
       clearTimeout(fadeTimerRef.current);
+      clearTimeout(autoExpandTimerRef.current);
     };
+  }, []);
+
+  // Auto-expand after 0.5 seconds on page load
+  useEffect(() => {
+    autoExpandTimerRef.current = setTimeout(() => {
+      setCollapsed(false);
+    }, 500);
+
+    return () => clearTimeout(autoExpandTimerRef.current);
   }, []);
 
   // Drag-and-drop Events
