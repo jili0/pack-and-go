@@ -3,7 +3,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLoading } from "./LoadingContext";
-import { useSocket } from "./useSocket";
 
 const AuthContext = createContext();
 
@@ -17,8 +16,6 @@ export const AuthProvider = ({ children }) => {
   const authLogin = useLoading("auth", "login");
   const authRegister = useLoading("auth", "register");
 
-  // ⬇️ Initialize socket connection using your hook
-  const socket = useSocket();
 
   useEffect(() => {
     const timer = setTimeout(() => {

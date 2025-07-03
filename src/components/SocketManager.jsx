@@ -7,52 +7,51 @@ import { useAuth } from '@/context/AuthContext'; // Dein Auth Context
 
 export default function SocketManager() {
   const { registerUser, isConnected, notifications, clearNotifications } = useSocket();
-  const { user } = useAuth(); // Dein Auth Context
+  const { account } = useAuth(); // Dein Auth Context
   const [hasPermission, setHasPermission] = useState(false);
+  const role = account?.role;
+  const filteredNotifications = notifications.filter((n) => {
+  if (role === 'user') {
+    return ['order-confirmed', 'order-cancelled'].includes(n.type);
+  }
+  if (role === 'company') {
+    return ['order-created', 'review-submitted'].includes(n.type);
+  }
+  if (role === 'admin') {
+    return ['order-created'].includes(n.type);
+  }
+  return false;
+});
+
+
+  // useEffect(() => {
+  //   // Request notification permission
+  //   if ('Notification' in window) {
+  //     Notification.requestPermission().then(permission => {
+  //       setHasPermission(permission === 'granted');
+  //     });
+  //   }
+  // }, []);
 
   useEffect(() => {
-    // Request notification permission
-    if ('Notification' in window) {
-      Notification.requestPermission().then(permission => {
-        setHasPermission(permission === 'granted');
-      });
+    if (isConnected && account) {
+      console.log("🧠 account object at registerUser:", account);
+      registerUser(account.id, account.role);
     }
-  }, []);
-
-  useEffect(() => {
-    if (isConnected && user) {
-      registerUser(user.id, user.role);
-    }
-  }, [isConnected, user, registerUser]);
+  }, [isConnected, account, registerUser]);
 
   return (
-    <div className="fixed top-4 right-4 z-50">
-      {/* Connection Status */}
-      <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
-        isConnected 
-          ? 'bg-green-100 text-green-800' 
-          : 'bg-red-100 text-red-800'
-      }`}>
-        <div className={`w-2 h-2 rounded-full ${
-          isConnected ? 'bg-green-500' : 'bg-red-500'
-        }`} />
-        {isConnected ? 'Connected' : 'Disconnected'}
-      </div>
-
+    <div className="notification-container">
       {/* Notifications */}
-      {notifications.length > 0 && (
-        <div className="mt-2 space-y-2">
-          {notifications.slice(-3).map((notification, index) => (
-            <div
-              key={index}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg max-w-sm animate-slide-in"
-            >
-              <p className="font-semibold capitalize">{notification.type.replace('-', ' ')}</p>
-              <p className="text-sm">{notification.message}</p>
-              <button
-                onClick={() => clearNotifications()}
-                className="text-xs mt-1 hover:underline opacity-80"
-              >
+      {filteredNotifications.length > 0 && (
+        <div className="notification-list">
+          {filteredNotifications.slice(-3).map((notification, index) => (
+            <div key={index} className="notification-box">
+              <p className="notification-title">
+                {notification.type.replace('-', ' ')}
+              </p>
+              <p className="notification-message">{notification.message}</p>
+              <button onClick={clearNotifications} className="notification-clear">
                 Clear all
               </button>
             </div>
@@ -60,5 +59,5 @@ export default function SocketManager() {
         </div>
       )}
     </div>
-  );
+  )
 }
