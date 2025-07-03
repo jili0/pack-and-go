@@ -8,7 +8,7 @@ import fs from "fs";
 const tenancyId = process.env.ORACLE_CLOUD_TENANCY_OCID;
 const userId = process.env.ORACLE_CLOUD_USER_OCID;
 const fingerprint = process.env.ORACLE_CLOUD_KEY_FINGERPRINT;
-const privateKeyPath = process.env.ORACLE_CLOUD_PRIVATE_KEY_PATH;
+const privateKeyBase64 = process.env.ORACLE_PRIVATE_KEY_BASE64;
 const region = process.env.ORACLE_CLOUD_REGION;
 const bucketName = process.env.ORACLE_CLOUD_BUCKET_NAME;
 const namespaceName = process.env.ORACLE_CLOUD_NAMESPACE;
@@ -29,7 +29,7 @@ console.log("Oracle Cloud Config:", {
   tenancyId: tenancyId ? "SET" : "MISSING",
   userId: userId ? "SET" : "MISSING",
   fingerprint: fingerprint ? "SET" : "MISSING",
-  privateKeyPath: privateKeyPath ? "SET" : "MISSING",
+  privateKeyBase64: privateKeyBase64 ? "SET" : "MISSING",
   region: region,
   bucketName: bucketName ? "SET" : "MISSING",
   namespaceName: namespaceName ? "SET" : "MISSING",
@@ -41,7 +41,7 @@ const requiredEnvVars = {
   tenancyId,
   userId,
   fingerprint,
-  privateKeyPath,
+  privateKeyBase64,
   region,
   bucketName,
   namespaceName,
@@ -62,18 +62,6 @@ if (missingVars.length > 0) {
   );
 }
 
-// Check if private key file exists
-if (!fs.existsSync(privateKeyPath)) {
-  console.error(`Private key file not found at: ${privateKeyPath}`);
-  throw new Error(`Private key file not found: ${privateKeyPath}`);
-}
-
-// Validate region format
-if (!region || !region.includes("-")) {
-  console.error(`Invalid region format: ${region}`);
-  throw new Error(`Invalid region format: ${region}`);
-}
-
 let provider;
 let client;
 
@@ -83,7 +71,7 @@ try {
     tenancyId: tenancyId ? "SET" : "MISSING",
     userId: userId ? "SET" : "MISSING",
     fingerprint: fingerprint ? "SET" : "MISSING",
-    privateKeyPath: privateKeyPath ? "SET" : "MISSING",
+    privateKeyBase64: privateKeyBase64 ? "SET" : "MISSING",
     region: region,
     bucketName: bucketName ? "SET" : "MISSING",
     namespaceName: namespaceName ? "SET" : "MISSING",
@@ -91,11 +79,8 @@ try {
   });
 
   console.log("2. Private key file check:", {
-    exists: fs.existsSync(privateKeyPath),
-    path: privateKeyPath,
-    size: fs.existsSync(privateKeyPath)
-      ? fs.statSync(privateKeyPath).size
-      : "N/A",
+    exists: fs.existsSync(privateKeyBase64),
+    base64: privateKeyBase64,
   });
 
   console.log("3. Creating provider...");
@@ -107,7 +92,7 @@ try {
     tenancyId,
     userId,
     fingerprint,
-    fs.readFileSync(privateKeyPath, "utf8"),
+    Buffer.from(privateKeyBase64, "base64").toString("utf8"),
     null,
     compartmentId
   );
