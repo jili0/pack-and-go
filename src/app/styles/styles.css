@@ -1015,6 +1015,23 @@ footer a:hover {
   font-weight: 600;
 }
 
+.photo-inventory-category {
+  margin-bottom: 12px;
+}
+
+.photo-inventory-category:last-child {
+  margin-bottom: 0;
+}
+
+.photo-inventory-category-title {
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 6px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 /* Media Queries */
 @media (min-width: 640px) {
   .mobile-hide {

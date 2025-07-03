@@ -131,9 +131,15 @@ export default function PhotoInventoryWidget() {
 
   // Copy to clipboard with feedback
   const handleCopy = async () => {
-    const text = result.items
-      .map((item) => `${item.name} ${item.description} x ${item.count}`)
+    const furnitureText = result.furniture
+      .map((item) => `${item.description} ${item.name} x ${item.count}`)
       .join("\n");
+
+    const othersText = result.others
+      .map((item) => `${item.description} ${item.name} x ${item.count}`)
+      .join("\n");
+
+    const text = `FURNITURE:\n${furnitureText}${result.others.length > 0 ? "\n\nOTHERS:\n" + othersText : ""}`;
 
     try {
       await navigator.clipboard.writeText(text);
@@ -205,19 +211,37 @@ export default function PhotoInventoryWidget() {
             </div>
           </div>
           {error && <div className="photo-inventory-error">{error}</div>}
-          {result && result.items && (
-            <div className="photo-inventory-result">
-              <div className="photo-inventory-result-header">
-                <div>
-                  <strong>Detected items:</strong>
-                </div>
-                <button
-                  className="photo-inventory-copy-btn"
-                  onClick={handleCopy}
-                  title={copyFeedback ? "Copied!" : "Copy to clipboard"}
-                >
-                  {copyFeedback ? (
-                    <>
+          {result &&
+            (result.furniture?.length > 0 || result.others?.length > 0) && (
+              <div className="photo-inventory-result">
+                <div className="photo-inventory-result-header">
+                  <div>
+                    <strong>Detected items:</strong>
+                  </div>
+                  <button
+                    className="photo-inventory-copy-btn"
+                    onClick={handleCopy}
+                    title={copyFeedback ? "Copied!" : "Copy to clipboard"}
+                  >
+                    {copyFeedback ? (
+                      <>
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20,6 9,17 4,12"></polyline>
+                        </svg>
+                        <span style={{ marginLeft: "4px", fontSize: "12px" }}>
+                          Copied!
+                        </span>
+                      </>
+                    ) : (
                       <svg
                         width="16"
                         height="16"
@@ -228,50 +252,61 @@ export default function PhotoInventoryWidget() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <polyline points="20,6 9,17 4,12"></polyline>
+                        <rect
+                          x="9"
+                          y="9"
+                          width="13"
+                          height="13"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                       </svg>
-                      <span style={{ marginLeft: "4px", fontSize: "12px" }}>
-                        Copied!
-                      </span>
-                    </>
-                  ) : (
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect
-                        x="9"
-                        y="9"
-                        width="13"
-                        height="13"
-                        rx="2"
-                        ry="2"
-                      ></rect>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                  )}
-                </button>
+                    )}
+                  </button>
+                </div>
+
+                {result.furniture && result.furniture.length > 0 && (
+                  <div className="photo-inventory-category">
+                    <div className="photo-inventory-category-title">
+                      Furniture:
+                    </div>
+                    <ul>
+                      {result.furniture.map((item, i) => (
+                        <li key={i} className="photo-inventory-item">
+                          <span className="photo-inventory-item-name">
+                            {item.description} {item.name}
+                          </span>
+                          <span className="photo-inventory-item-count">
+                            x {item.count}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {result.others && result.others.length > 0 && (
+                  <div className="photo-inventory-category">
+                    <div className="photo-inventory-category-title">
+                      Others:
+                    </div>
+                    <ul>
+                      {result.others.map((item, i) => (
+                        <li key={i} className="photo-inventory-item">
+                          <span className="photo-inventory-item-name">
+                            {item.description} {item.name}
+                          </span>
+                          <span className="photo-inventory-item-count">
+                            x {item.count}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
-              <ul>
-                {result.items.map((item, i) => (
-                  <li key={i} className="photo-inventory-item">
-                    <span className="photo-inventory-item-name">
-                      {item.name} {item.description}
-                    </span>
-                    <span className="photo-inventory-item-count">
-                      x {item.count}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+            )}
         </div>
       )}
     </div>
