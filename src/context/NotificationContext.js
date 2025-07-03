@@ -1,4 +1,3 @@
-// context/NotificationContext.js
 "use client";
 
 import { createContext, useContext, useState } from "react";
@@ -20,22 +19,11 @@ export const NotificationProvider = ({ children }) => {
   return (
     <NotificationContext.Provider value={{ addNotification }}>
       {children}
-      {/* UI for rendering notifications */}
-      <div className="fixed top-5 right-5 z-50 space-y-3">
+      {/* Basic notification UI */}
+      <div className="notification-container">
         {notifications.map((n) => (
-          <div
-            key={n.id}
-            className={`p-4 rounded shadow-lg bg-white border-l-4 ${
-              n.type === "success"
-                ? "border-green-500"
-                : n.type === "error"
-                ? "border-red-500"
-                : n.type === "warning"
-                ? "border-yellow-500"
-                : "border-blue-500"
-            }`}
-          >
-            <strong className="block font-semibold">{n.title}</strong>
+          <div key={n.id} className={`notification ${n.type}`}>
+            <strong>{n.title}</strong>
             <p>{n.message}</p>
           </div>
         ))}

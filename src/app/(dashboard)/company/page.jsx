@@ -1,3 +1,5 @@
+// CompanyDashboard.jsx - Socket.IO Anpassungen
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -20,7 +22,9 @@ export default function CompanyDashboard() {
   const [selectedDates, setSelectedDates] = useState({});
   const [confirmingOrderId, setConfirmingOrderId] = useState(null);
 
-  const { notifyOrderConfirmed, notifyOrderCancelled } = useSocket()
+  // ✅ ANPASSUNG: Verwende die korrekten Socket-Hook-Namen
+  const { emitOrderConfirmed, emitOrderCancelled } = useSocket();
+
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("de-DE", {
       style: "currency",
@@ -132,25 +136,27 @@ export default function CompanyDashboard() {
           });
         }
   
-        // ✅ Notify user if confirmed or cancelled
+        // ✅ ANPASSUNG: Verwende die korrekten Socket-Hook-Namen
         const affectedOrder = result.updatedOrder || result.order;
         const userId = affectedOrder?.accountId?._id || affectedOrder?.accountId;
   
         if (updates.status === "confirmed" && userId) {
-          notifyOrderConfirmed(orderId, userId);
+          console.log(`📧 Sending order confirmation notification for order ${orderId} to user ${userId}`);
+          emitOrderConfirmed(orderId, userId);
         }
   
         if (updates.status === "cancelled" && userId) {
-          notifyOrderCancelled(orderId, userId);
+          console.log(`📧 Sending order cancellation notification for order ${orderId} to user ${userId}`);
+          emitOrderCancelled(orderId, userId);
         }
       } else {
         alert(result.message || "Error updating order");
       }
     } catch (error) {
+      console.error("Error updating order:", error);
       alert("Error updating order. Please try again.");
     }
   };
-  
 
   const deleteOrder = async (orderId) => {
     if (
