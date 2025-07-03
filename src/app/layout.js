@@ -1,10 +1,10 @@
-// src/app/layout.js
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { LoadingProvider } from "@/context/LoadingContext";
 import { NotificationProvider } from "@/context/NotificationContext";
-import SocketManager from "@/components/SocketManager"; // ✅ Import
+import { SocketProvider } from "@/context/useSocket"; // ✅ Neuer Socket Provider
+import SocketManager from "@/components/SocketManager";
 import PhotoInventoryWidget from "@/components/ui/PhotoInventoryWidget";
 
 import "@/app/styles/styles.css";
@@ -20,16 +20,17 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <LoadingProvider>
-          <AuthProvider>
-            <NotificationProvider>
-              <SocketManager />{" "}
-              {/* ✅ Socket wird nach allen Contexts geladen */}
-              <Header />
-              <main>{children}</main>
-              <PhotoInventoryWidget />
-              <Footer />
-            </NotificationProvider>
-          </AuthProvider>
+          <SocketProvider>{/* ✅ Socket Provider ganz nach außen */}
+            <AuthProvider>
+              <NotificationProvider>
+                <SocketManager />
+                <Header />
+                <main>{children}</main>
+                <PhotoInventoryWidget />
+                <Footer />
+              </NotificationProvider>
+            </AuthProvider>
+          </SocketProvider>
         </LoadingProvider>
       </body>
     </html>

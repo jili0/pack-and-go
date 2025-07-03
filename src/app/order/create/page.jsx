@@ -10,7 +10,7 @@ import { useSocket } from "@/context/useSocket";
 
 export default function CreateOrder() {
   const router = useRouter();
-  const { notifyOrderCreated } = useSocket();
+  const { emitOrderCreated } = useSocket();
   const { account, initialCheckDone } = useAuth();
   const sessionLoading = useLoading("api", "sessionData");
   const submitLoading = useLoading("api", "createOrder");
@@ -177,7 +177,8 @@ export default function CreateOrder() {
       
           if (data.success) {
             // 🔔 Benachrichtigung an Firma senden
-            notifyOrderCreated(data.order._id, selectedCompany._id);
+            emitOrderCreated(data.order._id, selectedCompany._id);
+            
       
             ["selectedCompany", "movingFormData", "searchResults"].forEach((item) =>
               sessionStorage.removeItem(item)
