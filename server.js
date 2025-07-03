@@ -23,11 +23,13 @@ app.prepare().then(() => {
   io.on('connection', (socket) => {
     console.log('📡 Client connected:', socket.id);
 
-    socket.on('register-user', ({ userId, role }) => {
-      socket.join(`user-${userId}`);
-      if (role === 'company') socket.join(`company-${userId}`);
+    console.log('🧠 Registering', account.id, account.role);
+
+    socket.on('register-user', ({ accountId, role }) => {
+      socket.join(`user-${accountId}`);
+      if (role === 'company') socket.join(`company-${accountId}`);
       if (role === 'admin') socket.join('admin');
-      console.log(`User ${userId} joined room(s) as ${role}`);
+      console.log(`User ${accountId} joined room(s) as ${role}`);
     });
 
     socket.on('order-created', ({ orderId, companyId }) => {
@@ -46,9 +48,9 @@ app.prepare().then(() => {
       });
     });
 
-    socket.on('order-confirmed', ({ orderId, userId }) => {
-      console.log(`✅ Order confirmed: ${orderId} for user: ${userId}`);
-      io.to(`user-${userId}`).emit('notification', {
+    socket.on('order-confirmed', ({ orderId, accountId }) => {
+      console.log(`✅ Order confirmed: ${orderId} for user: ${accountId}`);
+      io.to(`user-${accountId}`).emit('notification', {
         type: 'order-confirmed',
         message: `Your order ${orderId} has been confirmed.`,
         orderId,
@@ -56,15 +58,21 @@ app.prepare().then(() => {
       });
     });
 
-    socket.on('order-cancelled', ({ orderId, userId }) => {
-      console.log(`❌ Order cancelled: ${orderId} for user: ${userId}`);
-      io.to(`user-${userId}`).emit('notification', {
+    socket.on('order-cancelled', ({ orderId, accountId }) => {
+      console.log(`❌ Order cancelled: ${orderId} for user: ${accountId}`);
+      io.to(`user-${accountId}`).emit('notification', {
         type: 'order-cancelled',
         message: `Your order ${orderId} was declined.`,
         orderId,
         timestamp: new Date().toISOString(),
       });
     });
+    socket.on('your-event', (data) => {
+        io.to(`user-${data.accountId}`).emit('bookingConfirmed', {
+          message: 'Your booking has been confirmed!',
+          ...data,
+        });
+      });
 
     socket.on('review-submitted', ({ companyId, rating }) => {
       console.log(`⭐ Review submitted for company: ${companyId} - ${rating}★`);
@@ -75,6 +83,7 @@ app.prepare().then(() => {
         timestamp: new Date().toISOString(),
       });
     });
+    
 
     socket.on('disconnect', () => {
       console.log('❌ Client disconnected:', socket.id);

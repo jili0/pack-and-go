@@ -23,7 +23,22 @@ export default function CompanyDashboard() {
   const [confirmingOrderId, setConfirmingOrderId] = useState(null);
 
   // ✅ ANPASSUNG: Verwende die korrekten Socket-Hook-Namen
-  const { emitOrderConfirmed, emitOrderCancelled } = useSocket();
+  const { emitOrderConfirmed, emitOrderCancelled, registerUser, isConnected } = useSocket();
+  const { notifications, clearNotifications } = useSocket();
+
+const role = account?.role;
+const filteredNotifications = notifications.filter((n) => {
+  if (role === 'user') {
+    return ['order-confirmed', 'order-cancelled'].includes(n.type);
+  }
+  if (role === 'company') {
+    return ['order-created', 'review-submitted'].includes(n.type);
+  }
+  if (role === 'admin') {
+    return ['order-created'].includes(n.type);
+  }
+  return false;
+});
 
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("de-DE", {
@@ -77,6 +92,13 @@ export default function CompanyDashboard() {
     console.log("Auth OK, fetching company data");
     fetchCompanyData();
   }, [initialCheckDone, router]); // Only initialCheckDone as dependency
+
+  useEffect(() => {
+    if (isConnected && account) {
+      registerUser(account.id, account.role);
+    }
+  }, [isConnected, account, registerUser]);
+  
 
   const fetchCompanyData = async () => {
     dashboardLoading.startLoading();
