@@ -106,16 +106,9 @@ try {
     oracleRegion = common.Region.fromRegionId(region);
     console.log("5a2. Region created successfully with fromRegionId");
   } catch (error) {
-    console.log("5a3. fromRegionId failed, using fallback:", error.message);
-    // Fallback: create region manually with proper structure
-    oracleRegion = {
-      regionId: region,
-      realm: {
-        secondLevelDomain: "oraclecloud.com",
-        realmId: "oc1",
-      },
-    };
-    console.log("5a4. Fallback region created");
+    throw new Error(
+      `Invalid Oracle region: ${region}. Please check your environment variable ORACLE_CLOUD_REGION. (${error.message})`
+    );
   }
   console.log("5a. Oracle region object:", oracleRegion);
   console.log("5a5. Region type:", typeof oracleRegion);
@@ -130,16 +123,13 @@ try {
     client = new objectStorage.ObjectStorageClient({
       authenticationDetailsProvider: provider,
     });
+    client.region = oracleRegion;
+    client.endpoint = `https://objectstorage.${region}.oraclecloud.com`;
     console.log("5b3. ObjectStorageClient created successfully");
   } catch (clientError) {
     console.error("5b4. ObjectStorageClient creation failed:", clientError);
     throw clientError;
   }
-
-  // Set endpoint manually
-  console.log("5c. Setting endpoint manually...");
-  client.endpoint = `https://objectstorage.${region}.oraclecloud.com`;
-  console.log("5c1. Endpoint set successfully");
 
   console.log("6. Client created successfully");
   console.log("7. Client endpoint:", client.endpoint);
