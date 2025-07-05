@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -8,16 +8,22 @@ import { useLoading } from "@/context/LoadingContext";
 import Loader from "@/components/ui/Loader";
 import { useSocket } from "@/context/useSocket";
 
-
-
 export default function AccountDashboard() {
   const router = useRouter();
   const { account, loading, initialCheckDone } = useAuth();
-  useSocket();
+  
+  const { 
+    isConnected, 
+    registerUser, 
+    notifications, 
+    clearNotifications 
+  } = useSocket();
+  
   const ordersLoading = useLoading("api", "orders");
   const [orders, setOrders] = useState([]);
   const [upcomingOrders, setUpcomingOrders] = useState([]);
   const [error, setError] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const formatDate = (dateString) => {
     if (!dateString) return "No date set";
@@ -54,6 +60,34 @@ export default function AccountDashboard() {
 
     return <span className={statusClass}>{statusMap[status] || status}</span>;
   };
+
+  const registeredRef = useRef(false);
+  
+  useEffect(() => {
+    if (isConnected && account?.id && account?.role && !registeredRef.current) {
+      console.log("🔌 Registering customer user:", account.id, account.role);
+      registerUser(account.id, account.role);
+      registeredRef.current = true;
+    }
+  }, [isConnected, account?.id, account?.role, registerUser]);
+
+  useEffect(() => {
+    if (!orders.length) return;
+
+    const hasOrderNotifications = notifications.some(
+      (n) => n.type === 'orderConfirmed' || n.type === 'orderCancelled'
+    );
+
+    if (hasOrderNotifications) {
+      console.log("📦 Order status notification received, refreshing orders...");
+      fetchOrders();
+      setShowNotifications(true);
+      
+      setTimeout(() => {
+        setShowNotifications(false);
+      }, 5000);
+    }
+  }, [notifications, orders.length]);
 
   useEffect(() => {
     if (!initialCheckDone) return;
@@ -104,6 +138,55 @@ export default function AccountDashboard() {
       <h1>Hello, {account?.name}</h1>
       <p>Welcome to your personal dashboard</p>
 
+      {/* ✅ KORRIGIERT: Notification Display mit richtigen CSS-Klassen */}
+      {(notifications.length > 0 || showNotifications) && (
+        <div className="notification-bar">
+          <div className="notification-list">
+            {notifications.map((notification, index) => (
+              <div key={index} className="notification-box">
+                <div className="notification-content">
+                  <div className="notification-header-item">
+                    <span className="notification-type">
+                      {notification.type === 'orderConfirmed' ? '✅ Order Confirmed!' : 
+                       notification.type === 'orderCancelled' ? '❌ Order Cancelled!' : 
+                       '📦 Order Update'}
+                    </span>
+                    <span className="notification-time">
+                      {new Date().toLocaleTimeString('de-DE', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </span>
+                  </div>
+                  <div className="notification-message">
+                    {notification.message || 'Your order status has been updated.'}
+                  </div>
+                  {notification.orderId && (
+                    <div className="notification-meta">
+                      Order ID: {notification.orderId}
+                    </div>
+                  )}
+                </div>
+                <button 
+                  className="delete-btn"
+                  onClick={() => {
+                    console.log('Delete notification:', notification);
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+          <button 
+            onClick={clearNotifications} 
+            className="notification-clear-btn"
+          >
+            Clear All Notifications ({notifications.length})
+          </button>
+        </div>
+      )}
+
       <div className="row">
         <a href="/" className="contact-item quick-action-link">
           <div className="contact-icon">
@@ -123,7 +206,7 @@ export default function AccountDashboard() {
           <div className="contact-icon">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
               />
             </svg>
           </div>

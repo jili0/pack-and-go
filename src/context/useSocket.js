@@ -1,7 +1,7 @@
-// 2. src/context/useSocket.js (Neuer Socket Context)
+// src/context/useSocket.js (KORRIGIERT)
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 
 const SocketContext = createContext();
@@ -14,61 +14,29 @@ export function useSocket() {
   return context;
 }
 
+export function SocketProvider({ children }) {
+  const [socket, setSocket] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [currentAccount, setCurrentAccount] = useState(null);
+  
+  const currentAccountRef = useRef(null);
+  const hasInitialized = useRef(false);
 
-  export function SocketProvider({ children }) {
-    const [socket, setSocket] = useState(null);
-    const [isConnected, setIsConnected] = useState(false);
-    const [notifications, setNotifications] = useState([]);
-  
-    // ✅ 1. Notification-Berechtigung anfordern
-    useEffect(() => {
-      if (typeof Notification !== "undefined" && Notification.permission !== 'granted') {
-        Notification.requestPermission().then(permission => {
-          console.log("🔔 Browser notification permission:", permission);
-        });
-      }
-    }, []);
-  
-    // ✅ 2. Socket initialisieren
-    useEffect(() => {
-      const socketIO = io({
-        path: '/api/socket',
-        autoConnect: true,
-      });
-  
-      socketIO.on('connect', () => {
-        console.log('✅ Connected to Socket.IO server');
-        setIsConnected(true);
-      });
-  
-      socketIO.on('disconnect', () => {
-        console.log('❌ Disconnected from Socket.IO server');
-        setIsConnected(false);
-      });
-  
-      socketIO.on('notification', (notification) => {
-        console.log('📬 Received notification:', notification);
-        setNotifications(prev => [...prev, notification]);
-  
-        if (Notification.permission === 'granted') {
-          new Notification('Pack & Go', {
-            body: notification.message,
-            icon: '/favicon.ico',
-          });
-        } else {
-          console.warn("🔕 Browser notifications not granted.");
-        }
-      });
-  
-      setSocket(socketIO);
-  
-      return () => {
-        socketIO.disconnect();
-      };
-    }, []);
-  
-
+  // ✅ Request notification permission ONCE
   useEffect(() => {
+    if (typeof window !== 'undefined' && typeof Notification !== "undefined" && Notification.permission !== 'granted') {
+      Notification.requestPermission().then(permission => {
+        console.log("🔔 Browser notification permission:", permission);
+      });
+    }
+  }, []);
+
+  // ✅ Initialize socket ONLY ONCE
+  useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
     const socketIO = io({
       path: '/api/socket',
       autoConnect: true,
@@ -84,12 +52,32 @@ export function useSocket() {
       setIsConnected(false);
     });
 
+    // ✅ UNIFIED notification handler - NO FILTERING HERE
     socketIO.on('notification', (notification) => {
-      console.log('📬 Received notification:', notification);
-      setNotifications(prev => [...prev, notification]);
+      console.log('📬 Received unified notification:', notification);
       
-      // Optional: Show browser notification
-      if (Notification.permission === 'granted') {
+      // ✅ Add ALL notifications to state - filtering happens in UI
+      setNotifications(prev => {
+        // Prevent duplicates
+        const exists = prev.some(n => 
+          n.type === notification.type && 
+          n.orderId === notification.orderId &&
+          n.timestamp === notification.timestamp
+        );
+        
+        if (exists) {
+          console.log('🚫 Duplicate notification prevented');
+          return prev;
+        }
+        
+        console.log('✅ Adding notification to state');
+        return [...prev, notification];
+      });
+
+      // ✅ Show browser notification if tab is not active
+      if (typeof window !== 'undefined' && 
+          Notification.permission === 'granted' && 
+          document.hidden) {
         new Notification('Pack & Go', {
           body: notification.message,
           icon: '/favicon.ico',
@@ -104,52 +92,29 @@ export function useSocket() {
     };
   }, []);
 
-  const showNotification = (message, type = 'info') => {
-    // Falls du ein UI-System wie setNotifications verwendest:
-    setNotifications(prev => [...prev, { message, type }]);
-  
-    // Zusätzlich optional: Browser Notification
-    if (Notification.permission === 'granted') {
-      new Notification('Pack & Go', {
-        body: message,
-        icon: '/favicon.ico',
-      });
-    }
-  
-    console.log(`🔔 ${type.toUpperCase()}: ${message}`);
-  };
+  // ✅ Sync currentAccount with ref
   useEffect(() => {
-    if (!socket) return;
+    currentAccountRef.current = currentAccount;
+  }, [currentAccount]);
 
-    // Event-Listener für Notifications
-    socket.on('newBookingRequest', (data) => {
-      console.log('Neue Buchungsanfrage:', data);
-      showNotification('Neue Buchungsanfrage erhalten!', 'success');
-    });
-
-    socket.on('bookingConfirmed', (data) => {
-      console.log('Buchung bestätigt:', data);
-      showNotification('Deine Buchung wurde bestätigt!', 'success');
-    });
-
-    // Cleanup
-    return () => {
-      socket.off('newBookingRequest');
-      socket.off('bookingConfirmed');
-    };
-  }, [socket]);
-  
-  const registerUser = (accountId, role) => {
-    
+  const registerUser = useCallback((accountId, role) => {
     if (!accountId || !role) {
       console.error("❌ registerUser called without valid accountId or role");
       return;
     }
+    
+    console.log(`📝 Registering user: ${accountId} as ${role}`);
+    
+    // ✅ Set current account
+    setCurrentAccount({ accountId, role });
+    
+    // ✅ Clear old notifications when switching accounts
+    setNotifications([]);
+    
     if (socket && isConnected) {
-      console.log(`📝 Registering user: ${accountId} as ${role}`);
       socket.emit('register-user', { accountId, role });
     }
-  };
+  }, [socket, isConnected]);
 
   const emitOrderCreated = (orderId, companyId) => {
     if (socket && isConnected) {
@@ -160,14 +125,14 @@ export function useSocket() {
 
   const emitOrderConfirmed = (orderId, accountId) => {
     if (socket && isConnected) {
-      console.log(`✅ Emitting order confirmed: ${orderId} for user: ${accountId}`);
+      console.log(`✅ Emitting order confirmed: ${orderId} for account: ${accountId}`);
       socket.emit('order-confirmed', { orderId, accountId });
     }
   };
 
   const emitOrderCancelled = (orderId, accountId) => {
     if (socket && isConnected) {
-      console.log(`❌ Emitting order cancelled: ${orderId} for user: ${accountId}`);
+      console.log(`❌ Emitting order cancelled: ${orderId} for account: ${accountId}`);
       socket.emit('order-cancelled', { orderId, accountId });
     }
   };
@@ -182,17 +147,23 @@ export function useSocket() {
   const clearNotifications = () => {
     setNotifications([]);
   };
+  
+  const removeNotification = (index) => {
+    setNotifications(prev => prev.filter((_, i) => i !== index));
+  };
 
   const value = {
     socket,
     isConnected,
     notifications,
+    currentAccount,
     registerUser,
     emitOrderCreated,
     emitOrderConfirmed,
     emitOrderCancelled,
     emitReviewSubmitted,
     clearNotifications,
+    removeNotification,
   };
 
   return (
