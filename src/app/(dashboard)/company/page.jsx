@@ -1,44 +1,36 @@
-// CompanyDashboard.jsx - Socket.IO Anpassungen
+// CompanyDashboard.jsx - Korrigierte Version mit passenden CSS-Klassen
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/context/LoadingContext";
 import Loader from "@/components/ui/Loader";
-import { useSocket } from "@/context/useSocket"; 
+import { useSocket } from "@/context/useSocket";
 
 export default function CompanyDashboard() {
   const router = useRouter();
   const { account, initialCheckDone } = useAuth();
   const dashboardLoading = useLoading("api", "companyDashboard");
-
   const [company, setCompany] = useState(null);
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
   const [selectedDates, setSelectedDates] = useState({});
   const [confirmingOrderId, setConfirmingOrderId] = useState(null);
+  const [hasRegistered, setHasRegistered] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
-  // ✅ ANPASSUNG: Verwende die korrekten Socket-Hook-Namen
-  const { emitOrderConfirmed, emitOrderCancelled, registerUser, isConnected } = useSocket();
-  const { notifications, clearNotifications } = useSocket();
-
-const role = account?.role;
-const filteredNotifications = notifications.filter((n) => {
-  if (role === 'user') {
-    return ['order-confirmed', 'order-cancelled'].includes(n.type);
-  }
-  if (role === 'company') {
-    return ['order-created', 'review-submitted'].includes(n.type);
-  }
-  if (role === 'admin') {
-    return ['order-created'].includes(n.type);
-  }
-  return false;
-});
+  const { 
+    emitOrderConfirmed, 
+    emitOrderCancelled, 
+    registerUser, 
+    isConnected,
+    notifications,
+    clearNotifications 
+  } = useSocket();
 
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("de-DE", {
@@ -69,38 +61,21 @@ const filteredNotifications = notifications.filter((n) => {
     }
   };
 
-  useEffect(() => {
-    // Wait for initial auth check to complete
-    if (!initialCheckDone) {
-      console.log("Waiting for initial auth check...");
-      return;
+  const fetchOrdersOnly = useCallback(async () => {
+    try {
+      const ordersRes = await fetch("/api/orders");
+      const ordersData = await ordersRes.json();
+
+      if (ordersData.success) {
+        setOrders(ordersData.orders);
+        console.log("📋 Orders refreshed successfully");
+      }
+    } catch (error) {
+      console.error("Error refreshing orders:", error);
     }
+  }, []);
 
-    // Only decide on redirect after initial check is done
-    if (!account) {
-      console.log("No account found, redirecting to login");
-      router.push("/login");
-      return;
-    }
-
-    if (account.role !== "company") {
-      console.log("Not a company account, redirecting to home");
-      router.push("/");
-      return;
-    }
-
-    console.log("Auth OK, fetching company data");
-    fetchCompanyData();
-  }, [initialCheckDone, router]); // Only initialCheckDone as dependency
-
-  useEffect(() => {
-    if (isConnected && account) {
-      registerUser(account.id, account.role);
-    }
-  }, [isConnected, account, registerUser]);
-  
-
-  const fetchCompanyData = async () => {
+  const fetchCompanyData = useCallback(async () => {
     dashboardLoading.startLoading();
     try {
       const [companyRes, ordersRes] = await Promise.all([
@@ -132,7 +107,59 @@ const filteredNotifications = notifications.filter((n) => {
     } finally {
       dashboardLoading.stopLoading();
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (!initialCheckDone) {
+      console.log("Waiting for initial auth check...");
+      return;
+    }
+
+    if (!account) {
+      console.log("No account found, redirecting to login");
+      router.push("/login");
+      return;
+    }
+
+    if (account.role !== "company") {
+      console.log("Not a company account, redirecting to home");
+      router.push("/");
+      return;
+    }
+
+    console.log("Auth OK, fetching company data");
+    fetchCompanyData();
+  }, [initialCheckDone, account, router, fetchCompanyData]);
+
+  const registeredRef = useRef(false);
+  
+  useEffect(() => {
+    if (isConnected && account?.id && account?.role && !registeredRef.current) {
+      console.log("🔌 Registering company user:", account.id, account.role);
+      registerUser(account.id, account.role);
+      registeredRef.current = true;
+      setHasRegistered(true);
+    }
+  }, [isConnected, account?.id, account?.role, registerUser]);
+
+  useEffect(() => {
+    if (!company) return;
+
+    const hasNewOrderNotifications = notifications.some(
+      (n) => n.type === 'order-created' || n.type === 'newBookingRequest'
+    );
+    
+    if (hasNewOrderNotifications) {
+      console.log("📦 New order notification received, refreshing orders...");
+      fetchOrdersOnly();
+      setShowNotifications(true);
+      
+      // Auto-hide nach 5 Sekunden
+      setTimeout(() => {
+        setShowNotifications(false);
+      }, 5000);
+    }
+  }, [notifications, company, fetchOrdersOnly]);
 
   const updateOrder = async (orderId, updates) => {
     try {
@@ -142,14 +169,14 @@ const filteredNotifications = notifications.filter((n) => {
         body: JSON.stringify(updates),
       });
       const result = await response.json();
-  
+
       if (result.success) {
         setOrders((prev) =>
           prev.map((order) =>
             order._id === orderId ? { ...order, ...updates } : order
           )
         );
-  
+
         if (updates.status === "confirmed" && updates.confirmedDate) {
           setSelectedDates((prev) => {
             const updated = { ...prev };
@@ -157,18 +184,17 @@ const filteredNotifications = notifications.filter((n) => {
             return updated;
           });
         }
-  
-        // ✅ ANPASSUNG: Verwende die korrekten Socket-Hook-Namen
+
         const affectedOrder = result.updatedOrder || result.order;
         const userId = affectedOrder?.accountId?._id || affectedOrder?.accountId;
-  
+
         if (updates.status === "confirmed" && userId) {
-          console.log(`📧 Sending order confirmation notification for order ${orderId} to user ${userId}`);
+          console.log(`✅ Sending order confirmation notification for order ${orderId} to user ${userId}`);
           emitOrderConfirmed(orderId, userId);
         }
-  
+
         if (updates.status === "cancelled" && userId) {
-          console.log(`📧 Sending order cancellation notification for order ${orderId} to user ${userId}`);
+          console.log(`❌ Sending order cancellation notification for order ${orderId} to user ${userId}`);
           emitOrderCancelled(orderId, userId);
         }
       } else {
@@ -287,6 +313,7 @@ const filteredNotifications = notifications.filter((n) => {
     </>
   );
 
+  // Early Returns
   if (!initialCheckDone) {
     return (
       <div className="container">
@@ -337,13 +364,73 @@ const filteredNotifications = notifications.filter((n) => {
 
   return (
     <div className="container">
-      <h1>Welcome, {company.companyName}! </h1>
-      <Link href="/company/profile" className="btn-primary">
-        Edit Profile
-      </Link>
-      <Link href="/company/reviews" className="btn-primary">
-        View Reviews
-      </Link>
+      <div className="dashboard-header">
+        <h1>Welcome, {company.companyName}!</h1>
+      </div>
+
+      <div className="dashboard-actions">
+        <Link href="/company/profile" className="btn-primary">
+          Edit Profile
+        </Link>
+        <Link href="/company/reviews" className="btn-primary">
+          View Reviews
+        </Link>
+        {notifications.length > 0 && (
+          <button onClick={clearNotifications} className="btn-secondary">
+            Clear Notifications ({notifications.length})
+          </button>
+        )}
+      </div>
+
+      {/* ✅ KORRIGIERT: Notification Display mit richtigen CSS-Klassen */}
+      {(notifications.length > 0 || showNotifications) && (
+        <div className="notification-bar">
+          <div className="notification-list">
+            {notifications.map((notification, index) => (
+              <div key={index} className="notification-box">
+                <div className="notification-content">
+                  <div className="notification-header-item">
+                    <span className="notification-type">
+                      {notification.type === 'order-created' ? '📦 New Order Request!' : 
+                       notification.type === 'newBookingRequest' ? '🔔 New Booking Request!' : 
+                       '📋 Order Update'}
+                    </span>
+                    <span className="notification-time">
+                      {new Date().toLocaleTimeString('de-DE', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </span>
+                  </div>
+                  <div className="notification-message">
+                    {notification.message || 'You have received a new order request from a customer.'}
+                  </div>
+                  {notification.orderId && (
+                    <div className="notification-meta">
+                      Order ID: {notification.orderId}
+                    </div>
+                  )}
+                </div>
+                <button 
+                  className="delete-btn"
+                  onClick={() => {
+                    // Einzelne Notification löschen (falls implementiert)
+                    console.log('Delete notification:', notification);
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+          <button 
+            onClick={clearNotifications} 
+            className="notification-clear-btn"
+          >
+            Clear All Notifications ({notifications.length})
+          </button>
+        </div>
+      )}
 
       {!company.isVerified && (
         <p className="verification-warning">
@@ -352,7 +439,7 @@ const filteredNotifications = notifications.filter((n) => {
         </p>
       )}
 
-      <div>
+      <div className="order-filters">
         <StatusButton status="all" count={orderStats.total} />
         <StatusButton status="pending" count={orderStats.pending} />
         <StatusButton status="confirmed" count={orderStats.confirmed} />
@@ -449,7 +536,7 @@ const filteredNotifications = notifications.filter((n) => {
               </p>
             )}
 
-            <div>
+            <div className="order-actions">
               <OrderActions order={order} />
             </div>
           </div>
