@@ -13,11 +13,18 @@ const handler = app.getRequestHandler();
 app.prepare().then(() => {
   const httpServer = createServer(handler);
 
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://pack-and-go.jingli.work",
+  ];
+
   const io = new Server(httpServer, {
     path: "/api/socket",
     cors: {
-      origin: dev ? "http://localhost:3001" : "https://pack-and-go.jingli.work",
+      origin: allowedOrigins,
       methods: ["GET", "POST"],
+      credentials: true,
     },
   });
 
