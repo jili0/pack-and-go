@@ -13,14 +13,14 @@ export default function SocketManager() {
   const [isMinimized, setIsMinimized] = useState(false);
 
   // ✅ User Registration on Connection
+  // ✅ User Registration on Connection (OPTIMIERT)
   useEffect(() => {
     if (isConnected && account?.id && account?.role && !hasRegistered) {
       console.log("🧠 Registering user:", account.id, "as", account.role);
       registerUser(account.id, account.role);
       setHasRegistered(true);
     }
-  }, [isConnected, account?.id, account?.role, hasRegistered, registerUser]);
-
+  }, [isConnected, account?.id, account?.role, hasRegistered]); // ✅ registerUser entfernt
   // ✅ Reset registration when account changes
   useEffect(() => {
     setHasRegistered(false);
