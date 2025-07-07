@@ -48,6 +48,8 @@ export default function CreateOrder() {
         const parsedFormData = JSON.parse(savedFormData);
 
         setSelectedCompany(parsedCompany);
+        console.log("📦 selectedCompany:", parsedCompany);
+        
         setFormData({
           ...parsedFormData,
           helpersCount: parsedFormData.helpersCount || 2,

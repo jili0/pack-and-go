@@ -16,7 +16,7 @@ app.prepare().then(() => {
   const io = new Server(httpServer, {
     path: "/api/socket",
     cors: {
-      origin: dev ? "http://localhost:3001" : "https://pack-and-go.jingli.work",
+      origin: dev ? "http://localhost:3000" : "https://pack-and-go.jingli.work",
       methods: ["GET", "POST"],
     },
   });

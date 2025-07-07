@@ -1,25 +1,26 @@
-// components/NotificationButton.jsx (UPDATED - Matches SocketManager logic)
+// components/NotificationButton.jsx (FINAL & CORRECTED)
 'use client'
+
 import { useState, useEffect } from "react";
 import { useSocket } from "@/context/useSocket";
 
 export default function NotificationButton({ account }) {
   const { notifications, clearNotifications, removeNotification } = useSocket();
   const [isOpen, setIsOpen] = useState(false);
+  const [testNotifications, setTestNotifications] = useState([]);
 
-  const role = account?.role;
-  
-  // ✅ UPDATED filtering logic (matches SocketManager)
+  const allNotifications = [...notifications, ...testNotifications];
+
+  // ✅ UPDATED filtering logic
   const getFilteredNotifications = () => {
     if (!account?.role) {
       console.log('🚫 No account role, showing no notifications');
       return [];
     }
 
-    const filtered = notifications.filter((notification) => {
+    const filtered = allNotifications.filter((notification) => {
       const { type, target } = notification;
-      
-      // ✅ New logic: Check the 'target' field from backend
+
       if (target) {
         switch (account.role) {
           case 'user':
@@ -27,51 +28,46 @@ export default function NotificationButton({ account }) {
           case 'company':
             return target === 'company' || target === 'all';
           case 'admin':
-            return true; // Admins see everything
+            return true;
           default:
             return false;
         }
       }
-      
-      // ✅ Fallback: Old logic based on notification type
+
       switch (account.role) {
         case 'user':
-          return ['order-confirmed', 'order-cancelled', 'bookingConfirmed', 'bookingCancelled'].includes(type);
-        
+          return ['order-confirmed', 'order-cancelled'].includes(type);
         case 'company':
-          return ['order-created', 'review-submitted', 'newBookingRequest'].includes(type);
-        
+          return ['order-created', 'review-submitted'].includes(type);
         case 'admin':
           return true;
-        
         default:
           return false;
       }
     });
 
-    console.log(`🔍 Filtered notifications: ${filtered.length}/${notifications.length} for role: ${account.role}`);
+    console.log(`🔍 Filtered notifications: ${filtered.length}/${allNotifications.length} for role: ${account.role}`);
     return filtered;
   };
 
   const filteredNotifications = getFilteredNotifications();
-  
 
-  // ✅ Individual delete notification function
+  console.log("🧪 [TEST] Incoming notifications:", allNotifications);
+  console.log("🧪 [TEST] Filtered notifications:", filteredNotifications);
+
   const deleteNotification = (indexToDelete) => {
-    console.log("🗑️ Delete notification at index:", indexToDelete);
     const notificationToDelete = filteredNotifications[indexToDelete];
-    const actualIndex = notifications.findIndex(n => 
-      n.type === notificationToDelete.type && 
+    const actualIndex = notifications.findIndex(n =>
+      n.type === notificationToDelete.type &&
       n.orderId === notificationToDelete.orderId &&
       n.timestamp === notificationToDelete.timestamp
     );
-    
+
     if (actualIndex !== -1) {
       removeNotification(actualIndex);
     }
   };
 
-  // ✅ Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isOpen && !event.target.closest('.notification-wrapper')) {
@@ -103,7 +99,7 @@ export default function NotificationButton({ account }) {
       >
         🔔
         {filteredNotifications.length > 0 && (
-          <span 
+          <span
             className="notification-badge"
             style={{
               position: 'absolute',
@@ -128,7 +124,7 @@ export default function NotificationButton({ account }) {
       </button>
 
       {isOpen && (
-        <div 
+        <div
           className="notification-dropdown"
           style={{
             position: 'absolute',
@@ -145,7 +141,7 @@ export default function NotificationButton({ account }) {
           }}
         >
           {filteredNotifications.length === 0 ? (
-            <p 
+            <p
               className="notification-empty"
               style={{
                 padding: '16px',
@@ -160,7 +156,7 @@ export default function NotificationButton({ account }) {
             <>
               <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                 {filteredNotifications.slice(-5).map((notification, idx) => (
-                  <div 
+                  <div
                     key={`${notification.type}-${notification.orderId}-${notification.timestamp}`}
                     className="notification-item"
                     style={{
@@ -208,7 +204,7 @@ export default function NotificationButton({ account }) {
                   </div>
                 ))}
               </div>
-              <button 
+              <button
                 onClick={() => {
                   clearNotifications();
                   setIsOpen(false);
@@ -235,6 +231,36 @@ export default function NotificationButton({ account }) {
         </div>
       )}
 
+      {/* ✅ Test Button (DEV only) */}
+      {process.env.NODE_ENV === 'development' && (
+        <button
+          onClick={() =>
+            setTestNotifications((prev) => [
+              ...prev,
+              {
+                type: 'order-created',
+                target: 'company',
+                orderId: `TEST-${Math.floor(Math.random() * 1000)}`,
+                message: '📦 Neue Testbenachrichtigung für die Firma!',
+                timestamp: new Date().toISOString(),
+              },
+            ])
+          }
+          style={{
+            marginTop: '12px',
+            fontSize: '12px',
+            padding: '6px 12px',
+            backgroundColor: '#f0f0f0',
+            border: '1px solid #ccc',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            display: 'block',
+          }}
+        >
+          ➕ Testbenachrichtigung (company)
+        </button>
+      )}
+
       <style jsx>{`
         .notification-wrapper {
           position: relative;
@@ -245,7 +271,7 @@ export default function NotificationButton({ account }) {
   );
 }
 
-// ✅ Helper Functions (same as SocketManager)
+// ✅ Helper Functions
 function getNotificationIcon(type) {
   switch (type) {
     case 'order-created':
