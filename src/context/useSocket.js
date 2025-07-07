@@ -38,7 +38,7 @@ export function SocketProvider({ children }) {
     hasInitialized.current = true;
 
     // ✅ KORREKTE Konfiguration für Next.js + Socket.IO Server
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || '';
     console.log("🔌 Connecting to Next.js Socket server:", socketUrl);
 
     const socketIO = io(socketUrl, {
