@@ -1,4 +1,4 @@
-// src/context/useSocket.js (KORRIGIERT)
+// src/context/useSocket.js (KORRIGIERT für Next.js Integration)
 'use client';
 
 import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
@@ -32,24 +32,46 @@ export function SocketProvider({ children }) {
     }
   }, []);
 
-  // ✅ Initialize socket ONLY ONCE
+  // ✅ Initialize socket ONLY ONCE - FÜR NEXT.JS INTEGRATION
   useEffect(() => {
     if (hasInitialized.current) return;
     hasInitialized.current = true;
 
-    const socketIO = io({
-      path: '/api/socket',
+    // ✅ KORREKTE Konfiguration für Next.js + Socket.IO Server
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
+    console.log("🔌 Connecting to Next.js Socket server:", socketUrl);
+
+    const socketIO = io(socketUrl, {
+      path: '/api/socket', // ✅ WICHTIG: Der Pfad wie in deinem Server definiert
       autoConnect: true,
+      transports: ['websocket', 'polling'],
+      timeout: 20000,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
     });
 
     socketIO.on('connect', () => {
-      console.log('✅ Connected to Socket.IO server');
+      console.log('✅ Connected to Next.js Socket.IO server:', socketIO.id);
       setIsConnected(true);
     });
 
-    socketIO.on('disconnect', () => {
-      console.log('❌ Disconnected from Socket.IO server');
+    socketIO.on('disconnect', (reason) => {
+      console.log('❌ Disconnected from Socket.IO server:', reason);
       setIsConnected(false);
+    });
+
+    socketIO.on('connect_error', (error) => {
+      console.error('🚨 Socket connection error:', error);
+      setIsConnected(false);
+    });
+
+    socketIO.on('reconnect', (attemptNumber) => {
+      console.log(`🔄 Socket reconnected after ${attemptNumber} attempts`);
+    });
+
+    socketIO.on('reconnect_failed', () => {
+      console.error('💥 Socket reconnection failed completely');
     });
 
     // ✅ UNIFIED notification handler - NO FILTERING HERE
@@ -88,6 +110,7 @@ export function SocketProvider({ children }) {
     setSocket(socketIO);
 
     return () => {
+      console.log("🔌 Cleaning up socket connection");
       socketIO.disconnect();
     };
   }, []);
@@ -102,19 +125,30 @@ export function SocketProvider({ children }) {
       console.error("❌ registerUser called without valid accountId or role");
       return;
     }
-    
-    console.log(`📝 Registering user: ${accountId} as ${role}`);
-    
-    // ✅ Set current account
+  
+    console.log(`🧠 registerUser CALLED: ${accountId}, role: ${role}`);
     setCurrentAccount({ accountId, role });
-    
-    // ✅ Clear old notifications when switching accounts
     setNotifications([]);
-    
-    if (socket && isConnected) {
+  
+    if (socket && socket.connected) {
+      console.log("📨 Emitting register-user");
       socket.emit('register-user', { accountId, role });
+    } else {
+      console.warn("⚠️ Socket not ready, delaying registration...");
+  
+      // ➕ Automatisch registrieren, sobald verbunden
+      const tryRegister = () => {
+        if (socket && socket.connected) {
+          console.log("✅ Late registration after connect:", accountId, role);
+          socket.emit('register-user', { accountId, role });
+          socket.off('connect', tryRegister); // Cleanup
+        }
+      };
+  
+      socket?.on('connect', tryRegister);
     }
-  }, [socket, isConnected]);
+  }, [socket]);
+  
 
   const emitOrderCreated = (orderId, companyId) => {
     if (socket && isConnected) {
@@ -137,10 +171,10 @@ export function SocketProvider({ children }) {
     }
   };
 
-  const emitReviewSubmitted = (companyId, rating) => {
+  const emitReviewSubmitted = (companyId, rating, orderId) => {
     if (socket && isConnected) {
       console.log(`⭐ Emitting review submitted for company: ${companyId} - ${rating}★`);
-      socket.emit('review-submitted', { companyId, rating });
+      socket.emit('review-submitted', { companyId, rating, orderId });
     }
   };
 

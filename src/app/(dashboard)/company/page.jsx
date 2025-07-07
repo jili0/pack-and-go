@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/context/LoadingContext";
 import Loader from "@/components/ui/Loader";
 import { useSocket } from "@/context/useSocket";
+import NotificationButton from "@/components/ui/NotificationButton";
 
 export default function CompanyDashboard() {
   const router = useRouter();
@@ -21,7 +22,6 @@ export default function CompanyDashboard() {
   const [selectedDates, setSelectedDates] = useState({});
   const [confirmingOrderId, setConfirmingOrderId] = useState(null);
   const [hasRegistered, setHasRegistered] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
 
   const { 
     emitOrderConfirmed, 
@@ -141,25 +141,6 @@ export default function CompanyDashboard() {
       setHasRegistered(true);
     }
   }, [isConnected, account?.id, account?.role, registerUser]);
-
-  useEffect(() => {
-    if (!company) return;
-
-    const hasNewOrderNotifications = notifications.some(
-      (n) => n.type === 'order-created' || n.type === 'newBookingRequest'
-    );
-    
-    if (hasNewOrderNotifications) {
-      console.log("📦 New order notification received, refreshing orders...");
-      fetchOrdersOnly();
-      setShowNotifications(true);
-      
-      // Auto-hide nach 5 Sekunden
-      setTimeout(() => {
-        setShowNotifications(false);
-      }, 5000);
-    }
-  }, [notifications, company, fetchOrdersOnly]);
 
   const updateOrder = async (orderId, updates) => {
     try {
@@ -361,6 +342,30 @@ export default function CompanyDashboard() {
       </div>
     );
   }
+  const getFilteredNotifications = () => {
+  if (!account?.role) return [];
+
+  return notifications.filter(({ type, target }) => {
+    if (target) {
+      switch (account.role) {
+        case 'user':
+          return target === 'user' || target === 'all';
+        case 'company':
+          return target === 'company' || target === 'all';
+        case 'admin':
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    // Fallback (optional)
+    return false;
+  });
+};
+
+const filteredNotifications = getFilteredNotifications();
+
 
   return (
     <div className="container">
@@ -375,62 +380,10 @@ export default function CompanyDashboard() {
         <Link href="/company/reviews" className="btn-primary">
           View Reviews
         </Link>
-        {notifications.length > 0 && (
-          <button onClick={clearNotifications} className="btn-secondary">
-            Clear Notifications ({notifications.length})
-          </button>
-        )}
-      </div>
-
-      {/* ✅ KORRIGIERT: Notification Display mit richtigen CSS-Klassen */}
-      {(notifications.length > 0 || showNotifications) && (
-        <div className="notification-bar">
-          <div className="notification-list">
-            {notifications.map((notification, index) => (
-              <div key={index} className="notification-box">
-                <div className="notification-content">
-                  <div className="notification-header-item">
-                    <span className="notification-type">
-                      {notification.type === 'order-created' ? '📦 New Order Request!' : 
-                       notification.type === 'newBookingRequest' ? '🔔 New Booking Request!' : 
-                       '📋 Order Update'}
-                    </span>
-                    <span className="notification-time">
-                      {new Date().toLocaleTimeString('de-DE', { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
-                    </span>
-                  </div>
-                  <div className="notification-message">
-                    {notification.message || 'You have received a new order request from a customer.'}
-                  </div>
-                  {notification.orderId && (
-                    <div className="notification-meta">
-                      Order ID: {notification.orderId}
-                    </div>
-                  )}
-                </div>
-                <button 
-                  className="delete-btn"
-                  onClick={() => {
-                    // Einzelne Notification löschen (falls implementiert)
-                    console.log('Delete notification:', notification);
-                  }}
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-          <button 
-            onClick={clearNotifications} 
-            className="notification-clear-btn"
-          >
-            Clear All Notifications ({notifications.length})
-          </button>
+        <div>
+           <NotificationButton account={account} />
         </div>
-      )}
+      </div>
 
       {!company.isVerified && (
         <p className="verification-warning">
