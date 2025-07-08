@@ -45,7 +45,6 @@ export default function PhotoInventoryWidget() {
 
   useEffect(() => {
     return () => {
-      clearTimeout(timerRef.current);
       clearTimeout(fadeTimerRef.current);
       clearTimeout(autoExpandTimerRef.current);
     };
@@ -164,8 +163,9 @@ export default function PhotoInventoryWidget() {
   return (
     <div
       className={`photo-inventory-widget${collapsed ? " collapsed" : ""}`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => {
+        if (collapsed) setCollapsed(false);
+      }}
       ref={widgetRef}
       style={{ zIndex: 9999 }}
     >
