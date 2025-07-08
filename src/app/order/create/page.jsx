@@ -172,7 +172,7 @@ export default function CreateOrder() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          companyId: selectedCompany._id,
+          companyId: selectedCompany?._id,
           fromAddress: formData.fromAddress,
           toAddress: formData.toAddress,
           preferredDates: formData.preferredDates.filter((date) => date),
@@ -188,7 +188,7 @@ export default function CreateOrder() {
       if (data.success) {
         if (isConnected) {
           try {
-            emitOrderCreated(data.order._id, selectedCompany._id);
+            emitOrderCreated(data.order._id, selectedCompany.accountId);
             console.log("✅ Socket notification sent successfully");
           } catch (socketError) {
             console.error("❌ Failed to send socket notification:", socketError);

@@ -35,6 +35,8 @@ app.prepare().then(() => {
     maxHttpBufferSize: 1e6, // 1MB
   });
 
+  globalThis.io = io;
+
   // Enhanced connection handling
   io.on("connection", (socket) => {
     console.log("📡 Client connected:", socket.id, "Transport:", socket.conn.transport.name);

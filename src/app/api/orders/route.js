@@ -1,9 +1,7 @@
-// src/app/api/orders/route.js
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Order from "@/models/Order";
 import Company from "@/models/Company";
-// import User from "@/models/User";
 import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
 import {
@@ -11,7 +9,8 @@ import {
   sendNewOrderNotificationEmail,
 } from "@/lib/email";
 
-export async function POST(request) {
+// 📥 GET: Alle Bestellungen basierend auf Rolle
+export async function GET(request) {
   try {
     const session = await getSession();
 
@@ -20,6 +19,46 @@ export async function POST(request) {
         { success: false, message: "Nicht autorisiert" },
         { status: 401 }
       );
+    }
+
+    await connectDB();
+
+    let query = {};
+
+    if (session.role === "user") {
+      query.accountId = session.id;
+    } else if (session.role === "company") {
+      // 👉 Korrekt: nach companyAccountId suchen!
+      query.companyAccountId = session.id;
+    }
+
+    const { searchParams } = new URL(request.url);
+    const statusFilter = searchParams.get("status");
+    if (statusFilter) {
+      query.status = statusFilter;
+    }
+
+    const orders = await Order.find(query)
+      .populate("accountId", "name email phone")
+      .populate("companyId", "companyName email phone")
+      .sort({ createdAt: -1 });
+
+    return NextResponse.json({ success: true, orders }, { status: 200 });
+  } catch (error) {
+    console.error("Fehler beim Abrufen der Bestellungen:", error);
+    return NextResponse.json(
+      { success: false, message: "Serverfehler beim Abrufen der Bestellungen" },
+      { status: 500 }
+    );
+  }
+}
+
+// 📤 POST: Neue Bestellung anlegen
+export async function POST(request) {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ success: false, message: "Nicht autorisiert" }, { status: 401 });
     }
 
     await connectDB();
@@ -35,7 +74,6 @@ export async function POST(request) {
       notes,
     } = await request.json();
 
-    // Validiere die Eingaben
     if (
       !companyId ||
       !fromAddress ||
@@ -44,37 +82,26 @@ export async function POST(request) {
       preferredDates.length === 0
     ) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Alle Pflichtfelder müssen ausgefüllt sein",
-        },
+        { success: false, message: "Alle Pflichtfelder müssen ausgefüllt sein" },
         { status: 400 }
       );
     }
 
-    // Überprüfe, ob die Firma existiert
-    // const company = await Company.findById(companyId);
-    const company = await Company.findOne({_id:companyId});
- 
+    const company = await Company.findById(companyId);
     if (!company) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Die ausgewählte Umzugsfirma wurde nicht gefunden",
-        },
+        { success: false, message: "Die ausgewählte Umzugsfirma wurde nicht gefunden" },
         { status: 404 }
       );
     }
 
-    // Erstelle die Bestellung
     const newOrder = await Order.create({
-      // userId: session.id,
       accountId: session.id,
       companyId,
+      companyAccountId: company.accountId, // ✅ Wird jetzt gesetzt!
       fromAddress,
       toAddress,
-      // preferredDates,
-      preferredDates: preferredDates.map(date => new Date(date)), // Convert strings to Dates
+      preferredDates: preferredDates.map(date => new Date(date)),
       helpersCount,
       estimatedHours,
       totalPrice,
@@ -82,22 +109,14 @@ export async function POST(request) {
       status: "pending",
     });
 
-    // Aktualisiere die Benutzer- und Firmendaten mit der neuen Bestellung
-    // await User.findByIdAndUpdate(session.id, {
-    //   $push: { orders: newOrder._id },
-    // });
     await Account.findByIdAndUpdate(session.id, {
       $push: { orders: newOrder._id },
     });
 
-    // Sende Bestätigungsemails
-    // const user = await User.findById(session.id);
     const account = await Account.findById(session.id);
 
-    // E-Mail an den Benutzer
+    // E-Mails
     await sendOrderConfirmationEmail({
-      // email: user.email,
-      // name: user.name,
       email: account.email,
       name: account.name,
       orderId: newOrder._id,
@@ -108,15 +127,11 @@ export async function POST(request) {
       totalPrice,
     });
 
-    // E-Mail an die Firma
     await sendNewOrderNotificationEmail({
       email: company.email,
       companyName: company.companyName,
       orderDetails: {
         id: newOrder._id,
-        // customerName: user.name,
-        // customerEmail: user.email,
-        // customerPhone: user.phone,
         customerName: account.name,
         customerEmail: account.email,
         customerPhone: account.phone,
@@ -130,84 +145,40 @@ export async function POST(request) {
       },
     });
 
+    // Socket
+    try {
+      const socketResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/api/socket/emit`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'order-created',
+            data: {
+              orderId: newOrder._id.toString(),
+              companyId: companyId.toString(),
+            },
+          }),
+        }
+      );
+
+      if (socketResponse.ok) {
+        console.log('✅ Socket event order-created emitted successfully');
+      } else {
+        console.warn('⚠️ Failed to emit socket event order-created');
+      }
+    } catch (socketError) {
+      console.error('❌ Error emitting socket event:', socketError);
+    }
+
     return NextResponse.json(
-      {
-        success: true,
-        message: "Bestellung erfolgreich erstellt",
-        order: newOrder,
-      },
+      { success: true, message: "Bestellung erfolgreich erstellt", order: newOrder },
       { status: 201 }
     );
   } catch (error) {
     console.error("Fehler beim Erstellen der Bestellung:", error);
-
     return NextResponse.json(
       { success: false, message: "Serverfehler beim Erstellen der Bestellung" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET(request) {
-  try {
-    const session = await getSession();
-
-    if (!session) {
-      return NextResponse.json(
-        { success: false, message: "Nicht autorisiert" },
-        { status: 401 }
-      );
-    }
-
-    await connectDB();
-
-    // Prüfe die Rolle des Benutzers
-    if (session.role === "user") {
-      // Benutzer sehen nur ihre eigenen Bestellungen
-      // const orders = await Order.find({ userId: session.id })
-      const orders = await Order.find({ accountId: session.id })
-        .populate("companyId", "companyName")
-        .sort({ createdAt: -1 });
-
-      return NextResponse.json({ success: true, orders }, { status: 200 });
-    } else if (session.role === "company") {
-      // Unternehmen sehen nur Bestellungen für ihr Unternehmen
-      // const company = await Company.findOne({ userId: session.id });
-      const company = await Company.findOne({ accountId: session.id });
-
-      if (!company) {
-        return NextResponse.json(
-          { success: false, message: "Unternehmen nicht gefunden" },
-          { status: 404 }
-        );
-      }
-
-      const orders = await Order.find({ companyId: company._id })
-        // .populate("userId", "name email phone")
-        .populate("accountId", "name email phone")
-        .sort({ createdAt: -1 });
-
-      return NextResponse.json({ success: true, orders }, { status: 200 });
-    } else if (session.role === "admin") {
-      // Administratoren sehen alle Bestellungen
-      const orders = await Order.find()
-        // .populate("userId", "name email")
-        .populate("accountId", "name email")
-        .populate("companyId", "companyName")
-        .sort({ createdAt: -1 });
-
-      return NextResponse.json({ success: true, orders }, { status: 200 });
-    } else {
-      return NextResponse.json(
-        { success: false, message: "Keine Berechtigung" },
-        { status: 403 }
-      );
-    }
-  } catch (error) {
-    console.error("Fehler beim Abrufen der Bestellungen:", error);
-
-    return NextResponse.json(
-      { success: false, message: "Serverfehler beim Abrufen der Bestellungen" },
       { status: 500 }
     );
   }

@@ -23,9 +23,7 @@ export default function CompanyDashboard() {
   const [confirmingOrderId, setConfirmingOrderId] = useState(null);
   const [hasRegistered, setHasRegistered] = useState(false);
 
-  const { 
-    emitOrderConfirmed, 
-    emitOrderCancelled, 
+  const {  
     registerUser, 
     isConnected,
     notifications,
@@ -132,6 +130,44 @@ export default function CompanyDashboard() {
   }, [initialCheckDone, account, router, fetchCompanyData]);
 
   const registeredRef = useRef(false);
+  const emitOrderConfirmed = async (orderId, accountId) => {
+    try {
+      const res = await fetch("/api/socket/emit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "order-confirmed",
+          data: { orderId, accountId },
+        }),
+      });
+  
+      if (!res.ok) {
+        console.warn("⚠️ Socket emit order-confirmed failed");
+      }
+    } catch (err) {
+      console.error("❌ Error in emitOrderConfirmed:", err);
+    }
+  };
+  
+  const emitOrderCancelled = async (orderId, accountId) => {
+    try {
+      const res = await fetch("/api/socket/emit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "order-cancelled",
+          data: { orderId, accountId },
+        }),
+      });
+  
+      if (!res.ok) {
+        console.warn("⚠️ Socket emit order-cancelled failed");
+      }
+    } catch (err) {
+      console.error("❌ Error in emitOrderCancelled:", err);
+    }
+  };
+  
   
   useEffect(() => {
     if (isConnected && account?.id && account?.role && !registeredRef.current) {
@@ -150,14 +186,14 @@ export default function CompanyDashboard() {
         body: JSON.stringify(updates),
       });
       const result = await response.json();
-
+  
       if (result.success) {
         setOrders((prev) =>
           prev.map((order) =>
             order._id === orderId ? { ...order, ...updates } : order
           )
         );
-
+  
         if (updates.status === "confirmed" && updates.confirmedDate) {
           setSelectedDates((prev) => {
             const updated = { ...prev };
@@ -165,19 +201,109 @@ export default function CompanyDashboard() {
             return updated;
           });
         }
-
+  
+        // ✅ FIX: Korrekte Extraktion der accountId
         const affectedOrder = result.updatedOrder || result.order;
-        const userId = affectedOrder?.accountId?._id || affectedOrder?.accountId;
-
+        let userId;
+  
+        // Verschiedene Möglichkeiten, wie accountId zurückgegeben werden kann
+        if (affectedOrder?.accountId) {
+          if (typeof affectedOrder.accountId === 'string') {
+            userId = affectedOrder.accountId;
+          } else if (affectedOrder.accountId._id) {
+            userId = affectedOrder.accountId._id;
+          }
+        }
+  
+        // ✅ Fallback: Suche in der lokalen orders-Liste
+        if (!userId) {
+          const localOrder = orders.find(order => order._id === orderId);
+          if (localOrder?.accountId) {
+            if (typeof localOrder.accountId === 'string') {
+              userId = localOrder.accountId;
+            } else if (localOrder.accountId._id) {
+              userId = localOrder.accountId._id;
+            }
+          }
+        }
+  
+        console.log("🔍 Debug Info:");
+        console.log("  - Order ID:", orderId);
+        console.log("  - Updates:", updates);
+        console.log("  - Affected Order:", affectedOrder);
+        console.log("  - Extracted User ID:", userId);
+  
+        // ✅ Emit socket notification for confirmed
         if (updates.status === "confirmed" && userId) {
-          console.log(`✅ Sending order confirmation notification for order ${orderId} to user ${userId}`);
-          emitOrderConfirmed(orderId, userId);
+          try {
+            console.log("📡 Emitting order-confirmed for user:", userId);
+            const socketResponse = await fetch("/api/socket/emit", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                event: "order-confirmed",
+                data: {
+                  orderId,
+                  accountId: userId,
+                },
+              }),
+            });
+  
+            if (socketResponse.ok) {
+              console.log("✅ Socket event order-confirmed emitted successfully");
+              const socketResult = await socketResponse.json();
+              console.log("  - Socket response:", socketResult);
+            } else {
+              console.warn("⚠️ Failed to emit socket event order-confirmed");
+              const errorText = await socketResponse.text();
+              console.warn("  - Error:", errorText);
+            }
+          } catch (error) {
+            console.error("❌ Error emitting order-confirmed:", error);
+          }
         }
-
+  
+        // ✅ Emit socket notification for cancelled
         if (updates.status === "cancelled" && userId) {
-          console.log(`❌ Sending order cancellation notification for order ${orderId} to user ${userId}`);
-          emitOrderCancelled(orderId, userId);
+          try {
+            console.log("📡 Emitting order-cancelled for user:", userId);
+            const socketResponse = await fetch("/api/socket/emit", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                event: "order-cancelled",
+                data: {
+                  orderId,
+                  accountId: userId,
+                },
+              }),
+            });
+  
+            if (socketResponse.ok) {
+              console.log("✅ Socket event order-cancelled emitted successfully");
+              const socketResult = await socketResponse.json();
+              console.log("  - Socket response:", socketResult);
+            } else {
+              console.warn("⚠️ Failed to emit socket event order-cancelled");
+              const errorText = await socketResponse.text();
+              console.warn("  - Error:", errorText);
+            }
+          } catch (error) {
+            console.error("❌ Error emitting order-cancelled:", error);
+          }
         }
+  
+        // ✅ Warnung wenn keine userId gefunden wurde
+        if ((updates.status === "confirmed" || updates.status === "cancelled") && !userId) {
+          console.error("❌ No user ID found for notification!");
+          console.error("  - Order:", affectedOrder);
+          console.error("  - Local Orders:", orders);
+        }
+  
       } else {
         alert(result.message || "Error updating order");
       }
