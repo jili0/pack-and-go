@@ -4,6 +4,7 @@ import connectDB from "@/lib/db";
 import Account from "@/models/Account";
 import { createToken, setTokenCookie } from "@/lib/auth";
 import { sendWelcomeEmail } from "@/lib/email";
+import { getIoInstance } from "@/lib/socket";
 
 export async function POST(request) {
   try {
@@ -168,6 +169,24 @@ export async function POST(request) {
       maxAge: 60 * 60 * 24 * 7, // 7 Tage
       sameSite: "strict",
     });
+    try {
+      const io = getIoInstance();
+      if (io) {
+        io.to('admin').emit('notification', { // 'notification' ist der Event-Name, den dein Frontend erwartet
+          type: 'new_registration',
+          message: `New Registration ${newAccount.name} (${newAccount.email}) als ${newAccount.role}.`,
+          target: 'admin', // Zielrolle
+          accountId: newAccount._id, // ID des neuen Accounts
+          timestamp: new Date().toISOString(),
+          read: false, // Standardmäßig ungelesen
+        });
+        console.log(`✅ Socket.IO: 'new_registration' Benachrichtigung an Admin gesendet für ${newAccount.email}`);
+      } else {
+        console.warn("⚠️ Socket.IO-Instanz nicht verfügbar. 'new_registration' Benachrichtigung konnte nicht gesendet werden.");
+      }
+    } catch (socketError) {
+      console.error("❌ Fehler beim Senden der Socket.IO-Benachrichtigung für Registrierung:", socketError);
+    }
 
     return response;
   } catch (error) {
