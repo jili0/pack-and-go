@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLoading } from "@/context/LoadingContext";
 import Loader from "@/components/ui/Loader";
 import "@/app/styles/styles.css";
+import NotificationButton from "@/components/ui/NotificationButton";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -230,6 +231,7 @@ export default function AdminDashboard() {
             Moderate Reviews
           </button>
           </div>
+          <NotificationButton />
       <div>
         <div className="admin-stats">
           <p>Total Accounts: {totalAccounts}</p>
