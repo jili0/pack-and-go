@@ -5,18 +5,38 @@ import { useRouter } from "next/navigation";
 import { useLoading } from "@/context/LoadingContext";
 import Loader from "@/components/ui/Loader";
 import "@/app/styles/styles.css";
+import { useAuth } from "@/context/AuthContext";
+import { useSocket } from "@/context/useSocket";
 import NotificationButton from "@/components/ui/NotificationButton";
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const { account, loading, initialCheckDone } = useAuth();
   const dashboardLoading = useLoading("api", "dashboard");
   const deleteLoading = useLoading("api", "deleteAccount");
+  const { 
+    isConnected, 
+    registerUser, 
+    notifications, 
+    clearNotifications 
+  } = useSocket();
+  
 
   const [accounts, setAccounts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const USER_ROLES = ["user", "company", "admin"];
+
+  const registeredRef = useRef(false);
+    
+    useEffect(() => {
+      if (isConnected && account?.id && account?.role && !registeredRef.current) {
+        console.log("🔌 Registering customer user:", account.id, account.role);
+        registerUser(account.id, account.role);
+        registeredRef.current = true;
+      }
+    }, [isConnected, account?.id, account?.role, registerUser]);
 
   useEffect(() => {
     fetchDashboardData();

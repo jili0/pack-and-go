@@ -1,10 +1,10 @@
-// app/api/reviews/route.js
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db'; // Fixed import path to match your existing code
+import connectDB from '@/lib/db';
 import Review from '@/models/Review';
 import Order from '@/models/Order';
 import Company from '@/models/Company';
-import { getSession } from '@/lib/auth'; // Using your existing auth function
+import Account from '@/models/Account';
+import { getSession } from '@/lib/auth';
 
 export async function GET(request) {
   try {
@@ -21,7 +21,7 @@ export async function GET(request) {
     let query = {};
 
     if (session.role === "admin") {
-      // show all
+      // Admin sieht alles
     } else if (session.role === "company") {
       const company = await Company.findOne({ accountId: session.id });
       if (!company || company._id.toString() !== companyId) {
@@ -44,12 +44,9 @@ export async function GET(request) {
   }
 }
 
-
 export async function POST(request) {
   try {
-    // Check authentication using your existing session function
     const session = await getSession();
-    
     if (!session) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
@@ -58,7 +55,6 @@ export async function POST(request) {
 
     const { orderId, companyId, rating, comment } = await request.json();
 
-    // Validation
     if (!orderId || !companyId || !rating || !comment) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
@@ -71,7 +67,6 @@ export async function POST(request) {
       return NextResponse.json({ message: 'Comment cannot exceed 500 characters' }, { status: 400 });
     }
 
-    // Verify order exists and belongs to the user
     const order = await Order.findById(orderId);
     if (!order) {
       return NextResponse.json({ message: 'Order not found' }, { status: 404 });
@@ -85,13 +80,11 @@ export async function POST(request) {
       return NextResponse.json({ message: 'Can only review completed orders' }, { status: 400 });
     }
 
-    // Check if review already exists
     const existingReview = await Review.findOne({ orderId });
     if (existingReview) {
       return NextResponse.json({ message: 'Review already exists for this order' }, { status: 400 });
     }
 
-    // Create new review
     const review = new Review({
       accountId: session.id,
       companyId,
@@ -101,21 +94,56 @@ export async function POST(request) {
     });
 
     await review.save();
-    // Recalculate averageRating and reviewsCount
+
+    // 🔧 Hole User & Company für Benachrichtigung
+    const user = await Account.findById(session.id);
+    const company = await Company.findById(companyId);
+
+    const userName = user?.name || "Unbekannter Benutzer";
+    const companyName = company?.companyName || "Unbekanntes Unternehmen";
+
+    try {
+      const socketResponse = await fetch(`${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/api/socket/emit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event: 'review-saved-notification',
+          data: {
+            reviewId: review._id.toString(),
+            companyId: review.companyId.toString(),
+            rating: review.rating,
+            userId: review.accountId.toString(),
+            userName,
+            companyName
+          }
+        })
+      });
+
+      if (socketResponse.ok) {
+        console.log('✅ Socket event review-saved-notification emitted successfully via API.');
+      } else {
+        const text = await socketResponse.text();
+        console.warn(`⚠️ Failed to emit socket event review-saved-notification: ${socketResponse.status} - ${text}`);
+      }
+    } catch (socketError) {
+      console.error('❌ Error emitting socket event via API:', socketError);
+    }
+
+    // 📊 Durchschnitt aktualisieren
     const reviews = await Review.find({ companyId });
     const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
 
     await Company.findByIdAndUpdate(companyId, {
-     averageRating: avgRating,
+      averageRating: avgRating,
       reviewsCount: reviews.length,
     });
 
-
-    // Update order to mark as reviewed
     await Order.findByIdAndUpdate(orderId, { review: review._id });
 
-    return NextResponse.json({ 
-      message: 'Review submitted successfully', 
+    return NextResponse.json({
+      message: 'Review submitted successfully',
       review: {
         _id: review._id,
         rating: review.rating,

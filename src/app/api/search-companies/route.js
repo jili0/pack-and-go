@@ -140,7 +140,8 @@ export async function POST(request) {
           reviewsCount: 1,
           logo: 1,
           createdAt: 1,
-          hourlyRate: 1
+          hourlyRate: 1,
+          accountId: 1
         }
       },
       {
@@ -211,7 +212,8 @@ export async function POST(request) {
             averageRating: 1,
             reviewsCount: 1,
             logo: 1,
-            createdAt: 1
+            createdAt: 1,
+            accountId: 1
           }
         },
         {

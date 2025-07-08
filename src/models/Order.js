@@ -11,6 +11,11 @@ const OrderSchema = new mongoose.Schema({
     ref: "Company",
     required: true,
   },
+  companyAccountId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Account",
+    required: true,
+  },
   fromAddress: {
     street: { type: String, required: true },
     city: { type: String, required: true },
