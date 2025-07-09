@@ -25,7 +25,7 @@ export const OrderInfo = ({ order, company }) => {
       </div>
       <div className="order-detail">
         <span>Order Status:</span>
-        <span>Request Sent</span>
+        <span>{order.status}</span>
       </div>
       <div className="order-detail">
         <span>Moving Company:</span>
