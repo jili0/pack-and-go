@@ -2,7 +2,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Account from "@/models/Account";
-import Company from "@/models/Company";
 import { createToken, setTokenCookie } from "@/lib/auth";
 import { sendWelcomeEmail } from "@/lib/email";
 
@@ -84,6 +83,7 @@ export async function POST(request) {
       }
     } catch (error) {
       console.error("Fehler bei der Benutzerüberprüfung:", error);
+      // Fehler bei der Benutzerüberprüfung ignorieren, da möglicherweise keine DB-Verbindung besteht
     }
 
     // Zulässige Rollen beschränken
@@ -104,50 +104,8 @@ export async function POST(request) {
         phone,
         role,
       });
-      
-      // If the role is "company", create a company profile
-      if (role === "company") {
-        console.log("🏢 Creating company profile for user:", newAccount._id);
-        
-        try {
-          await Company.create({
-            accountId: newAccount._id,
-            companyName: name,
-            description: "",
-            address: {
-              street: "",
-              city: "",
-              postalCode: "",
-              country: "Germany",
-            },
-            serviceAreas: [],
-            phone: phone || "",
-            email: email,
-            taxId: "",
-            isKisteKlarCertified: false,
-            isVerified: false,
-            documents: {
-              businessLicense: { 
-                url: null,
-                verified: false 
-              },
-              kisteKlarCertificate: { 
-                url: null,
-                verified: false 
-              },
-            },
-          });
-          
-          console.log("✓ Company profile created successfully");
-        } catch (error) {
-          console.error("❌ Error creating company profile:", error);
-          // Don't fail registration if company profile creation fails
-          // The company can complete their profile later
-        }
-      }
-
     } catch (error) {
-      console.error("Fehler bei der Benutzerregistrierung:", error);
+      console.error("Fehler beim Erstellen des Benutzers:", error);
 
       if (error.name === "ValidationError") {
         const errors = Object.keys(error.errors).map((key) => ({
@@ -179,6 +137,7 @@ export async function POST(request) {
       await sendWelcomeEmail(email, name);
     } catch (emailError) {
       console.error("Fehler beim Senden der Willkommens-E-Mail:", emailError);
+      // Wir wollen nicht die Registrierung abbrechen, wenn die E-Mail nicht gesendet werden kann
     }
 
     // JWT-Token erstellen
