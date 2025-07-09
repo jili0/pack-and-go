@@ -94,11 +94,13 @@ const OrderDetails = () => {
 
   const orderDetailsLoading = useLoading("api", "orderDetails");
   const cancelLoading = useLoading("api", "cancelOrder");
+  const deleteLoading = useLoading("api", "deleteOrder");
 
   const [order, setOrder] = useState(null);
   const [company, setCompany] = useState(null);
   const [error, setError] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -152,6 +154,27 @@ const OrderDetails = () => {
     }
   };
 
+  const handleDeleteOrder = async () => {
+    deleteLoading.startLoading();
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        router.push("/account");
+      } else {
+        setError(data.message || "Failed to delete order.");
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      setError("An error occurred. Please try again later.");
+    } finally {
+      deleteLoading.stopLoading();
+    }
+  };
+
   if (orderDetailsLoading.isLoading) {
     return (
       <div className="container">
@@ -167,7 +190,7 @@ const OrderDetails = () => {
         <p>{error}</p>
         <button
           className="btn-primary"
-          onClick={() => router.push("/account/orders")}
+          onClick={() => router.push("/account")}
         >
           Back to Orders
         </button>
@@ -182,7 +205,7 @@ const OrderDetails = () => {
         <p>The requested order could not be found.</p>
         <button
           className="btn-primary"
-          onClick={() => router.push("/account/orders")}
+          onClick={() => router.push("/account")}
         >
           Back to Orders
         </button>
@@ -200,7 +223,7 @@ const OrderDetails = () => {
         <button className="btn-primary" onClick={() => router.back()}>
           Back to Dashboard
         </button>
-        {order.status === "pending" && (
+        {(order.status === "pending" || order.status === "confirmed") && (
           <button
             className="btn-primary"
             onClick={() => setShowCancelModal(true)}
@@ -208,12 +231,20 @@ const OrderDetails = () => {
             Cancel Order
           </button>
         )}
-        {order.status === "completed" && !order.review && (
+        {order.status === "completed" && (
           <button
             className="btn-primary"
             onClick={() => router.push(`/account/orders/${orderId}/review`)}
           >
             Leave a Review
+          </button>
+        )}
+        {(order.status === "completed" || order.status === "cancelled") && (
+          <button
+            className="btn-primary"
+            onClick={() => setShowDeleteModal(true)}
+          >
+            Delete Order
           </button>
         )}
       </div>
@@ -239,6 +270,31 @@ const OrderDetails = () => {
                 {cancelLoading.isLoading
                   ? "Cancelling..."
                   : "Yes, Cancel Order"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Delete Order</h3>
+            <p>Are you sure you want to delete this order?</p>
+            <p>This action cannot be undone.</p>
+            <div className="form-footer">
+              <button
+                className="btn-primary"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                No
+              </button>
+              <button
+                className="btn-primary"
+                onClick={handleDeleteOrder}
+                disabled={deleteLoading.isLoading}
+              >
+                {deleteLoading.isLoading ? "Deleting..." : "Yes, Delete Order"}
               </button>
             </div>
           </div>
