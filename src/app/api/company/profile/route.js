@@ -3,7 +3,8 @@ import connectDB from "@/lib/db";
 import Company from "@/models/Company";
 import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
-import { uploadToOracleObjectStorage } from "@/lib/fileUpload";
+// Oracle-Import entfernt
+// import { uploadToOracleObjectStorage } from "@/lib/fileUpload";
 
 export async function GET() {
   try {
@@ -101,35 +102,35 @@ export async function POST(request) {
       );
     }
 
-    const businessLicenseFile = formData.get("businessLicense");
+    // Business License komplett entfernt
+    // const businessLicenseFile = formData.get("businessLicense");
     const kisteKlarCertificateFile = formData.get("kisteKlarCertificate");
 
     const existingCompany = await Company.findOne({ accountId: session.id });
 
-    let businessLicenseUrl =
-      existingCompany?.documents?.businessLicense?.url || null;
+    // Business License URL entfernt
     let kisteKlarCertificateUrl =
       existingCompany?.documents?.kisteKlarCertificate?.url || null;
 
-    if (businessLicenseFile) {
-      businessLicenseUrl = await uploadToOracleObjectStorage(
-        businessLicenseFile,
-        "businessLicense",
-        session.id
-      );
-    } else if (!existingCompany) {
-      return NextResponse.json(
-        { success: false, message: "Business license is required" },
-        { status: 400 }
-      );
-    }
-
+    // KisteKlar Certificate Upload: lokale Lösung
     if (isKisteKlarCertified && kisteKlarCertificateFile) {
-      kisteKlarCertificateUrl = await uploadToOracleObjectStorage(
-        kisteKlarCertificateFile,
-        "kisteKlarCertificate",
-        session.id
+      // Speichere Datei lokal im Verzeichnis 'public/uploads/kisteklar/'
+      const arrayBuffer = await kisteKlarCertificateFile.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const fs = require("fs");
+      const path = require("path");
+      const uploadDir = path.join(
+        process.cwd(),
+        "public",
+        "uploads",
+        "kisteklar"
       );
+      if (!fs.existsSync(uploadDir))
+        fs.mkdirSync(uploadDir, { recursive: true });
+      const filename = `${session.id}_kisteklar_${Date.now()}_${kisteKlarCertificateFile.name}`;
+      const filePath = path.join(uploadDir, filename);
+      fs.writeFileSync(filePath, buffer);
+      kisteKlarCertificateUrl = `/uploads/kisteklar/${filename}`;
     } else if (isKisteKlarCertified && !existingCompany) {
       return NextResponse.json(
         {
@@ -156,11 +157,7 @@ export async function POST(request) {
       serviceAreas,
       isKisteKlarCertified,
       documents: {
-        businessLicense: {
-          url: businessLicenseUrl,
-          verified:
-            existingCompany?.documents?.businessLicense?.verified || false,
-        },
+        // businessLicense entfernt
         ...(kisteKlarCertificateUrl
           ? {
               kisteKlarCertificate: {
@@ -185,18 +182,11 @@ export async function POST(request) {
     );
 
     return NextResponse.json(
-      {
-        success: true,
-        message: existingCompany
-          ? "Company profile updated successfully"
-          : "Company profile created successfully and submitted for review",
-        company: updatedCompany,
-      },
+      { success: true, company: updatedCompany },
       { status: 200 }
     );
   } catch (error) {
     console.error("Error updating company profile:", error);
-
     return NextResponse.json(
       {
         success: false,

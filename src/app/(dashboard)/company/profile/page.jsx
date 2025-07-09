@@ -23,7 +23,6 @@ export default function CompanyProfileEdit() {
     email: "info@berlinmoving.de",
     isKisteKlarCertified: false,
     serviceAreas: [{ from: "Berlin", to: "Hamburg" }],
-    businessLicense: null,
     kisteKlarCertificate: null,
   });
   const [errors, setErrors] = useState({});
@@ -72,7 +71,6 @@ export default function CompanyProfileEdit() {
             company.serviceAreas?.length > 0
               ? company.serviceAreas
               : [{ from: "Berlin", to: "Hamburg" }],
-          businessLicense: null,
           kisteKlarCertificate: null,
         });
       }
@@ -140,10 +138,7 @@ export default function CompanyProfileEdit() {
           data.append(key, JSON.stringify(value));
         } else if (key === "isKisteKlarCertified") {
           data.append(key, value.toString());
-        } else if (
-          (key === "businessLicense" || key === "kisteKlarCertificate") &&
-          value instanceof File
-        ) {
+        } else if (key === "kisteKlarCertificate" && value instanceof File) {
           data.append(key, value);
         } else if (value !== null && value !== undefined) {
           data.append(key, value);
@@ -353,22 +348,6 @@ export default function CompanyProfileEdit() {
           {errors.serviceAreas && (
             <div className="error">{errors.serviceAreas}</div>
           )}
-        </div>
-
-        <div className="form-field">
-          <label>
-            Business License (Upload new file to replace current)
-            <input
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) =>
-                handleChange("businessLicense", e.target.files[0] || null)
-              }
-            />
-            {errors.businessLicense && (
-              <div className="error">{errors.businessLicense}</div>
-            )}
-          </label>
         </div>
 
         {formData.isKisteKlarCertified && (
