@@ -45,13 +45,13 @@ export default function SearchForm() {
       const formData = {
         fromAddress: {
           city: fromLocation.trim(),
-          postalCode: "00000",
-          street: "Address not specified",
+          postalCode: "10117",
+          street: "Friedrichstrasse 123",
         },
         toAddress: {
           city: toLocation.trim(),
-          postalCode: "00000",
-          street: "Address not specified",
+          postalCode: "20095",
+          street: "Hauptstrasse 456",
         },
         moveDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         estimatedHours: 4,

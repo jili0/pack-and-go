@@ -28,7 +28,6 @@ export async function GET(request) {
     if (session.role === "user") {
       query.accountId = session.id;
     } else if (session.role === "company") {
-      // 👉 Korrekt: nach companyAccountId suchen!
       query.companyAccountId = session.id;
     }
 

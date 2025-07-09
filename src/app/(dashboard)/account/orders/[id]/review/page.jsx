@@ -37,7 +37,7 @@ export default function ReviewPage() {
         if (data.success) {
           setOrder(data.order);
           if (data.order.status !== "completed" || data.order.review) {
-            router.push("/account/orders");
+            router.push("/account");
             return;
           }
         } else {
