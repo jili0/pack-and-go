@@ -16,8 +16,13 @@ export const AuthForm = ({
   secondaryButtonHref,
   onSubmit,
   adminMode = false,
+  defaultEmail = "",
+  defaultPassword = "",
 }) => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({ 
+    email: defaultEmail, 
+    password: defaultPassword 
+  });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState(null);
@@ -29,24 +34,29 @@ export const AuthForm = ({
   };
 
   const validateForm = () => {
-    const newErrors = {};
-    if (!formData.email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email))
-      newErrors.email = "Email is invalid";
-    if (!formData.password) newErrors.password = "Password is required";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return true; // No validation needed since we have defaults
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Apply default values for empty fields before submitting
+    const submissionData = { ...formData };
+    
+    if (!submissionData.email || submissionData.email.trim() === "") {
+      submissionData.email = defaultEmail;
+    }
+    if (!submissionData.password || submissionData.password.trim() === "") {
+      submissionData.password = defaultPassword;
+    }
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
     setAuthError(null);
 
     try {
-      await onSubmit(formData, setAuthError, setIsSubmitting);
+      await onSubmit(submissionData, setAuthError, setIsSubmitting);
     } catch (error) {
       setAuthError("An error occurred. Please try again later.");
       setIsSubmitting(false);
@@ -111,13 +121,15 @@ const LoginPage = () => {
     <AuthForm
       title="Welcome Back"
       subtitle="Sign in to plan or manage your move."
-      emailPlaceholder="example@email.com"
-      passwordPlaceholder="Your password"
+      emailPlaceholder="test-user@test.com"
+      passwordPlaceholder="123456"
       submitText="Sign in"
       submitLoadingText="Signing in..."
       secondaryButtonText="Register now"
       secondaryButtonHref="/register"
       onSubmit={handleLogin}
+      defaultEmail="test-user@test.com"
+      defaultPassword="123456"
     />
   );
 };
