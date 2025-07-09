@@ -44,6 +44,7 @@ export async function GET() {
       {
         success: false,
         message: "Server error while fetching company profile",
+        error: error.message,
       },
       { status: 500 }
     );
