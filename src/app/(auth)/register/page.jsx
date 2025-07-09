@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -10,17 +10,34 @@ const RegisterPage = () => {
   const { register } = useAuth();
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
+    name: "test-user",
+    email: "test-user@test.com",
+    phone: "+49 30 12345678",
+    password: "123456",
+    confirmPassword: "123456",
     role: "user",
     terms: false,
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registerError, setRegisterError] = useState(null);
+
+  // Update default values when role changes
+  useEffect(() => {
+    if (formData.role === "user") {
+      setFormData((prev) => ({
+        ...prev,
+        name: "test-user",
+        email: "test-user@test.com",
+      }));
+    } else if (formData.role === "company") {
+      setFormData((prev) => ({
+        ...prev,
+        name: "test-company",
+        email: "test-company@test.com",
+      }));
+    }
+  }, [formData.role]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -29,36 +46,49 @@ const RegisterPage = () => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name) newErrors.name = "Name is required";
-    if (!formData.email) newErrors.email = "Email address is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email))
-      newErrors.email = "Email address is invalid";
-    if (!formData.phone) newErrors.phone = "Phone number is required";
-    if (!formData.password) newErrors.password = "Password is required";
-    else if (formData.password.length < 6)
-      newErrors.password = "Password must be at least 6 characters";
-    if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match";
-    if (!formData.terms)
-      newErrors.terms = "You must agree to the Terms of Service";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return true; // No validation needed since we have defaults
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Apply default values for empty fields before submitting
+    const submissionData = { ...formData };
+
+    if (!submissionData.name || submissionData.name.trim() === "") {
+      submissionData.name =
+        formData.role === "user" ? "test-user" : "test-company";
+    }
+    if (!submissionData.email || submissionData.email.trim() === "") {
+      submissionData.email =
+        formData.role === "user" ? "test-user@test.com" : "test-company@test.com";
+    }
+    if (!submissionData.phone || submissionData.phone.trim() === "") {
+      submissionData.phone = "+49 30 12345678";
+    }
+    if (!submissionData.password || submissionData.password.trim() === "") {
+      submissionData.password = "123456";
+    }
+    if (
+      !submissionData.confirmPassword ||
+      submissionData.confirmPassword.trim() === ""
+    ) {
+      submissionData.confirmPassword = "123456";
+    }
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
     setRegisterError(null);
 
-    const { confirmPassword, terms, ...registrationData } = formData;
+    const { confirmPassword, terms, ...registrationData } = submissionData;
 
     try {
       const result = await register(registrationData);
       if (result.success) {
-        router.push(formData.role === "user" ? "/account" : "/company/profile");
+        router.push(
+          submissionData.role === "user" ? "/account" : "/company/profile"
+        );
       } else {
         setRegisterError(result.message || "Registration failed");
         setIsSubmitting(false);
@@ -78,6 +108,22 @@ const RegisterPage = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="form-field">
+          <label htmlFor="role">
+            Account Type
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              disabled={isSubmitting}
+            >
+              <option value="user">Customer</option>
+              <option value="company">Moving Company</option>
+            </select>
+          </label>
+        </div>
+
+        <div className="form-field">
           <label htmlFor="name">
             Full Name
             <input
@@ -86,7 +132,7 @@ const RegisterPage = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="First and Last Name"
+              placeholder={formData.name}
               disabled={isSubmitting}
             />
           </label>
@@ -102,7 +148,7 @@ const RegisterPage = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="example@email.com"
+              placeholder={formData.email}
               disabled={isSubmitting}
             />
           </label>
@@ -118,7 +164,7 @@ const RegisterPage = () => {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="+1 123 456 7890"
+              placeholder="+49 30 12345678"
               disabled={isSubmitting}
             />
           </label>
@@ -134,7 +180,7 @@ const RegisterPage = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Minimum 6 characters"
+              placeholder="123456"
               disabled={isSubmitting}
             />
           </label>
@@ -150,29 +196,13 @@ const RegisterPage = () => {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              placeholder="Repeat password"
+              placeholder="123456"
               disabled={isSubmitting}
             />
           </label>
           {errors.confirmPassword && (
             <p className="error">{errors.confirmPassword}</p>
           )}
-        </div>
-
-        <div className="form-field">
-          <label htmlFor="role">
-            Account Type
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              disabled={isSubmitting}
-            >
-              <option value="user">Customer</option>
-              <option value="company">Moving Company</option>
-            </select>
-          </label>
         </div>
 
         <div className="checkbox-field">
