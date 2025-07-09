@@ -136,7 +136,9 @@ const OrderDetails = () => {
     cancelLoading.startLoading();
     try {
       const response = await fetch(`/api/orders/${orderId}`, {
-        method: "DELETE",
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled" }),
       });
       const data = await response.json();
 
@@ -188,10 +190,7 @@ const OrderDetails = () => {
       <div className="container">
         <h3 className="error">Error</h3>
         <p>{error}</p>
-        <button
-          className="btn-primary"
-          onClick={() => router.push("/account")}
-        >
+        <button className="btn-primary" onClick={() => router.push("/account")}>
           Back to Orders
         </button>
       </div>
@@ -203,10 +202,7 @@ const OrderDetails = () => {
       <div className="container">
         <h3>Order Not Found</h3>
         <p>The requested order could not be found.</p>
-        <button
-          className="btn-primary"
-          onClick={() => router.push("/account")}
-        >
+        <button className="btn-primary" onClick={() => router.push("/account")}>
           Back to Orders
         </button>
       </div>

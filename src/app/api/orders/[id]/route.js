@@ -34,7 +34,8 @@ export async function GET(request, context) {
     // ✅ Zugriffskontrolle
     if (
       (session.role === "user" && order.accountId.toString() !== session.id) ||
-      (session.role === "company" && order.companyAccountId?.toString() !== session.id)
+      (session.role === "company" &&
+        order.companyAccountId?.toString() !== session.id)
     ) {
       return NextResponse.json(
         { success: false, message: "Keine Berechtigung" },
@@ -103,7 +104,8 @@ export async function PUT(request, { params }) {
     // ✅ Zugriff prüfen
     if (
       (session.role === "user" && order.accountId.toString() !== session.id) ||
-      (session.role === "company" && order.companyAccountId?.toString() !== session.id)
+      (session.role === "company" &&
+        order.companyAccountId?.toString() !== session.id)
     ) {
       return NextResponse.json(
         { success: false, message: "Keine Berechtigung" },
@@ -113,7 +115,8 @@ export async function PUT(request, { params }) {
 
     const updateData = {};
     if (status) updateData.status = status;
-    if (status === "confirmed" && confirmedDate) updateData.confirmedDate = confirmedDate;
+    if (status === "confirmed" && confirmedDate)
+      updateData.confirmedDate = confirmedDate;
     if (notes) updateData.notes = notes;
 
     const updatedOrder = await Order.findByIdAndUpdate(id, updateData, {
@@ -228,19 +231,20 @@ export async function DELETE(request, context) {
       );
     }
 
-    const account = await Account.findById(order.accountId);
-    const company = await Company.findById(order.companyId);
-
     let hasPermission = false;
-    let isUser = false;
 
     if (session.role === "admin") {
       hasPermission = true;
-    } else if (session.role === "user" && order.accountId.toString() === session.id) {
+    } else if (
+      session.role === "user" &&
+      order.accountId.toString() === session.id
+    ) {
       hasPermission = true;
-      isUser = true;
-    } else if (session.role === "company" && order.companyAccountId?.toString() === session.id) {
-      hasPermission = true;
+    } else if (session.role === "company") {
+      const company = await Company.findOne({ accountId: session.id });
+      if (company && order.companyId.toString() === company._id.toString()) {
+        hasPermission = true;
+      }
     }
 
     if (!hasPermission) {
@@ -250,74 +254,22 @@ export async function DELETE(request, context) {
       );
     }
 
-    let result;
-    let message;
-
-    if (isUser) {
-      result = await Order.findByIdAndUpdate(
-        id,
-        { status: "cancelled" },
-        { new: true }
-      );
-      message = "Bestellung erfolgreich storniert";
-
-      await sendOrderStatusUpdateEmail({
-        email: account.email,
-        name: account.name,
-        orderId: order._id,
-        oldStatus: order.status,
-        newStatus: "cancelled",
-        companyName: company.companyName,
-        fromCity: order.fromAddress.city,
-        toCity: order.toAddress.city,
-      });
-      // 🟡 Socket-Event senden, wenn der Nutzer storniert hat
-try {
-  const socketResponse = await fetch(
-    `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/api/socket/emit`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        event: "order-cancelled",
-        data: {
-          orderId: order._id.toString(),
-          accountId: account._id.toString(),
-        },
-      }),
-    }
-  );
-
-  if (socketResponse.ok) {
-    console.log("✅ Socket event 'order-cancelled' emitted from DELETE");
-  } else {
-    console.warn("⚠️ Failed to emit 'order-cancelled' from DELETE");
-  }
-} catch (socketError) {
-  console.error("❌ Error emitting 'order-cancelled' from DELETE:", socketError);
-}
-
-    } else {
-      await Order.findByIdAndDelete(id);
-      result = null;
-      message = "Bestellung erfolgreich gelöscht";
-    }
+    // ✅ Alle Rollen: Echtes Löschen aus der Datenbank
+    await Order.findByIdAndDelete(id);
 
     return NextResponse.json(
       {
         success: true,
-        message,
-        order: result,
-        action: isUser ? "cancelled" : "deleted",
+        message: "Bestellung erfolgreich gelöscht",
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Fehler beim Verarbeiten der Bestellung:", error);
+    console.error("Fehler beim Löschen der Bestellung:", error);
     return NextResponse.json(
       {
         success: false,
-        message: "Serverfehler beim Verarbeiten der Bestellung",
+        message: "Serverfehler beim Löschen der Bestellung",
       },
       { status: 500 }
     );

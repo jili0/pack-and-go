@@ -85,7 +85,7 @@ export default function AccountDashboard() {
   const fetchOrders = async () => {
     ordersLoading.startLoading();
     try {
-      const response = await fetch("/api/account/orders");
+      const response = await fetch("/api/orders");
       const data = await response.json();
 
       if (data.success) {
@@ -190,7 +190,7 @@ export default function AccountDashboard() {
                 </div>
                 <div>
                   <p>
-                    <strong>Moving Company:</strong> {order.companyName}
+                    <strong>Moving Company:</strong> {order.companyId?.companyName || order.companyName}
                   </p>
                   <p>
                     <strong>Helpers / Hours:</strong> {order.helpersCount}&nbsp;
