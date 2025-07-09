@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Account from "@/models/Account";
-import Company from "@/models/Company"; // Add this import
+import Company from "@/models/Company";
 import { createToken, setTokenCookie } from "@/lib/auth";
 import { sendWelcomeEmail } from "@/lib/email";
 
@@ -109,19 +109,45 @@ export async function POST(request) {
       if (role === "company") {
         console.log("🏢 Creating company profile for user:", newAccount._id);
         
-        await Company.create({
-          accountId: newAccount._id,
-          companyName: name, // Use the account name as initial company name
-          description: "", // Empty initially
-          address: "", // Empty initially
-          serviceAreas: [], // Empty initially
-        });
-        
-        console.log("✓ Company profile created successfully");
+        try {
+          await Company.create({
+            accountId: newAccount._id,
+            companyName: name,
+            description: "",
+            address: {
+              street: "",
+              city: "",
+              postalCode: "",
+              country: "Germany",
+            },
+            serviceAreas: [],
+            phone: phone || "",
+            email: email,
+            taxId: "",
+            isKisteKlarCertified: false,
+            isVerified: false,
+            documents: {
+              businessLicense: { 
+                url: null,
+                verified: false 
+              },
+              kisteKlarCertificate: { 
+                url: null,
+                verified: false 
+              },
+            },
+          });
+          
+          console.log("✓ Company profile created successfully");
+        } catch (error) {
+          console.error("❌ Error creating company profile:", error);
+          // Don't fail registration if company profile creation fails
+          // The company can complete their profile later
+        }
       }
-      
+
     } catch (error) {
-      console.error("Fehler beim Erstellen des Benutzers:", error);
+      console.error("Fehler bei der Benutzerregistrierung:", error);
 
       if (error.name === "ValidationError") {
         const errors = Object.keys(error.errors).map((key) => ({
