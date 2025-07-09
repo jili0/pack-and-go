@@ -18,7 +18,7 @@ export async function GET() {
 
     await connectDB();
 
-    const company = await Company.findOne({ accountId: session.id });
+    let company = await Company.findOne({ accountId: session.id });
 
     if (!company) {
       return NextResponse.json(
