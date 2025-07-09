@@ -1,165 +1,22 @@
-// "use client";
-
-// import { useState } from "react";
-// import { useRouter } from "next/navigation";
-// import { useLoading } from "@/context/LoadingContext";
-// import "@/app/styles/styles.css";
-
-// export default function SearchForm() {
-//   const [fromLocation, setFromLocation] = useState("");
-//   const [toLocation, setToLocation] = useState("");
-//   const router = useRouter();
-//   const searchLoading = useLoading("api", "searchCompanies");
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     if (!fromLocation.trim() || !toLocation.trim()) {
-//       alert("Please enter both locations");
-//       return;
-//     }
-
-//     searchLoading.startLoading();
-
-//     try {
-//       const formData = {
-//         fromAddress: {
-//           city: fromLocation.trim(),
-//           postalCode: "00000",
-//           street: "Address not specified",
-//         },
-//         toAddress: {
-//           city: toLocation.trim(),
-//           postalCode: "00000",
-//           street: "Address not specified",
-//         },
-//         moveDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-//         estimatedHours: 4,
-//         helpersCount: 2,
-//         additionalServices: [],
-//       };
-
-//       const response = await fetch("/api/search-companies", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           fromCity: fromLocation.trim(),
-//           toCity: toLocation.trim(),
-//         }),
-//       });
-
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
-
-//       const companies = await response.json();
-
-//       sessionStorage.setItem("movingFormData", JSON.stringify(formData));
-//       sessionStorage.setItem("searchResults", JSON.stringify(companies));
-
-//       router.push("/search-results");
-//     } catch (error) {
-//       console.error("Search failed:", error);
-//       alert("Search failed. Please try again.");
-//     } finally {
-//       searchLoading.stopLoading();
-//     }
-//   };
-
-//   return (
-//     <div className="form-container">
-//       <form onSubmit={handleSubmit}>
-//         <div className="search-inputs">
-//           <div className="input-field">
-//             <label htmlFor="fromLocation">Moving from</label>
-//             <input
-//               type="text"
-//               id="fromLocation"
-//               value={fromLocation}
-//               onChange={(e) => setFromLocation(e.target.value)}
-//               placeholder="Your current city"
-//               required
-//               disabled={searchLoading.isLoading}
-//             />
-//           </div>
-
-//           <div className="arrow-icon">
-//             <svg
-//               xmlns="http://www.w3.org/2000/svg"
-//               width="24"
-//               height="24"
-//               viewBox="0 0 24 24"
-//               fill="none"
-//               stroke="currentColor"
-//               strokeWidth="2"
-//               strokeLinecap="round"
-//               strokeLinejoin="round"
-//             >
-//               <path d="M5 12h14" />
-//               <path d="m12 5 7 7-7 7" />
-//             </svg>
-//           </div>
-
-//           <div className="input-field">
-//             <label htmlFor="toLocation">Moving to</label>
-//             <input
-//               type="text"
-//               id="toLocation"
-//               value={toLocation}
-//               onChange={(e) => setToLocation(e.target.value)}
-//               placeholder="Your destination city"
-//               required
-//               disabled={searchLoading.isLoading}
-//             />
-//           </div>
-//         </div>
-
-//         <button
-//           type="submit"
-//           disabled={searchLoading.isLoading}
-//           className="btn-primary"
-//         >
-//           {searchLoading.isLoading ? "Searching..." : "Find companies"}
-//           <svg
-//             xmlns="http://www.w3.org/2000/svg"
-//             width="20"
-//             height="20"
-//             viewBox="0 0 20 20"
-//             fill="currentColor"
-//           >
-//             <path
-//               fillRule="evenodd"
-//               d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-//               clipRule="evenodd"
-//             />
-//           </svg>
-//         </button>
-//       </form>
-//     </div>
-//   );
-// }
-
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLoading } from "@/context/LoadingContext";
-import { useAuth } from "@/context/AuthContext"; 
+import { useAuth } from "@/context/AuthContext";
 import "@/app/styles/styles.css";
 
 export default function SearchForm() {
-  const [fromLocation, setFromLocation] = useState("");
-  const [toLocation, setToLocation] = useState("");
+  const [fromLocation, setFromLocation] = useState("Berlin");
+  const [toLocation, setToLocation] = useState("Hamburg");
   const router = useRouter();
   const searchLoading = useLoading("api", "searchCompanies");
   const { account, checkLoading } = useAuth(); // get account and checkLoading from AuthContext
-  
+
   // check if user is authenticated and their role
   const isAuthenticated = !!account;
-  const isCustomer =  account?.role === 'user';
-  const isCompany =  account?.role === 'company';
+  const isCustomer = account?.role === "user";
+  const isCompany = account?.role === "company";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -251,7 +108,7 @@ export default function SearchForm() {
               id="fromLocation"
               value={fromLocation}
               onChange={(e) => setFromLocation(e.target.value)}
-              placeholder="Your current city"
+              placeholder="Berlin"
               required
               disabled={searchLoading.isLoading || checkLoading}
             />
@@ -281,7 +138,7 @@ export default function SearchForm() {
               id="toLocation"
               value={toLocation}
               onChange={(e) => setToLocation(e.target.value)}
-              placeholder="Your destination city"
+              placeholder="Hamburg"
               required
               disabled={searchLoading.isLoading || checkLoading}
             />
@@ -289,51 +146,63 @@ export default function SearchForm() {
         </div>
 
         {!isAuthenticated && (
-          <div className="auth-notice" style={{ 
-            padding: "10px", 
-            marginBottom: "15px", 
-            backgroundColor: "#fff3cd", 
-            border: "1px solid #ffeaa7", 
-            borderRadius: "4px", 
-            color: "#856404" 
-          }}>
+          <div
+            className="auth-notice"
+            style={{
+              padding: "10px",
+              marginBottom: "15px",
+              backgroundColor: "#fff3cd",
+              border: "1px solid #ffeaa7",
+              borderRadius: "4px",
+              color: "#856404",
+            }}
+          >
             Please log in to search for moving companies
           </div>
         )}
 
         {isAuthenticated && isCompany && (
-          <div className="auth-notice" style={{ 
-            padding: "10px", 
-            marginBottom: "15px", 
-            backgroundColor: "#f8d7da", 
-            border: "1px solid #f5c6cb", 
-            borderRadius: "4px", 
-            color: "#721c24" 
-          }}>
+          <div
+            className="auth-notice"
+            style={{
+              padding: "10px",
+              marginBottom: "15px",
+              backgroundColor: "#f8d7da",
+              border: "1px solid #f5c6cb",
+              borderRadius: "4px",
+              color: "#721c24",
+            }}
+          >
             Only customers can search for moving companies
           </div>
         )}
 
         <button
           type={isAuthenticated && isCustomer ? "submit" : "button"}
-          onClick={isAuthenticated && isCustomer ? undefined : handleLoginPrompt}
-          disabled={searchLoading.isLoading || !isAuthenticated || !isCustomer || checkLoading}
-          className={`btn-primary ${(!isAuthenticated || !isCustomer) ? 'btn-disabled' : ''}`}
+          onClick={
+            isAuthenticated && isCustomer ? undefined : handleLoginPrompt
+          }
+          disabled={
+            searchLoading.isLoading ||
+            !isAuthenticated ||
+            !isCustomer ||
+            checkLoading
+          }
+          className={`btn-primary ${!isAuthenticated || !isCustomer ? "btn-disabled" : ""}`}
           style={{
-            opacity: (!isAuthenticated || !isCustomer) ? 0.6 : 1,
-            cursor: (!isAuthenticated || !isCustomer) ? 'not-allowed' : 'pointer'
+            opacity: !isAuthenticated || !isCustomer ? 0.6 : 1,
+            cursor: !isAuthenticated || !isCustomer ? "not-allowed" : "pointer",
           }}
         >
           {checkLoading
             ? "Checking authentication..."
-            : searchLoading.isLoading 
-              ? "Searching..." 
-              : !isAuthenticated 
+            : searchLoading.isLoading
+              ? "Searching..."
+              : !isAuthenticated
                 ? "Login to Find Companies"
                 : !isCustomer
                   ? "Only Customers Can Find Companies"
-                  : "Find companies"
-          }
+                  : "Find companies"}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"

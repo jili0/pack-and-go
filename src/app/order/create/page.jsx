@@ -16,13 +16,33 @@ export default function CreateOrder() {
   const submitLoading = useLoading("api", "createOrder");
 
   const [selectedCompany, setSelectedCompany] = useState(null);
+
+  // Helper function to get default dates (1, 2, 3 days from today)
+  const getDefaultDates = () => {
+    const dates = [];
+    for (let i = 1; i <= 3; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      dates.push(date.toISOString().split("T")[0]);
+    }
+    return dates;
+  };
+
   const [formData, setFormData] = useState({
-    fromAddress: {},
-    toAddress: {},
+    fromAddress: {
+      street: "Friedrichstrasse 123",
+      city: "Berlin",
+      postalCode: "10117",
+    },
+    toAddress: {
+      street: "Hauptstrasse 456",
+      city: "Hamburg",
+      postalCode: "20095",
+    },
     helpersCount: 2,
     estimatedHours: 4,
-    preferredDates: ["", "", ""],
-    notes: "",
+    preferredDates: getDefaultDates(),
+    notes: "Please handle fragile items with extra care.",
   });
   const [error, setError] = useState(null);
 
@@ -49,15 +69,26 @@ export default function CreateOrder() {
 
         setSelectedCompany(parsedCompany);
         console.log("📦 selectedCompany:", parsedCompany);
-        
+
         setFormData({
-          ...parsedFormData,
+          fromAddress: parsedFormData.fromAddress || {
+            street: "Friedrichstrasse 123",
+            city: "Berlin",
+            postalCode: "10117",
+          },
+          toAddress: parsedFormData.toAddress || {
+            street: "Hauptstrasse 456",
+            city: "Hamburg",
+            postalCode: "20095",
+          },
           helpersCount: parsedFormData.helpersCount || 2,
           estimatedHours: parsedFormData.estimatedHours || 4,
           preferredDates: parsedFormData.preferredDates?.length
             ? [...parsedFormData.preferredDates, "", "", ""].slice(0, 3)
-            : ["", "", ""],
-          notes: parsedFormData.notes || "",
+            : getDefaultDates(),
+          notes:
+            parsedFormData.notes ||
+            "Please handle fragile items with extra care.",
         });
       } catch (error) {
         console.error("Error loading order data:", error);
@@ -88,7 +119,9 @@ export default function CreateOrder() {
             type="text"
             value={address.street || ""}
             onChange={(e) => onChange({ ...address, street: e.target.value })}
-            placeholder="Example Street 123"
+            placeholder={
+              type === "from" ? "Friedrichstrasse 123" : "Hauptstrasse 456"
+            }
           />
         </label>
       </div>
@@ -101,7 +134,7 @@ export default function CreateOrder() {
             onChange={(e) =>
               onChange({ ...address, postalCode: e.target.value })
             }
-            placeholder="12345"
+            placeholder={type === "from" ? "10117" : "20095"}
           />
         </label>
         <label>
@@ -110,7 +143,7 @@ export default function CreateOrder() {
             type="text"
             value={address.city || ""}
             onChange={(e) => onChange({ ...address, city: e.target.value })}
-            placeholder="Berlin"
+            placeholder={type === "from" ? "Berlin" : "Hamburg"}
           />
         </label>
       </div>
@@ -118,35 +151,7 @@ export default function CreateOrder() {
   );
 
   const validateForm = () => {
-    const { fromAddress, toAddress, preferredDates } = formData;
-
-    if (
-      !fromAddress?.street ||
-      !fromAddress?.city ||
-      !fromAddress?.postalCode
-    ) {
-      setError("Please complete the origin address.");
-      return false;
-    }
-    if (!toAddress?.street || !toAddress?.city || !toAddress?.postalCode) {
-      setError("Please complete the destination address.");
-      return false;
-    }
-    if (!preferredDates?.[0]) {
-      setError("Please select at least one preferred date.");
-      return false;
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    for (const date of preferredDates) {
-      if (date && new Date(date) < today) {
-        setError("Selected dates must be in the future.");
-        return false;
-      }
-    }
-    return true;
+    return true; // No validation needed since we have defaults
   };
 
   const totalPrice =
@@ -158,6 +163,62 @@ export default function CreateOrder() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Apply default values for empty fields before submitting
+    const submissionData = { ...formData };
+
+    // Default addresses
+    if (
+      !submissionData.fromAddress.street ||
+      submissionData.fromAddress.street.trim() === ""
+    ) {
+      submissionData.fromAddress.street = "Friedrichstrasse 123";
+    }
+    if (
+      !submissionData.fromAddress.city ||
+      submissionData.fromAddress.city.trim() === ""
+    ) {
+      submissionData.fromAddress.city = "Berlin";
+    }
+    if (
+      !submissionData.fromAddress.postalCode ||
+      submissionData.fromAddress.postalCode.trim() === ""
+    ) {
+      submissionData.fromAddress.postalCode = "10117";
+    }
+
+    if (
+      !submissionData.toAddress.street ||
+      submissionData.toAddress.street.trim() === ""
+    ) {
+      submissionData.toAddress.street = "Hauptstrasse 456";
+    }
+    if (
+      !submissionData.toAddress.city ||
+      submissionData.toAddress.city.trim() === ""
+    ) {
+      submissionData.toAddress.city = "Hamburg";
+    }
+    if (
+      !submissionData.toAddress.postalCode ||
+      submissionData.toAddress.postalCode.trim() === ""
+    ) {
+      submissionData.toAddress.postalCode = "20095";
+    }
+
+    // Default dates
+    if (
+      !submissionData.preferredDates ||
+      submissionData.preferredDates.filter((date) => date).length === 0
+    ) {
+      submissionData.preferredDates = getDefaultDates();
+    }
+
+    // Default notes
+    if (!submissionData.notes || submissionData.notes.trim() === "") {
+      submissionData.notes = "Please handle fragile items with extra care.";
+    }
+
     if (!validateForm()) return;
 
     submitLoading.startLoading();
@@ -166,20 +227,22 @@ export default function CreateOrder() {
     try {
       const hourlyRate = selectedCompany.hourlyRate || 50;
       const calculatedPrice =
-        hourlyRate * formData.helpersCount * formData.estimatedHours;
+        hourlyRate *
+        submissionData.helpersCount *
+        submissionData.estimatedHours;
 
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           companyId: selectedCompany?._id,
-          fromAddress: formData.fromAddress,
-          toAddress: formData.toAddress,
-          preferredDates: formData.preferredDates.filter((date) => date),
-          helpersCount: formData.helpersCount,
-          estimatedHours: formData.estimatedHours,
+          fromAddress: submissionData.fromAddress,
+          toAddress: submissionData.toAddress,
+          preferredDates: submissionData.preferredDates.filter((date) => date),
+          helpersCount: submissionData.helpersCount,
+          estimatedHours: submissionData.estimatedHours,
           totalPrice: calculatedPrice,
-          notes: formData.notes,
+          notes: submissionData.notes,
         }),
       });
 
@@ -191,7 +254,10 @@ export default function CreateOrder() {
             emitOrderCreated(data.order._id, selectedCompany.accountId);
             console.log("✅ Socket notification sent successfully");
           } catch (socketError) {
-            console.error("❌ Failed to send socket notification:", socketError);
+            console.error(
+              "❌ Failed to send socket notification:",
+              socketError
+            );
           }
         } else {
           console.warn("⚠️ Socket not connected, notification not sent");
@@ -274,7 +340,9 @@ export default function CreateOrder() {
                 type="date"
                 value={formData.preferredDates?.[index] || ""}
                 onChange={(e) => {
-                  const newDates = [...(formData.preferredDates || ["", "", ""])];
+                  const newDates = [
+                    ...(formData.preferredDates || getDefaultDates()),
+                  ];
                   newDates[index] = e.target.value;
                   setFormData((prev) => ({
                     ...prev,
@@ -282,7 +350,6 @@ export default function CreateOrder() {
                   }));
                 }}
                 min={new Date().toISOString().split("T")[0]}
-                required={index === 0}
               />
             </label>
           ))}
@@ -295,7 +362,7 @@ export default function CreateOrder() {
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, notes: e.target.value }))
             }
-            placeholder="Add any special instructions or information for the moving company..."
+            placeholder="Please handle fragile items with extra care."
             rows={8}
           />
         </div>
@@ -314,7 +381,6 @@ export default function CreateOrder() {
               type="number"
               min="1"
               max="100"
-              required
             />
           </label>
           <label>
@@ -330,7 +396,6 @@ export default function CreateOrder() {
               type="number"
               min="1"
               max="100"
-              required
             />
           </label>
         </div>

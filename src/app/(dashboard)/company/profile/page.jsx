@@ -13,16 +13,16 @@ export default function CompanyProfileEdit() {
   const submitLoading = useLoading("api", "submitProfile");
 
   const [formData, setFormData] = useState({
-    companyName: "",
-    taxId: "",
-    street: "",
-    city: "",
-    postalCode: "",
+    companyName: "Berlin Moving Services GmbH",
+    taxId: "123456789",
+    street: "Friedrichstrasse 123",
+    city: "Berlin",
+    postalCode: "10117",
     country: "Germany",
-    phone: "",
-    email: "",
+    phone: "+49 30 12345678",
+    email: "info@berlinmoving.de",
     isKisteKlarCertified: false,
-    serviceAreas: [{ from: "", to: "" }],
+    serviceAreas: [{ from: "Berlin", to: "Hamburg" }],
     businessLicense: null,
     kisteKlarCertificate: null,
   });
@@ -59,19 +59,19 @@ export default function CompanyProfileEdit() {
       if (result.success && result.company) {
         const company = result.company;
         setFormData({
-          companyName: company.companyName || "",
-          taxId: company.taxId || "",
-          street: company.address?.street || "",
-          city: company.address?.city || "",
-          postalCode: company.address?.postalCode || "",
+          companyName: company.companyName || "Berlin Moving Services GmbH",
+          taxId: company.taxId || "123456789",
+          street: company.address?.street || "Friedrichstrasse 123",
+          city: company.address?.city || "Berlin",
+          postalCode: company.address?.postalCode || "10117",
           country: company.address?.country || "Germany",
-          phone: company.phone || "",
-          email: company.email || "",
+          phone: company.phone || "+49 30 12345678",
+          email: company.email || "info@berlinmoving.de",
           isKisteKlarCertified: company.isKisteKlarCertified || false,
           serviceAreas:
             company.serviceAreas?.length > 0
               ? company.serviceAreas
-              : [{ from: "", to: "" }],
+              : [{ from: "Berlin", to: "Hamburg" }],
           businessLicense: null,
           kisteKlarCertificate: null,
         });
@@ -91,29 +91,42 @@ export default function CompanyProfileEdit() {
 
   const updateServiceArea = (index, field, value) => {
     const areas = [...formData.serviceAreas];
-    areas[index][field] = value;
+    areas[index][field] = value || (field === "from" ? "Berlin" : "Hamburg");
     setFormData((prev) => ({ ...prev, serviceAreas: areas }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newErrors = {};
-    ["companyName", "taxId", "street", "city", "postalCode"].forEach(
-      (field) => {
-        if (!formData[field]?.trim()) newErrors[field] = `${field} is required`;
+    // Apply default values for empty fields before submitting
+    const defaultValues = {
+      companyName: "Berlin Moving Services GmbH",
+      taxId: "123456789",
+      street: "Friedrichstrasse 123",
+      city: "Berlin",
+      postalCode: "10117",
+      country: "Germany",
+      phone: "+49 30 12345678",
+      email: "info@berlinmoving.de",
+    };
+
+    const submissionData = { ...formData };
+    Object.keys(defaultValues).forEach((key) => {
+      if (!submissionData[key] || submissionData[key].trim() === "") {
+        submissionData[key] = defaultValues[key];
       }
-    );
-    if (
-      formData.serviceAreas.some((area) => !area.from.trim() || !area.to.trim())
-    ) {
-      newErrors.serviceAreas =
-        "All service areas must have both from and to cities";
-    }
+    });
+
+    // Apply default values for service areas
+    submissionData.serviceAreas = submissionData.serviceAreas.map((area) => ({
+      from: area.from.trim() === "" ? "Berlin" : area.from,
+      to: area.to.trim() === "" ? "Hamburg" : area.to,
+    }));
+
+    const newErrors = {};
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      setSubmitMessage("Please fix the errors below.");
       return;
     }
 
@@ -122,17 +135,19 @@ export default function CompanyProfileEdit() {
 
     try {
       const data = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (value === null || value === undefined) return;
-        if (key === "serviceAreas") data.append(key, JSON.stringify(value));
-        else if (key === "isKisteKlarCertified")
+      Object.entries(submissionData).forEach(([key, value]) => {
+        if (key === "serviceAreas") {
+          data.append(key, JSON.stringify(value));
+        } else if (key === "isKisteKlarCertified") {
           data.append(key, value.toString());
-        else if (
+        } else if (
           (key === "businessLicense" || key === "kisteKlarCertificate") &&
           value instanceof File
-        )
+        ) {
           data.append(key, value);
-        else data.append(key, value);
+        } else if (value !== null && value !== undefined) {
+          data.append(key, value);
+        }
       });
 
       const response = await fetch("/api/company/profile", {
@@ -182,8 +197,7 @@ export default function CompanyProfileEdit() {
             <input
               value={formData.companyName}
               onChange={(e) => handleChange("companyName", e.target.value)}
-              placeholder="Enter your company name"
-              required
+              placeholder="Berlin Moving Services GmbH"
             />
             {errors.companyName && (
               <div className="error">{errors.companyName}</div>
@@ -197,8 +211,7 @@ export default function CompanyProfileEdit() {
             <input
               value={formData.taxId}
               onChange={(e) => handleChange("taxId", e.target.value)}
-              placeholder="Enter your tax identification number"
-              required
+              placeholder="123456789"
             />
             {errors.taxId && <div className="error">{errors.taxId}</div>}
           </label>
@@ -210,8 +223,7 @@ export default function CompanyProfileEdit() {
             <input
               value={formData.street}
               onChange={(e) => handleChange("street", e.target.value)}
-              placeholder="Street and house number"
-              required
+              placeholder="Friedrichstrasse 123"
             />
             {errors.street && <div className="error">{errors.street}</div>}
           </label>
@@ -223,8 +235,7 @@ export default function CompanyProfileEdit() {
             <input
               value={formData.city}
               onChange={(e) => handleChange("city", e.target.value)}
-              placeholder="City name"
-              required
+              placeholder="Berlin"
             />
             {errors.city && <div className="error">{errors.city}</div>}
           </label>
@@ -236,8 +247,7 @@ export default function CompanyProfileEdit() {
             <input
               value={formData.postalCode}
               onChange={(e) => handleChange("postalCode", e.target.value)}
-              placeholder="12345"
-              required
+              placeholder="10117"
             />
             {errors.postalCode && (
               <div className="error">{errors.postalCode}</div>
@@ -263,7 +273,7 @@ export default function CompanyProfileEdit() {
               type="tel"
               value={formData.phone}
               onChange={(e) => handleChange("phone", e.target.value)}
-              placeholder="+49 123 456789"
+              placeholder="+49 30 12345678"
             />
           </label>
         </div>
@@ -275,7 +285,7 @@ export default function CompanyProfileEdit() {
               type="email"
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
-              placeholder="contact@company.com"
+              placeholder="info@berlinmoving.de"
             />
           </label>
         </div>
@@ -289,7 +299,10 @@ export default function CompanyProfileEdit() {
               onClick={() =>
                 setFormData((prev) => ({
                   ...prev,
-                  serviceAreas: [...prev.serviceAreas, { from: "", to: "" }],
+                  serviceAreas: [
+                    ...prev.serviceAreas,
+                    { from: "Berlin", to: "Munich" },
+                  ],
                 }))
               }
             >
@@ -313,15 +326,13 @@ export default function CompanyProfileEdit() {
                 onChange={(e) =>
                   updateServiceArea(index, "from", e.target.value)
                 }
-                placeholder="Starting city"
-                required
+                placeholder="Berlin"
               />
               <span>→</span>
               <input
                 value={area.to}
                 onChange={(e) => updateServiceArea(index, "to", e.target.value)}
-                placeholder="Destination city"
-                required
+                placeholder="Hamburg"
               />
               {formData.serviceAreas.length > 1 && (
                 <button

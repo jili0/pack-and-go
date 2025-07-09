@@ -95,7 +95,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           success: false,
-          message: "All required fields must be filled out",
+          message: `All required fields must be filled out: companyName: ${companyName}, taxId: ${taxId}, street: ${street}, city: ${city}, postalCode: ${postalCode}`,
         },
         { status: 400 }
       );
