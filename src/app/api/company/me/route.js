@@ -1,3 +1,4 @@
+// src/app/api/company/me/route.js
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Company from "@/models/Company";
@@ -18,16 +19,35 @@ export async function GET() {
     await connectDB();
 
     // Find the company based on user ID
-    const company = await Company.findOne({ accountId: session.id });
+    let company = await Company.findOne({ accountId: session.id });
 
+    // If no company profile exists, create one automatically
     if (!company) {
-      return NextResponse.json(
-        { success: false, message: "Company profile not found" },
-        { status: 404 }
-      );
+      console.log("🏢 No company profile found, creating one automatically");
+      
+      // Get account data for initial setup
+      const account = await Account.findById(session.id).select("-password");
+      
+      if (!account) {
+        return NextResponse.json(
+          { success: false, message: "Account not found" },
+          { status: 404 }
+        );
+      }
+
+      // Create company profile with account name as initial company name
+      company = await Company.create({
+        accountId: session.id,
+        companyName: account.name,
+        description: "",
+        address: "",
+        serviceAreas: [],
+      });
+      
+      console.log("✓ Company profile created automatically");
     }
 
-    // Also get the user data
+    // Get the user data
     const account = await Account.findById(session.id).select("-password");
 
     return NextResponse.json(
@@ -35,6 +55,7 @@ export async function GET() {
         success: true,
         company: company.toObject(),
         account: account.toObject(),
+        isNewProfile: !company.description && !company.address, // Indicate if profile needs setup
       },
       { status: 200 }
     );
