@@ -5,7 +5,7 @@ import { LoadingProvider } from "@/context/LoadingContext";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { SocketProvider } from "@/context/useSocket"; // ✅ Neuer Socket Provider
 import SocketManager from "@/components/SocketManager";
-import PhotoInventoryWidget from "@/components/ui/PhotoInventoryWidget";
+import Widget from "@/components/ui/Widget";
 
 import "@/app/styles/styles.css";
 
@@ -20,13 +20,14 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <LoadingProvider>
-          <SocketProvider>{/* ✅ Socket Provider ganz nach außen */}
+          <SocketProvider>
+            {/* ✅ Socket Provider ganz nach außen */}
             <AuthProvider>
               <NotificationProvider>
                 <SocketManager />
                 <Header />
                 <main>{children}</main>
-                <PhotoInventoryWidget />
+                <Widget />
                 <Footer />
               </NotificationProvider>
             </AuthProvider>

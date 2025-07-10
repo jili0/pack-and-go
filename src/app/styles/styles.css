@@ -839,197 +839,37 @@ footer a:hover {
   color: #ddd;
 }
 
-/* PhotoInventoryWidget */
-
-.photo-inventory-widget {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
+.widget {
   position: fixed;
   right: 24px;
   bottom: 24px;
-  max-width: 340px;
-  min-height: 280px;
-  max-height: 500px;
-  height: auto;
+  width: 340px;
+  min-height: 80px;
+  background: #667eea;
+  color: #fff;
   border-radius: 16px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.13);
   transition:
-    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width 0.3s,
+    right 0.3s,
+    box-shadow 0.3s;
   overflow: hidden;
+  z-index: 9999;
 }
-
-.photo-inventory-widget.collapsed {
+.widget.collapsed {
   width: 12px;
-  height: 280px;
   right: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
 }
-
-.photo-inventory-collapsed > *:not(span) {
-  display: none !important;
-}
-
-.photo-inventory-content {
-  padding: 20px 18px 18px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.photo-inventory-droparea {
-  border: 2px dashed #007bff;
-  border-radius: 10px;
-  padding: 18px 0;
-  text-align: center;
-  background: #f8faff;
-  cursor: pointer;
-  margin-bottom: 6px;
+.widget.slow-collapse {
   transition:
-    border-color 0.2s,
-    background 0.2s,
-    transform 0.1s ease,
-    box-shadow 0.1s ease;
-  display: block;
-}
-
-.photo-inventory-droparea:active:not(.uploading) {
-  transform: translateY(2px) scale(0.98);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.photo-inventory-content.drag-active .photo-inventory-droparea {
-  border-color: #0056b3;
-  background: #e6f0ff;
-}
-
-.photo-inventory-droptext {
-  color: #007bff;
-  font-weight: 500;
-}
-
-.photo-inventory-title {
-  font-size: 1.1rem;
-}
-
-.photo-inventory-close {
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  z-index: 10;
-  padding: 4px;
-  min-width: 24px;
-  min-height: 24px;
-}
-
-.photo-inventory-error {
-  color: #ff6b6b;
-  margin-top: -12px;
-}
-
-.photo-inventory-result {
-  background: #f6f8fa;
-  border-radius: 8px;
-  padding: 10px 12px;
-  margin-top: 6px;
-  color: #222;
-  max-height: 200px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e0 #f6f8fa;
-}
-
-.photo-inventory-result::-webkit-scrollbar {
-  width: 6px;
-}
-
-.photo-inventory-result::-webkit-scrollbar-track {
-  background: #f6f8fa;
-  border-radius: 3px;
-}
-
-.photo-inventory-result::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
-  border-radius: 3px;
-}
-
-.photo-inventory-result::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
-}
-
-.photo-inventory-result ul {
-  margin: 0;
-  padding-left: 0;
-  list-style: none;
-}
-
-.photo-inventory-result-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.photo-inventory-copy-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  font-size: 16px;
-  transition: background-color 0.2s;
-}
-
-.photo-inventory-copy-btn:hover {
-  background-color: #e2e8f0;
-}
-
-.photo-inventory-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 4px;
-  line-height: 1.4;
-}
-
-.photo-inventory-item-name {
-  font-weight: 500;
-}
-
-.photo-inventory-item-count {
-  color: #667eea;
-  font-weight: 600;
-}
-
-.photo-inventory-category {
-  margin-bottom: 12px;
-}
-
-.photo-inventory-category:last-child {
-  margin-bottom: 0;
-}
-
-.photo-inventory-category-title {
-  font-weight: 600;
-  color: #4a5568;
-  margin-bottom: 6px;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+    width 3s linear,
+    right 3s linear,
+    box-shadow 3s linear;
 }
 
 /* Media Queries */

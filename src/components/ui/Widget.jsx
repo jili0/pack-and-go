@@ -5,8 +5,9 @@ import React, { useRef, useState, useEffect } from "react";
 const COLLAPSE_DELAY = 10000; // 10 seconds
 const EXPAND_FADEIN_DELAY = 100; // ms - much faster transition
 
-export default function PhotoInventoryWidget() {
+export default function Widget() {
   const [collapsed, setCollapsed] = useState(true);
+  const [slowCollapse, setSlowCollapse] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -16,7 +17,9 @@ export default function PhotoInventoryWidget() {
   const timerRef = useRef(null);
   const fadeTimerRef = useRef(null);
   const autoExpandTimerRef = useRef(null);
+  const autoCollapseTimerRef = useRef(null);
   const widgetRef = useRef(null);
+  const mouseOverRef = useRef(false);
 
   // Collapse after 10s only if mouse is not over widget
   const startCollapseTimer = () => {
@@ -47,17 +50,34 @@ export default function PhotoInventoryWidget() {
     return () => {
       clearTimeout(fadeTimerRef.current);
       clearTimeout(autoExpandTimerRef.current);
+      clearTimeout(autoCollapseTimerRef.current);
     };
   }, []);
 
-  // Auto-expand after 0.5 seconds on page load
+  // Auto-expand on mount, then collapse after 3s (unless hovered)
   useEffect(() => {
     autoExpandTimerRef.current = setTimeout(() => {
       setCollapsed(false);
-    }, 500);
-
-    return () => clearTimeout(autoExpandTimerRef.current);
+      autoCollapseTimerRef.current = setTimeout(() => {
+        if (!mouseOverRef.current) {
+          setSlowCollapse(true);
+          setCollapsed(true);
+        }
+      }, 3000); // 3 Sekunden
+    }, 100);
+    return () => {
+      clearTimeout(autoExpandTimerRef.current);
+      clearTimeout(autoCollapseTimerRef.current);
+    };
   }, []);
+
+  // Nach der Animation slowCollapse wieder zurücksetzen
+  useEffect(() => {
+    if (slowCollapse && collapsed) {
+      const reset = setTimeout(() => setSlowCollapse(false), 3000);
+      return () => clearTimeout(reset);
+    }
+  }, [slowCollapse, collapsed]);
 
   // Drag-and-drop Events
   const handleDragOver = (e) => {
@@ -115,10 +135,12 @@ export default function PhotoInventoryWidget() {
 
   // Mouse events for collapse logic
   const handleMouseEnter = () => {
+    mouseOverRef.current = true;
     cancelCollapseTimer();
     if (collapsed) setCollapsed(false);
   };
   const handleMouseLeave = () => {
+    mouseOverRef.current = false;
     // Don't start collapse timer if result section is shown or uploading
     if (!collapsed && !uploading && !result) startCollapseTimer();
   };
@@ -162,46 +184,73 @@ export default function PhotoInventoryWidget() {
 
   return (
     <div
-      className={`photo-inventory-widget${collapsed ? " collapsed" : ""}`}
-      onMouseEnter={() => {
-        if (collapsed) setCollapsed(false);
-      }}
+      className={`widget${collapsed ? " collapsed" : ""}${slowCollapse ? " slow-collapse" : ""}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       ref={widgetRef}
-      style={{ zIndex: 9999 }}
+      style={{
+        zIndex: 9999,
+        transition: slowCollapse ? "all 3s linear" : undefined,
+      }}
     >
-      <div className="photo-inventory-collapsed"></div>
+      {/* collapsed state visual indicator, falls nötig */}
+      {collapsed && <div style={{ width: "100%", height: "100%" }}></div>}
       {!collapsed && (
         <div
-          className={`photo-inventory-content${dragActive ? " drag-active" : ""}`}
           style={{
             opacity: showContent ? 1 : 0,
             transition: "opacity 0.2s cubic-bezier(0.4,0,0.2,1)",
             pointerEvents: showContent ? "auto" : "none",
+            padding: 20,
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
           }}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
           <button
-            className="photo-inventory-close"
             onClick={handleCollapse}
             title="Minimize"
+            style={{
+              position: "absolute",
+              top: 8,
+              right: 12,
+              background: "none",
+              border: "none",
+              color: "#fff",
+              cursor: "pointer",
+              zIndex: 10,
+              padding: 4,
+              minWidth: 24,
+              minHeight: 24,
+            }}
           >
             ×
           </button>
-          <div className="photo-inventory-title">
-            <strong>Photo Inventory</strong>
+          <div style={{ fontSize: "1.1rem", fontWeight: "bold" }}>
+            Photo Inventory
           </div>
-          <div className="photo-inventory-desc">
+          <div style={{ marginBottom: 8 }}>
             Make a photo of your room and we give you a list of to transported
             items instantly back!
           </div>
           <div
-            className={`photo-inventory-droparea${uploading ? " uploading" : ""}`}
             onClick={handleDropAreaClick}
             style={{
+              border: "2px dashed #007bff",
+              borderRadius: 10,
+              padding: 18,
+              textAlign: "center",
+              background: uploading
+                ? "#f8faff"
+                : dragActive
+                  ? "#e6f0ff"
+                  : "#f8faff",
               cursor: uploading ? "not-allowed" : "pointer",
               opacity: uploading ? 0.6 : 1,
+              marginBottom: 6,
               transition: "opacity 0.2s ease",
             }}
           >
@@ -213,7 +262,7 @@ export default function PhotoInventoryWidget() {
               disabled={uploading}
               ref={fileInputRef}
             />
-            <div className="photo-inventory-droptext">
+            <div style={{ color: "#007bff", fontWeight: 500 }}>
               {uploading
                 ? "Uploading..."
                 : dragActive
@@ -221,101 +270,83 @@ export default function PhotoInventoryWidget() {
                   : "Drag & Drop or Click to Upload"}
             </div>
           </div>
-          {error && <div className="photo-inventory-error">{error}</div>}
+          {error && (
+            <div style={{ color: "#ff6b6b", marginTop: -12 }}>{error}</div>
+          )}
           {result &&
             (result.furniture?.length > 0 || result.others?.length > 0) && (
-              <div className="photo-inventory-result">
-                <div className="photo-inventory-result-header">
-                  <div>
-                    <strong>Detected items:</strong>
-                  </div>
+              <div
+                style={{
+                  background: "#f6f8fa",
+                  borderRadius: 8,
+                  padding: 12,
+                  marginTop: 6,
+                  color: "#222",
+                  maxHeight: 200,
+                  overflowY: "auto",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 8,
+                    paddingBottom: 6,
+                    borderBottom: "1px solid #e2e8f0",
+                  }}
+                >
+                  <span>Result</span>
                   <button
-                    className="photo-inventory-copy-btn"
                     onClick={handleCopy}
-                    title={copyFeedback ? "Copied!" : "Copy to clipboard"}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 4,
+                      borderRadius: 4,
+                      fontSize: 16,
+                    }}
                   >
-                    {copyFeedback ? (
-                      <>
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <polyline points="20,6 9,17 4,12"></polyline>
-                        </svg>
-                        <span style={{ marginLeft: "4px", fontSize: "12px" }}>
-                          Copied!
-                        </span>
-                      </>
-                    ) : (
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect
-                          x="9"
-                          y="9"
-                          width="13"
-                          height="13"
-                          rx="2"
-                          ry="2"
-                        ></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                      </svg>
-                    )}
+                    {copyFeedback ? "Copied!" : "Copy"}
                   </button>
                 </div>
-
-                {result.furniture && result.furniture.length > 0 && (
-                  <div className="photo-inventory-category">
-                    <div className="photo-inventory-category-title">
-                      Furniture:
-                    </div>
-                    <ul>
-                      {result.furniture.map((item, i) => (
-                        <li key={i} className="photo-inventory-item">
-                          <span className="photo-inventory-item-name">
-                            {item.description} {item.name}
-                          </span>
-                          <span className="photo-inventory-item-count">
-                            x {item.count}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {result.others && result.others.length > 0 && (
-                  <div className="photo-inventory-category">
-                    <div className="photo-inventory-category-title">
-                      Others:
-                    </div>
-                    <ul>
-                      {result.others.map((item, i) => (
-                        <li key={i} className="photo-inventory-item">
-                          <span className="photo-inventory-item-name">
-                            {item.description} {item.name}
-                          </span>
-                          <span className="photo-inventory-item-count">
-                            x {item.count}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <ul style={{ margin: 0, paddingLeft: 0, listStyle: "none" }}>
+                  {result.furniture?.map((item, idx) => (
+                    <li
+                      key={"furn-" + idx}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: 4,
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      <span style={{ fontWeight: 500 }}>{item.name}</span>
+                      <span style={{ color: "#667eea", fontWeight: 600 }}>
+                        {item.count}
+                      </span>
+                    </li>
+                  ))}
+                  {result.others?.map((item, idx) => (
+                    <li
+                      key={"oth-" + idx}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: 4,
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      <span style={{ fontWeight: 500 }}>{item.name}</span>
+                      <span style={{ color: "#667eea", fontWeight: 600 }}>
+                        {item.count}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
         </div>
