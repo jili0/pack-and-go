@@ -135,8 +135,8 @@ const OrderDetails = () => {
     cancelLoading.startLoading();
     try {
       console.log("🚫 Starting order cancellation process...");
-      console.log("📊 Order data:", order);
-      console.log("👤 Company ID:", company?.accountId);
+      console.log("📊 Complete Order data:", JSON.stringify(order, null, 2));
+      console.log("🏢 Complete Company data:", JSON.stringify(company, null, 2));
 
       const response = await fetch(`/api/orders/${orderId}`, {
         method: "PUT",
@@ -148,43 +148,9 @@ const OrderDetails = () => {
       if (data.success) {
         console.log("✅ Order cancelled successfully in database");
         
-        // ✅ Socket-Event für Company-Benachrichtigung
-        if (order?.accountId && company?.accountId) {
-          console.log(`🚫 Sending cancellation notification: orderId=${orderId}, userId=${order.accountId}, companyId=${company.accountId}`);
-          
-          try {
-            console.log("🔄 Sending notification via API...");
-            const socketResponse = await fetch('/api/socket/emit', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                event: 'order-user-cancelled',
-                data: {
-                  orderId,
-                  accountId: order.accountId,
-                  companyId: company.accountId
-                }
-              }),
-            });
-            
-            const socketData = await socketResponse.json();
-            if (socketData.success) {
-              console.log("✅ Company notification sent successfully");
-            } else {
-              console.error("❌ Company notification failed:", socketData.message);
-            }
-          } catch (socketError) {
-            console.error("❌ Error sending company notification:", socketError);
-          }
-        } else {
-          console.error("❌ Missing data for notification:", {
-            userAccountId: order?.accountId,
-            companyAccountId: company?.accountId,
-            orderId
-          });
-        }
+        // ✅ Socket-Event wird bereits von der API Route gesendet
+        // Das Backend sendet das Event automatisch über globalThis.io
+        console.log("🔔 Socket notification handled by API route - no additional notification needed");
 
         setOrder(data.order);
         setShowCancelModal(false);
@@ -203,24 +169,57 @@ const OrderDetails = () => {
   const handleDeleteOrder = async () => {
     deleteLoading.startLoading();
     try {
+      console.log("🗑️ Deleting order:", orderId);
+      
       const response = await fetch(`/api/orders/${orderId}`, {
         method: "DELETE",
       });
-      const data = await response.json();
+      
+      console.log("📊 Delete response status:", response.status);
+      console.log("📊 Delete response ok:", response.ok);
+      
+      // ✅ Prüfe Response Status
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      // ✅ Prüfe ob Response Content hat
+      const text = await response.text();
+      console.log("📄 Raw response text:", text);
+      
+      if (!text.trim()) {
+        // Leere Response - aber erfolgreich gelöscht
+        console.log("✅ Empty response, assuming success");
+        router.push("/account");
+        return;
+      }
+      
+      // ✅ Versuche JSON zu parsen
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (jsonError) {
+        console.error("❌ JSON parse error:", jsonError);
+        console.error("📄 Response text was:", text);
+        throw new Error("Invalid server response");
+      }
 
       if (data.success) {
+        console.log("✅ Order deleted successfully");
         router.push("/account");
       } else {
+        console.error("❌ Delete failed:", data.message);
         setError(data.message || "Failed to delete order.");
       }
     } catch (error) {
-      console.error("Error deleting order:", error);
+      console.error("❌ Error deleting order:", error);
       setError("An error occurred. Please try again later.");
     } finally {
       deleteLoading.stopLoading();
     }
   };
 
+  // ✅ CHECKS ZUERST - BEVOR DAS JSX RETURN!
   if (orderDetailsLoading.isLoading) {
     return (
       <div className="container">
@@ -253,6 +252,7 @@ const OrderDetails = () => {
     );
   }
 
+  // ✅ JETZT IST order GARANTIERT NICHT NULL
   return (
     <div className="container">
       <h1>Order Details</h1>
@@ -337,6 +337,19 @@ const OrderDetails = () => {
                 {deleteLoading.isLoading ? "Deleting..." : "Yes, Delete Order"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Debug Info (Development Only) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
+          <h4>Debug Info:</h4>
+          <div style={{ fontSize: '12px', color: '#666' }}>
+            <p>User Account ID: {order?.accountId || 'Not found'}</p>
+            <p>Company Account ID: {company?.accountId || 'Not found'}</p>
+            <p>Order ID: {orderId}</p>
+            <p>Order Status: {order?.status}</p>
           </div>
         </div>
       )}
