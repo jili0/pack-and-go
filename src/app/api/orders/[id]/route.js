@@ -224,3 +224,71 @@ export async function PUT(request, { params }) {
     );
   }
 }
+// ---------------------- DELETE ----------------------
+export async function DELETE(request, context) {
+  try {
+    const { id } = await context.params;
+    const session = await getSession();
+
+    if (!session) {
+      return NextResponse.json(
+        { success: false, message: "Nicht autorisiert" },
+        { status: 401 }
+      );
+    }
+
+    await connectDB();
+
+    const order = await Order.findById(id);
+    if (!order) {
+      return NextResponse.json(
+        { success: false, message: "Bestellung nicht gefunden" },
+        { status: 404 }
+      );
+    }
+
+    // ✅ Zugriffskontrolle
+    let hasPermission = false;
+
+    if (session.role === "admin") {
+      hasPermission = true;
+    } else if (
+      session.role === "user" &&
+      order.accountId.toString() === session.id
+    ) {
+      hasPermission = true;
+    } else if (session.role === "company") {
+      const company = await Company.findOne({ accountId: session.id });
+      if (company && order.companyId.toString() === company._id.toString()) {
+        hasPermission = true;
+      }
+    }
+
+    if (!hasPermission) {
+      return NextResponse.json(
+        { success: false, message: "Keine Berechtigung" },
+        { status: 403 }
+      );
+    }
+
+    // ✅ Order löschen
+    await Order.findByIdAndDelete(id);
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Bestellung erfolgreich gelöscht",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Fehler beim Löschen der Bestellung:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Serverfehler beim Löschen der Bestellung",
+      },
+      { status: 500 }
+    );
+  }
+}
