@@ -853,7 +853,7 @@ footer a:hover {
 }
 
 .widget.collapsed {
-  transform: translateX(80%);
+  transform: translateX(calc(100% + 10px));
 }
 
 .widget-content {
