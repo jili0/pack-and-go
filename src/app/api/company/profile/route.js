@@ -102,13 +102,10 @@ export async function POST(request) {
       );
     }
 
-    // Business License komplett entfernt
-    // const businessLicenseFile = formData.get("businessLicense");
     const kisteKlarCertificateFile = formData.get("kisteKlarCertificate");
 
     const existingCompany = await Company.findOne({ accountId: session.id });
 
-    // Business License URL entfernt
     let kisteKlarCertificateUrl =
       existingCompany?.documents?.kisteKlarCertificate?.url || null;
 
@@ -157,7 +154,6 @@ export async function POST(request) {
       serviceAreas,
       isKisteKlarCertified,
       documents: {
-        // businessLicense entfernt
         ...(kisteKlarCertificateUrl
           ? {
               kisteKlarCertificate: {

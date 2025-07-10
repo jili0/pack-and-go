@@ -6,7 +6,7 @@ import Company from "@/models/Company";
 import Order from "@/models/Order";
 import Review from "@/models/Review";
 import { getSession, removeTokenCookie } from "@/lib/auth";
-import { deleteFile } from "@/lib/fileUpload";
+import { deleteFile } from "@/lib/imageHandler";
 
 export async function DELETE(request) {
   try {
@@ -38,20 +38,8 @@ export async function DELETE(request) {
 
       if (company) {
         // Delete uploaded documents from storage
-        if (company.documents) {
-          if (
-            company.documents.businessLicense &&
-            company.documents.businessLicense.url
-          ) {
-            await deleteFile(company.documents.businessLicense.url);
-          }
-
-          if (
-            company.documents.kisteKlarCertificate &&
-            company.documents.kisteKlarCertificate.url
-          ) {
-            await deleteFile(company.documents.kisteKlarCertificate.url);
-          }
+        if (company.documents?.kisteKlarCertificate?.url) {
+          await deleteFile(company.documents.kisteKlarCertificate.url);
         }
 
         // Delete company record

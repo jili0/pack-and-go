@@ -111,10 +111,6 @@ export async function POST(request) {
       isVerified: false, // Needs to be verified by admin
       isKisteKlarCertified: isKisteKlarCertified || false,
       documents: {
-        businessLicense: {
-          url: null,
-          verified: false,
-        },
         kisteKlarCertificate: {
           url: null,
           verified: false,
@@ -223,7 +219,6 @@ export async function PATCH(request) {
       });
     }
 
-
     // Update the company
     const updatedCompany = await Company.findByIdAndUpdate(
       id,
@@ -305,12 +300,8 @@ export async function DELETE(request) {
     }
 
     // Delete uploaded documents from storage if applicable
-    if (company.documents?.businessLicense?.url) {
-      // Implement file deletion logic (e.g., from S3)
-      // await deleteFile(company.documents.businessLicense.url);
-    }
-
     if (company.documents?.kisteKlarCertificate?.url) {
+      // const { deleteFile } = await import("@/lib/imageHandler");
       // await deleteFile(company.documents.kisteKlarCertificate.url);
     }
 

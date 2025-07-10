@@ -41,10 +41,6 @@ const CompanySchema = new mongoose.Schema({
     default: false,
   },
   documents: {
-    businessLicense: {
-      url: String,
-      verified: { type: Boolean, default: false },
-    },
     kisteKlarCertificate: {
       url: String,
       verified: { type: Boolean, default: false },
