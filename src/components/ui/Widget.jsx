@@ -5,7 +5,6 @@ import React, { useRef, useState, useEffect } from "react";
 export default function Widget() {
   const [state, setState] = useState({
     collapsed: true,
-    showContent: false,
     dragActive: false,
     uploading: false,
     copyFeedback: false,
@@ -15,7 +14,6 @@ export default function Widget() {
 
   const timers = useRef({});
   const fileInputRef = useRef(null);
-  const mouseOverRef = useRef(false);
   const widgetRef = useRef(null);
 
   const updateState = (updates) =>
@@ -37,7 +35,6 @@ export default function Widget() {
 
   const handleExpand = () => {
     updateState({ collapsed: false });
-    setTimeout(() => updateState({ showContent: true }), 100);
   };
 
   useEffect(() => {
@@ -53,12 +50,6 @@ export default function Widget() {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [state.collapsed]);
-
-  useEffect(() => {
-    if (state.collapsed) {
-      updateState({ showContent: false });
-    }
   }, [state.collapsed]);
 
   const handleFileUpload = async (file) => {
@@ -140,69 +131,66 @@ export default function Widget() {
       onMouseEnter={() => handleMouse(true)}
       onMouseLeave={() => handleMouse(false)}
     >
-      {state.collapsed && <div></div>}
-      {!state.collapsed && (
-        <div
-          className="widget-content"
-          onDragOver={(e) => handleDrag(e, "over")}
-          onDragLeave={(e) => handleDrag(e, "leave")}
-          onDrop={(e) => handleDrag(e, "drop")}
+      <div
+        className="widget-content"
+        onDragOver={(e) => handleDrag(e, "over")}
+        onDragLeave={(e) => handleDrag(e, "leave")}
+        onDrop={(e) => handleDrag(e, "drop")}
+      >
+        <button
+          className="widget-close btn-secondary"
+          onClick={() => handleCollapse()}
         >
-          <button
-            className="widget-close btn-secondary"
-            onClick={() => handleCollapse()}
-          >
-            ×
-          </button>
-          <div className="widget-header">Photo Inventory</div>
-          <div>
-            Make a photo of your room and we give you a list of to transported
-            items instantly back!
-          </div>
-
-          <div
-            className={`upload-area${state.dragActive ? " drag-active" : ""}`}
-            onClick={openFileDialog}
-          >
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              disabled={state.uploading}
-              ref={fileInputRef}
-            />
-            {state.uploading
-              ? "Uploading..."
-              : state.dragActive
-                ? "Drop your photo here!"
-                : "Drag & Drop or Click to Upload"}
-          </div>
-
-          {error && <div className="error">{error}</div>}
-
-          {result &&
-            (result.furniture?.length > 0 || result.others?.length > 0) && (
-              <div className="result-section">
-                <div className="result-header">
-                  <span>Result</span>
-                  <button className="btn-primary" onClick={handleCopy}>
-                    {state.copyFeedback ? "Copied!" : "Copy"}
-                  </button>
-                </div>
-                <ul>
-                  {[...(result.furniture || []), ...(result.others || [])].map(
-                    (item, idx) => (
-                      <li key={idx}>
-                        <span>{item.name}</span>
-                        <span>{item.count}</span>
-                      </li>
-                    )
-                  )}
-                </ul>
-              </div>
-            )}
+          ×
+        </button>
+        <div className="widget-header">Photo Inventory</div>
+        <div>
+          Make a photo of your room and we give you a list of to transported
+          items instantly back!
         </div>
-      )}
+
+        <div
+          className={`upload-area${state.dragActive ? " drag-active" : ""}`}
+          onClick={openFileDialog}
+        >
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            disabled={state.uploading}
+            ref={fileInputRef}
+          />
+          {state.uploading
+            ? "Uploading..."
+            : state.dragActive
+              ? "Drop your photo here!"
+              : "Drag & Drop or Click to Upload"}
+        </div>
+
+        {error && <div className="error">{error}</div>}
+
+        {result &&
+          (result.furniture?.length > 0 || result.others?.length > 0) && (
+            <div className="result-section">
+              <div className="result-header">
+                <span>Result</span>
+                <button className="btn-primary" onClick={handleCopy}>
+                  {state.copyFeedback ? "Copied!" : "Copy"}
+                </button>
+              </div>
+              <ul>
+                {[...(result.furniture || []), ...(result.others || [])].map(
+                  (item, idx) => (
+                    <li key={idx}>
+                      <span>{item.name}</span>
+                      <span>{item.count}</span>
+                    </li>
+                  )
+                )}
+              </ul>
+            </div>
+          )}
+      </div>
     </div>
   );
 }

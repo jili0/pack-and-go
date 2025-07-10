@@ -853,10 +853,7 @@ footer a:hover {
 }
 
 .widget.collapsed {
-  width: 8px;
-  height: 200px;
-  border-radius: 4px 0 0 4px;
-  right: 0;
+  transform: translateX(calc(100% + 10px));
 }
 
 .widget-content {
