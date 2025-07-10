@@ -31,19 +31,13 @@ export default function Widget() {
     timers.current[name] = setTimeout(callback, delay);
   };
 
-  const handleCollapse = (slow = false) => {
-    clearAllTimers();
+  const handleCollapse = () => {
     updateState({ collapsed: true });
   };
 
   const handleExpand = () => {
-    clearAllTimers();
     updateState({ collapsed: false });
-    setTimer("showContent", () => updateState({ showContent: true }), 100);
-  };
-
-  const startCollapseTimer = () => {
-    setTimer("collapse", () => handleCollapse(), 10000);
+    setTimeout(() => updateState({ showContent: true }), 100);
   };
 
   useEffect(() => {
@@ -62,24 +56,6 @@ export default function Widget() {
   }, [state.collapsed]);
 
   useEffect(() => {
-    setTimer(
-      "autoExpand",
-      () => {
-        handleExpand();
-        setTimer(
-          "autoCollapse",
-          () => {
-            if (!mouseOverRef.current) handleCollapse(true);
-          },
-          3000
-        );
-      },
-      100
-    );
-    return clearAllTimers;
-  }, []);
-
-  useEffect(() => {
     if (state.collapsed) {
       updateState({ showContent: false });
     }
@@ -89,7 +65,6 @@ export default function Widget() {
     updateState({ uploading: true });
     setError(null);
     setResult(null);
-    clearAllTimers();
 
     try {
       const formData = new FormData();
@@ -102,7 +77,6 @@ export default function Widget() {
       setResult(await res.json());
     } catch (err) {
       setError("Upload failed. Please try again.");
-      if (!state.collapsed) startCollapseTimer();
     } finally {
       updateState({ uploading: false });
     }
@@ -126,11 +100,7 @@ export default function Widget() {
   };
 
   const handleMouse = (entering) => {
-    mouseOverRef.current = entering;
-    clearAllTimers();
     if (entering && state.collapsed) handleExpand();
-    if (!entering && !state.collapsed && !state.uploading && !result)
-      startCollapseTimer();
   };
 
   const handleCopy = async () => {
@@ -159,7 +129,6 @@ export default function Widget() {
 
   const openFileDialog = () => {
     if (!state.uploading && fileInputRef.current) {
-      clearAllTimers();
       fileInputRef.current.click();
     }
   };
