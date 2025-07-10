@@ -170,6 +170,14 @@ export function SocketProvider({ children }) {
       socket.emit('order-cancelled', { orderId, accountId });
     }
   };
+  const emitOrderUserCancelled = (orderId, accountId, companyId) => {
+    if (socket && isConnected) {
+      console.log(`🚫 Emitting user cancelled order: ${orderId} by user: ${accountId} for company: ${companyId}`);
+      socket.emit('order-user-cancelled', { orderId, accountId, companyId });
+    } else {
+      console.error('❌ Socket not connected - cannot emit user cancellation');
+    }
+  };
 
   const emitReviewSubmitted = (companyId, rating, orderId) => {
     if (socket && isConnected) {
@@ -195,6 +203,7 @@ export function SocketProvider({ children }) {
     emitOrderCreated,
     emitOrderConfirmed,
     emitOrderCancelled,
+    emitOrderUserCancelled,
     emitReviewSubmitted,
     clearNotifications,
     removeNotification,

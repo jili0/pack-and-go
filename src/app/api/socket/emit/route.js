@@ -92,6 +92,33 @@ export async function POST(request) {
         });
         break;
       }
+      case 'order-user-cancelled': {
+        const { orderId, accountId, companyId } = data;
+        const companyRoom = `company-${companyId}`;
+        console.log(`🚫 Emitting 'notification' (order-user-cancelled) to room ${companyRoom}`);
+        
+        // Benachrichtigung an die Firma
+        io.to(companyRoom).emit('notification', {
+          type: 'order-user-cancelled',
+          message: `Customer cancelled their booking (ID: ${orderId})`,
+          orderId,
+          accountId,
+          target: "company",
+          timestamp: new Date().toISOString(),
+        });
+
+        // Benachrichtigung an Admin
+        io.to("admin").emit("notification", {
+          type: "order-user-cancelled",
+          message: `User ${accountId} cancelled order ${orderId}`,
+          orderId,
+          accountId,
+          companyId,
+          target: "admin",
+          timestamp: new Date().toISOString(),
+        });
+        break;
+      }
 
       case 'review-saved-notification': {
         const { reviewId, companyId: reviewCompanyId, rating, userId, userName, companyName } = data;
