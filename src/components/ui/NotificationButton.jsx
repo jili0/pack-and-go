@@ -1,4 +1,4 @@
-// components/NotificationButton.jsx (FINAL & CORRECTED)
+// components/NotificationButton.jsx (FINAL & CORRECTED with Read Status)
 'use client'
 
 import { useState, useEffect } from "react";
@@ -8,8 +8,50 @@ export default function NotificationButton({ account }) {
   const { notifications, clearNotifications, removeNotification } = useSocket();
   const [isOpen, setIsOpen] = useState(false);
   const [testNotifications, setTestNotifications] = useState([]);
+  const [localNotifications, setLocalNotifications] = useState([]);
 
+  // Kombiniere alle Benachrichtigungen
   const allNotifications = [...notifications, ...testNotifications];
+
+  // Synchronisiere mit lokalen Benachrichtigungen (für Read-Status)  
+  useEffect(() => {
+    // Verwende JSON.stringify für tiefe Vergleiche
+    const currentIds = allNotifications.map(n => `${n.type}-${n.orderId}-${n.timestamp}`);
+    const localIds = localNotifications.map(n => `${n.type}-${n.orderId}-${n.timestamp}`);
+    
+    const hasNewNotifications = currentIds.some(id => !localIds.includes(id));
+    
+    if (hasNewNotifications) {
+      setLocalNotifications(prev => {
+        const newNotifications = allNotifications.filter(notification => 
+          !prev.some(local => 
+            local.type === notification.type && 
+            local.orderId === notification.orderId &&
+            local.timestamp === notification.timestamp
+          )
+        );
+        
+        return [
+          ...prev,
+          ...newNotifications.map(n => ({ ...n, read: false }))
+        ];
+      });
+    }
+  }, [allNotifications.length, notifications.length]); // ✅ Stable dependencies
+
+  // Wenn Dropdown geöffnet wird, markiere alle als gelesen
+  const handleDropdownOpen = () => {
+    setIsOpen(!isOpen);
+    
+    if (!isOpen) {
+      // Markiere alle als gelesen nach kurzer Verzögerung
+      setTimeout(() => {
+        setLocalNotifications(prev => 
+          prev.map(notification => ({ ...notification, read: true }))
+        );
+      }, 1000); // 1 Sekunde Verzögerung
+    }
+  };
 
   // ✅ UPDATED filtering logic
   const getFilteredNotifications = () => {
@@ -18,7 +60,7 @@ export default function NotificationButton({ account }) {
       return [];
     }
 
-    const filtered = allNotifications.filter((notification) => {
+    const filtered = localNotifications.filter((notification) => {
       const { type, target } = notification;
 
       if (target) {
@@ -46,17 +88,30 @@ export default function NotificationButton({ account }) {
       }
     });
 
-    console.log(`🔍 Filtered notifications: ${filtered.length}/${allNotifications.length} for role: ${account.role}`);
+    console.log(`🔍 Filtered notifications: ${filtered.length}/${localNotifications.length} for role: ${account.role}`);
     return filtered;
   };
 
   const filteredNotifications = getFilteredNotifications();
 
+  // Badge nur für ungelesene Benachrichtigungen anzeigen
+  const unreadCount = filteredNotifications.filter(n => !n.read).length;
+
   console.log("🧪 [TEST] Incoming notifications:", allNotifications);
   console.log("🧪 [TEST] Filtered notifications:", filteredNotifications);
+  console.log("🧪 [TEST] Unread count:", unreadCount);
 
   const deleteNotification = (indexToDelete) => {
     const notificationToDelete = filteredNotifications[indexToDelete];
+    
+    // Entferne aus lokalen Benachrichtigungen
+    setLocalNotifications(prev => prev.filter(n =>
+      !(n.type === notificationToDelete.type &&
+        n.orderId === notificationToDelete.orderId &&
+        n.timestamp === notificationToDelete.timestamp)
+    ));
+
+    // Entferne aus globalen Benachrichtigungen
     const actualIndex = notifications.findIndex(n =>
       n.type === notificationToDelete.type &&
       n.orderId === notificationToDelete.orderId &&
@@ -66,6 +121,12 @@ export default function NotificationButton({ account }) {
     if (actualIndex !== -1) {
       removeNotification(actualIndex);
     }
+  };
+
+  const clearAllNotifications = () => {
+    setLocalNotifications([]);
+    clearNotifications();
+    setIsOpen(false);
   };
 
   useEffect(() => {
@@ -82,7 +143,7 @@ export default function NotificationButton({ account }) {
   return (
     <div className="notification-wrapper">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleDropdownOpen}
         className="notification-icon"
         style={{
           position: 'relative',
@@ -98,7 +159,7 @@ export default function NotificationButton({ account }) {
         onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
       >
         🔔
-        {filteredNotifications.length > 0 && (
+        {unreadCount > 0 && (
           <span
             className="notification-badge"
             style={{
@@ -116,9 +177,10 @@ export default function NotificationButton({ account }) {
               fontSize: '12px',
               fontWeight: 'bold',
               minWidth: '20px',
+              animation: unreadCount > 0 ? 'pulse 2s infinite' : 'none',
             }}
           >
-            {filteredNotifications.length}
+            {unreadCount}
           </span>
         )}
       </button>
@@ -163,11 +225,18 @@ export default function NotificationButton({ account }) {
                       padding: '12px 16px',
                       borderBottom: idx < filteredNotifications.length - 1 ? '1px solid #eee' : 'none',
                       position: 'relative',
+                      backgroundColor: notification.read ? 'transparent' : '#f8f9ff',
+                      borderLeft: notification.read ? 'none' : '3px solid #4285f4',
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
-                      <strong style={{ color: '#333', fontSize: '14px' }}>
+                      <strong style={{ 
+                        color: notification.read ? '#666' : '#333', 
+                        fontSize: '14px',
+                        fontWeight: notification.read ? 'normal' : 'bold'
+                      }}>
                         {getNotificationIcon(notification.type)} {formatNotificationType(notification.type)}
+                        {!notification.read && <span style={{ color: '#4285f4', marginLeft: '4px' }}>•</span>}
                       </strong>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{ fontSize: '11px', color: '#666' }}>
@@ -193,7 +262,12 @@ export default function NotificationButton({ account }) {
                         </button>
                       </div>
                     </div>
-                    <p style={{ margin: 0, fontSize: '13px', color: '#555', lineHeight: '1.4' }}>
+                    <p style={{ 
+                      margin: 0, 
+                      fontSize: '13px', 
+                      color: notification.read ? '#777' : '#555', 
+                      lineHeight: '1.4' 
+                    }}>
                       {notification.message}
                     </p>
                     {notification.orderId && (
@@ -205,10 +279,7 @@ export default function NotificationButton({ account }) {
                 ))}
               </div>
               <button
-                onClick={() => {
-                  clearNotifications();
-                  setIsOpen(false);
-                }}
+                onClick={clearAllNotifications}
                 className="notification-clear-btn"
                 style={{
                   width: '100%',
@@ -243,6 +314,7 @@ export default function NotificationButton({ account }) {
                 orderId: `TEST-${Math.floor(Math.random() * 1000)}`,
                 message: '📦 Neue Testbenachrichtigung für die Firma!',
                 timestamp: new Date().toISOString(),
+                read: false,
               },
             ])
           }
@@ -265,6 +337,18 @@ export default function NotificationButton({ account }) {
         .notification-wrapper {
           position: relative;
           display: inline-block;
+        }
+        
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.1);
+          }
+          100% {
+            transform: scale(1);
+          }
         }
       `}</style>
     </div>
