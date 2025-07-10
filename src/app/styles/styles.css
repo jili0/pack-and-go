@@ -842,35 +842,80 @@ footer a:hover {
 /* Widget */
 .widget {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
-  width: 340px;
-  min-height: 80px;
-  background: #667eea;
-  color: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.13);
-  transition:
-    width 0.3s,
-    right 0.3s,
-    box-shadow 0.3s;
-  overflow: hidden;
+  bottom: 20px;
+  right: 20px;
+  width: 320px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
   z-index: 9999;
+  transition: all 0.3s ease;
 }
+
 .widget.collapsed {
-  width: 12px;
-  right: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 8px;
+  height: 200px;
+  border-radius: 4px 0 0 4px;
+  right: 0;
 }
-.widget.slow-collapse {
-  transition:
-    width 3s linear,
-    right 3s linear,
-    box-shadow 3s linear;
+
+.widget-content {
+  padding: 20px;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.widget-header {
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.widget-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.upload-area {
+  border: 2px dashed #007bff;
+  border-radius: 10px;
+  padding: 40px 20px;
+  text-align: center;
+  background: #f8faff;
+  cursor: pointer;
+  margin: 12px 0;
+  color: #007bff;
+  font-weight: 500;
+}
+
+.upload-area.drag-active {
+  background: #e6f0ff;
+}
+
+.upload-area input {
+  display: none;
+}
+
+.result-section {
+  background: #f6f8fa;
+  border-radius: 8px;
+  padding: 12px;
+  color: #222;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 /* Media Queries */

@@ -39,7 +39,21 @@ async function analyzeImageWithGemini(base64Image, mimeType) {
   if (!res.ok) {
     const errorText = await res.text();
     console.error("Gemini API error:", errorText);
-    throw new Error("Gemini Vision API error");
+
+    // Handle specific error types
+    if (res.status === 503) {
+      throw new Error(
+        "Gemini API ist derzeit überlastet. Bitte versuchen Sie es in einigen Minuten erneut."
+      );
+    } else if (res.status === 429) {
+      throw new Error(
+        "Rate Limit erreicht. Bitte warten Sie und versuchen Sie es später erneut."
+      );
+    } else {
+      throw new Error(
+        `Gemini Vision API Fehler: ${res.status} ${res.statusText}`
+      );
+    }
   }
 
   return await res.json();
@@ -137,6 +151,39 @@ export async function POST(req) {
     return NextResponse.json({ furniture, others });
   } catch (err) {
     console.error("Analysis failed:", err);
-    return NextResponse.json({ error: "Analysis failed" }, { status: 500 });
+
+    // Return specific error messages based on the error type
+    if (err.message.includes("überlastet") || err.message.includes("503")) {
+      return NextResponse.json(
+        {
+          error: "Service temporär nicht verfügbar",
+          message:
+            "Gemini API ist derzeit überlastet. Bitte versuchen Sie es in 1-2 Minuten erneut.",
+          retryAfter: 60,
+        },
+        { status: 503 }
+      );
+    } else if (
+      err.message.includes("Rate Limit") ||
+      err.message.includes("429")
+    ) {
+      return NextResponse.json(
+        {
+          error: "Rate Limit erreicht",
+          message:
+            "Sie haben das API-Limit erreicht. Bitte warten Sie 5 Minuten und versuchen Sie es erneut.",
+          retryAfter: 300,
+        },
+        { status: 429 }
+      );
+    } else {
+      return NextResponse.json(
+        {
+          error: "Analyse fehlgeschlagen",
+          message: err.message || "Ein unbekannter Fehler ist aufgetreten.",
+        },
+        { status: 500 }
+      );
+    }
   }
 }
