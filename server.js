@@ -179,6 +179,69 @@ app.prepare().then(() => {
         timestamp: new Date().toISOString(),
       });
     });
+    // ✅ Order User-Cancelled (Kunde bricht selbst ab)
+socket.on("order-user-cancelled", async ({ orderId, accountId, companyId }) => {
+  console.log(`🚫 User cancelled order: ${orderId} by user: ${accountId} for company: ${companyId}`);
+  
+  const roomName = `company-${companyId}`;
+  const companyRoomSockets = io.sockets.adapter.rooms.get(roomName);
+  console.log(`SERVER DEBUG: Notifying company ${companyId} about user cancellation`);
+  
+  let notificationSentViaSocket = false;
+
+  // Benachrichtigung an die Firma
+  if (companyRoomSockets && companyRoomSockets.size > 0) {
+    io.to(roomName).emit("notification", {
+      type: "order-user-cancelled",
+      message: `Customer cancelled their booking (ID: ${orderId})`,
+      orderId,
+      accountId,
+      target: "company",
+      timestamp: new Date().toISOString(),
+    });
+    console.log(`SERVER: ✅ 'order-user-cancelled' notification sent to company: ${companyId}`);
+    notificationSentViaSocket = true;
+  } else {
+    console.warn(`SERVER WARNING: No sockets found in company room ${roomName}`);
+  }
+
+  // Fallback notification (falls Firma offline)
+  if (!notificationSentViaSocket) {
+    try {
+      const response = await fetch(`http://localhost:${port}/api/notifications`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "orderUserCancelled",
+          orderId,
+          companyId,
+          accountId,
+          message: `Customer cancelled booking (ID: ${orderId})`,
+          target: "company"
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        console.log("SERVER: ✅ Fallback notification sent successfully.");
+      } else {
+        console.error("SERVER: ❌ Fallback notification failed:", data.message);
+      }
+    } catch (fallbackError) {
+      console.error("SERVER: ❌ Error sending fallback notification:", fallbackError);
+    }
+  }
+
+  // Admin notification
+  io.to("admin").emit("notification", {
+    type: "order-user-cancelled",
+    message: `User ${accountId} cancelled order ${orderId} for company ${companyId}`,
+    orderId,
+    accountId,
+    companyId,
+    target: "admin",
+    timestamp: new Date().toISOString(),
+  });
+});
 
     // ✅ Review Submitted
     socket.on("review-submitted", ({ companyId, rating, orderId }) => {

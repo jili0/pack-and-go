@@ -91,7 +91,6 @@ const OrderDetails = () => {
   const router = useRouter();
   const params = useParams();
   const orderId = params.id;
-
   const orderDetailsLoading = useLoading("api", "orderDetails");
   const cancelLoading = useLoading("api", "cancelOrder");
   const deleteLoading = useLoading("api", "deleteOrder");
@@ -135,6 +134,10 @@ const OrderDetails = () => {
   const handleCancelOrder = async () => {
     cancelLoading.startLoading();
     try {
+      console.log("🚫 Starting order cancellation process...");
+      console.log("📊 Order data:", order);
+      console.log("👤 Company ID:", company?.accountId);
+
       const response = await fetch(`/api/orders/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -143,8 +146,49 @@ const OrderDetails = () => {
       const data = await response.json();
 
       if (data.success) {
+        console.log("✅ Order cancelled successfully in database");
+        
+        // ✅ Socket-Event für Company-Benachrichtigung
+        if (order?.accountId && company?.accountId) {
+          console.log(`🚫 Sending cancellation notification: orderId=${orderId}, userId=${order.accountId}, companyId=${company.accountId}`);
+          
+          try {
+            console.log("🔄 Sending notification via API...");
+            const socketResponse = await fetch('/api/socket/emit', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                event: 'order-user-cancelled',
+                data: {
+                  orderId,
+                  accountId: order.accountId,
+                  companyId: company.accountId
+                }
+              }),
+            });
+            
+            const socketData = await socketResponse.json();
+            if (socketData.success) {
+              console.log("✅ Company notification sent successfully");
+            } else {
+              console.error("❌ Company notification failed:", socketData.message);
+            }
+          } catch (socketError) {
+            console.error("❌ Error sending company notification:", socketError);
+          }
+        } else {
+          console.error("❌ Missing data for notification:", {
+            userAccountId: order?.accountId,
+            companyAccountId: company?.accountId,
+            orderId
+          });
+        }
+
         setOrder(data.order);
         setShowCancelModal(false);
+        console.log("✅ Order cancellation completed");
       } else {
         setError(data.message || "Failed to cancel order.");
       }

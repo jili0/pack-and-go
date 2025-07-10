@@ -140,19 +140,19 @@ export async function PUT(request, { params }) {
         confirmedDate: updatedOrder.confirmedDate,
       });
 
-      // ✅ Direktes Socket.IO Event
+      // ✅ Direktes Socket.IO Event - KORRIGIERT
       const io = globalThis.io;
 
       if (io) {
         const payload = {
           orderId: order._id.toString(),
-          target: "user",
           timestamp: new Date().toISOString(),
         };
 
         if (status === "confirmed") {
           io.to(`user-${order.accountId}`).emit("notification", {
             ...payload,
+            target: "user",
             type: "order-confirmed",
             message: `Your booking has been confirmed! (ID: ${order._id})`,
           });
@@ -168,20 +168,37 @@ export async function PUT(request, { params }) {
         }
 
         if (status === "cancelled") {
-          io.to(`user-${order.accountId}`).emit("notification", {
-            ...payload,
-            type: "order-cancelled",
-            message: `Your booking was declined. (ID: ${order._id})`,
-          });
-
+          // ✅ KORRIGIERT: Unterscheide zwischen Company-Cancellation und User-Cancellation
+          if (session.role === "company") {
+            // Company storniert → User benachrichtigen
+            io.to(`user-${order.accountId}`).emit("notification", {
+              ...payload,
+              target: "user",
+              type: "order-cancelled",
+              message: `Your booking was declined. (ID: ${order._id})`,
+            });
+            console.log("✅ Socket: Sent 'order-cancelled' (company declined)");
+          } else if (session.role === "user") {
+            // User storniert → Company benachrichtigen
+            io.to(`company-${order.companyAccountId}`).emit("notification", {
+              ...payload,
+              target: "company",
+              type: "order-user-cancelled",
+              message: `Customer cancelled their booking (ID: ${order._id})`,
+              accountId: order.accountId,
+            });
+            console.log("✅ Socket: Sent 'order-user-cancelled' (user cancelled)");
+          }
+          
+          // Admin bekommt immer eine Benachrichtigung
           io.to("admin").emit("notification", {
             ...payload,
             target: "admin",
-            type: "order-cancelled",
-            message: `Booking cancelled: ${order._id} for user: ${order.accountId}`,
+            type: session.role === "company" ? "order-cancelled" : "order-user-cancelled",
+            message: `Booking cancelled: ${order._id} by ${session.role}`,
+            accountId: order.accountId,
+            companyId: order.companyId,
           });
-
-          console.log("✅ Socket: Sent 'order-cancelled'");
         }
       } else {
         console.warn("⚠️ globalThis.io is not defined – no socket event sent.");
@@ -202,74 +219,6 @@ export async function PUT(request, { params }) {
       {
         success: false,
         message: "Serverfehler beim Aktualisieren der Bestellung",
-      },
-      { status: 500 }
-    );
-  }
-}
-
-// ---------------------- DELETE ----------------------
-export async function DELETE(request, context) {
-  try {
-    const { id } = await context.params;
-    const session = await getSession();
-
-    if (!session) {
-      return NextResponse.json(
-        { success: false, message: "Nicht autorisiert" },
-        { status: 401 }
-      );
-    }
-
-    await connectDB();
-
-    const order = await Order.findById(id);
-    if (!order) {
-      return NextResponse.json(
-        { success: false, message: "Bestellung nicht gefunden" },
-        { status: 404 }
-      );
-    }
-
-    let hasPermission = false;
-
-    if (session.role === "admin") {
-      hasPermission = true;
-    } else if (
-      session.role === "user" &&
-      order.accountId.toString() === session.id
-    ) {
-      hasPermission = true;
-    } else if (session.role === "company") {
-      const company = await Company.findOne({ accountId: session.id });
-      if (company && order.companyId.toString() === company._id.toString()) {
-        hasPermission = true;
-      }
-    }
-
-    if (!hasPermission) {
-      return NextResponse.json(
-        { success: false, message: "Keine Berechtigung" },
-        { status: 403 }
-      );
-    }
-
-    // ✅ Alle Rollen: Echtes Löschen aus der Datenbank
-    await Order.findByIdAndDelete(id);
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Bestellung erfolgreich gelöscht",
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Fehler beim Löschen der Bestellung:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Serverfehler beim Löschen der Bestellung",
       },
       { status: 500 }
     );

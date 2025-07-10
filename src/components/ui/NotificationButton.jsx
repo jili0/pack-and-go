@@ -38,7 +38,7 @@ export default function NotificationButton({ account }) {
         case 'user':
           return ['order-confirmed', 'order-cancelled'].includes(type);
         case 'company':
-          return ['order-created', 'review-submitted'].includes(type);
+          return ['order-created', 'order-user-cancelled', 'review-submitted'].includes(type);
         case 'admin':
           return true;
         default:
@@ -283,6 +283,8 @@ function getNotificationIcon(type) {
     case 'order-cancelled':
     case 'bookingCancelled':
       return '❌';
+    case 'order-user-cancelled': 
+      return '🚫';
     case 'review-submitted':
       return '⭐';
     default:
@@ -301,6 +303,8 @@ function formatNotificationType(type) {
     case 'order-cancelled':
     case 'bookingCancelled':
       return 'Cancelled';
+    case 'order-user-cancelled': 
+      return 'User Cancelled';
     case 'review-submitted':
       return 'New Review';
     default:
