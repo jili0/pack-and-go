@@ -14,7 +14,7 @@ const PriceCalculator = () => {
   return (
     <div className="form-container">
       <form className="calculator">
-        <h2>Price Calculator</h2>
+        <h2>Calculate your moving price</h2>
 
         <div className="row">
           <label>Helpers</label>
