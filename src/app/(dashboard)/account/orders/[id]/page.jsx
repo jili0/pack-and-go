@@ -100,23 +100,27 @@ const OrderDetails = () => {
   const [error, setError] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  // ✅ Fixed: useEffect ohne useCallback - stoppt infinite loop
   useEffect(() => {
     const fetchOrderDetails = async () => {
       if (!orderId) {
         setError("Invalid Order ID");
-        orderDetailsLoading.stopLoading();
         return;
       }
 
       orderDetailsLoading.startLoading();
       try {
-        const response = await fetch(`/api/orders/${orderId}`);
+        // ✅ Cache busting mit timestamp
+        const timestamp = Date.now();
+        const response = await fetch(`/api/orders/${orderId}?t=${timestamp}`);
         const data = await response.json();
 
         if (data.success) {
           setOrder(data.order);
           setCompany(data.company);
+          console.log("✅ Order details refreshed");
         } else {
           setError(data.message || "Failed to load order details.");
         }
@@ -129,7 +133,30 @@ const OrderDetails = () => {
     };
 
     fetchOrderDetails();
-  }, [orderId]);
+  }, [orderId, refreshTrigger]); // ✅ Nur orderId und refreshTrigger
+
+  // ✅ Auto-refresh when page gets focus (z.B. nach Admin-Review-Delete)
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log("🔄 Page focused, refreshing order data...");
+      setRefreshTrigger(prev => prev + 1);
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log("🔄 Page became visible, refreshing order data...");
+        setRefreshTrigger(prev => prev + 1);
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []); // ✅ Leere dependencies - keine loops
 
   const handleCancelOrder = async () => {
     cancelLoading.startLoading();
@@ -177,6 +204,13 @@ const OrderDetails = () => {
       
       console.log("📊 Delete response status:", response.status);
       console.log("📊 Delete response ok:", response.ok);
+      
+      // ✅ Spezielle Behandlung für 405 Error
+      if (response.status === 405) {
+        console.error("❌ DELETE method not allowed - API route may be missing DELETE handler");
+        setError("Delete operation not supported. Please contact support.");
+        return;
+      }
       
       // ✅ Prüfe Response Status
       if (!response.ok) {
@@ -350,6 +384,7 @@ const OrderDetails = () => {
             <p>Company Account ID: {company?.accountId || 'Not found'}</p>
             <p>Order ID: {orderId}</p>
             <p>Order Status: {order?.status}</p>
+            <p>Refresh Trigger: {refreshTrigger}</p>
           </div>
         </div>
       )}
