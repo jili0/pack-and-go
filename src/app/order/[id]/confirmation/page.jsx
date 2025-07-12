@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react"; // ✅ useCallback hinzugefügt
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/context/LoadingContext";
@@ -19,6 +19,33 @@ export default function OrderConfirmation() {
   const [company, setCompany] = useState(null);
   const [error, setError] = useState(null);
 
+  // ✅ fetchOrderDetails als useCallback (AUSSERHALB von useEffect)
+  const fetchOrderDetails = useCallback(async () => {
+    if (!id || !account) return;
+    
+    orderLoading.startLoading();
+    try {
+      // ✅ Cache busting mit timestamp
+      const timestamp = Date.now();
+      const response = await fetch(`/api/orders/${id}?t=${timestamp}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setOrder(data.order);
+        setCompany(data.company);
+        console.log("✅ Confirmation page data refreshed");
+      } else {
+        setError(data.message || "The order details could not be loaded.");
+      }
+    } catch (error) {
+      console.error("Error fetching order details:", error);
+      setError("An error occurred. Please try again later.");
+    } finally {
+      orderLoading.stopLoading();
+    }
+  }, [id, account]);
+
+  // ✅ Initial fetch
   useEffect(() => {
     if (!initialCheckDone) return;
     if (!account) {
@@ -26,28 +53,31 @@ export default function OrderConfirmation() {
       return;
     }
 
-    const fetchOrderDetails = async () => {
-      orderLoading.startLoading();
-      try {
-        const response = await fetch(`/api/orders/${id}`);
-        const data = await response.json();
+    fetchOrderDetails();
+  }, [initialCheckDone, account, router, fetchOrderDetails]);
 
-        if (data.success) {
-          setOrder(data.order);
-          setCompany(data.company);
-        } else {
-          setError(data.message || "The order details could not be loaded.");
-        }
-      } catch (error) {
-        console.error("Error fetching order details:", error);
-        setError("An error occurred. Please try again later.");
-      } finally {
-        orderLoading.stopLoading();
+  // ✅ Auto-refresh Events
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log("🔄 Confirmation page focused, refreshing data...");
+      fetchOrderDetails();
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log("🔄 Confirmation page became visible, refreshing data...");
+        fetchOrderDetails();
       }
     };
 
-    fetchOrderDetails();
-  }, [id, initialCheckDone, account, router]);
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [fetchOrderDetails]);
 
   if (!initialCheckDone || orderLoading.isLoading) {
     return <Loader text="Loading order details..." />;

@@ -302,37 +302,6 @@ export default function NotificationButton({ account }) {
         </div>
       )}
 
-      {/* ✅ Test Button (DEV only) */}
-      {process.env.NODE_ENV === 'development' && (
-        <button
-          onClick={() =>
-            setTestNotifications((prev) => [
-              ...prev,
-              {
-                type: 'order-created',
-                target: 'company',
-                orderId: `TEST-${Math.floor(Math.random() * 1000)}`,
-                message: '📦 Neue Testbenachrichtigung für die Firma!',
-                timestamp: new Date().toISOString(),
-                read: false,
-              },
-            ])
-          }
-          style={{
-            marginTop: '12px',
-            fontSize: '12px',
-            padding: '6px 12px',
-            backgroundColor: '#f0f0f0',
-            border: '1px solid #ccc',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            display: 'block',
-          }}
-        >
-          ➕ Testbenachrichtigung (company)
-        </button>
-      )}
-
       <style jsx>{`
         .notification-wrapper {
           position: relative;
