@@ -1,10 +1,12 @@
-// components/NotificationButton.jsx (FINAL & CORRECTED with Read Status)
+// components/NotificationButton.jsx (FINAL & CORRECTED with Read Status + Clickable)
 'use client'
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useSocket } from "@/context/useSocket";
 
 export default function NotificationButton({ account }) {
+  const router = useRouter();
   const { notifications, clearNotifications, removeNotification } = useSocket();
   const [isOpen, setIsOpen] = useState(false);
   const [testNotifications, setTestNotifications] = useState([]);
@@ -129,6 +131,62 @@ export default function NotificationButton({ account }) {
     setIsOpen(false);
   };
 
+  // ✅ Handle notification click for navigation
+  const handleNotificationClick = (notification, index) => {
+    const { type, orderId, companyId } = notification;
+    
+    console.log('🔗 Notification clicked:', { type, orderId, companyId, role: account?.role });
+    
+    // Navigate based on notification type and user role
+    switch (type) {
+      case 'order-created':
+      case 'newBookingRequest':
+        // Company: Zur Company Dashboard mit direkter Order-Navigation
+        if (account?.role === 'company') {
+          router.push(`/company#order-${orderId}`);
+        }
+        break;
+        
+      case 'order-confirmed':
+      case 'bookingConfirmed':
+        // User: Zur Order-Details  
+        if (account?.role === 'user') {
+          router.push(`/account/orders/${orderId}`);
+        }
+        break;
+        
+      case 'order-cancelled':
+      case 'bookingCancelled':
+        // User: Zur Order-Details
+        if (account?.role === 'user') {
+          router.push(`/account/orders/${orderId}`);
+        }
+        break;
+        
+      case 'order-user-cancelled':
+        // Company: Zur Company Dashboard mit direkter Order-Navigation
+        if (account?.role === 'company') {
+          router.push(`/company#order-${orderId}`);
+        }
+        break;
+        
+      case 'review-submitted':
+        // Company: Zu Reviews
+        if (account?.role === 'company') {
+          router.push(`/company/reviews`);
+        }
+        break;
+        
+      default:
+        console.log('No navigation defined for notification type:', type);
+        return; // Don't close dropdown if no navigation
+    }
+    
+    // Mark as read and close dropdown
+    deleteNotification(index);
+    setIsOpen(false);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isOpen && !event.target.closest('.notification-wrapper')) {
@@ -221,12 +279,29 @@ export default function NotificationButton({ account }) {
                   <div
                     key={`${notification.type}-${notification.orderId}-${notification.timestamp}`}
                     className="notification-item"
+                    onClick={() => handleNotificationClick(notification, idx)}
                     style={{
                       padding: '12px 16px',
                       borderBottom: idx < filteredNotifications.length - 1 ? '1px solid #eee' : 'none',
                       position: 'relative',
                       backgroundColor: notification.read ? 'transparent' : '#f8f9ff',
                       borderLeft: notification.read ? 'none' : '3px solid #4285f4',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!notification.read) {
+                        e.currentTarget.style.backgroundColor = '#f0f7ff';
+                      } else {
+                        e.currentTarget.style.backgroundColor = '#f5f5f5';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!notification.read) {
+                        e.currentTarget.style.backgroundColor = '#f8f9ff';
+                      } else {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
@@ -243,7 +318,10 @@ export default function NotificationButton({ account }) {
                           {new Date(notification.timestamp).toLocaleTimeString()}
                         </span>
                         <button
-                          onClick={() => deleteNotification(idx)}
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent notification click
+                            deleteNotification(idx);
+                          }}
                           style={{
                             background: 'none',
                             border: 'none',
@@ -272,7 +350,7 @@ export default function NotificationButton({ account }) {
                     </p>
                     {notification.orderId && (
                       <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#888', fontStyle: 'italic' }}>
-                        Order: {notification.orderId}
+                        Order: {notification.orderId} • Click to view
                       </p>
                     )}
                   </div>
@@ -301,7 +379,6 @@ export default function NotificationButton({ account }) {
           )}
         </div>
       )}
-
       <style jsx>{`
         .notification-wrapper {
           position: relative;
