@@ -10,7 +10,7 @@ html {
 }
 
 body {
-  font-family: 'Noto Sans', 'Lora', system-ui, sans-serif;
+  font-family: "Noto Sans", "Lora", system-ui, sans-serif;
   line-height: 1.6;
   color: #333;
   text-align: center;
@@ -285,8 +285,9 @@ nav {
 
 /* Home */
 main {
-  padding-top: 50px;
+  padding-top: 100px;
   margin-top: 0;
+  min-height: 95vh;
 }
 
 section {
@@ -299,13 +300,12 @@ section {
     linear-gradient(rgba(30, 30, 40, 0.45), rgba(30, 30, 40, 0.45)),
     url("/images/img4.png") center center/cover no-repeat;
   color: white;
-  padding-top: 50px;
   padding-bottom: clamp(20px, 15vw, 100px);
   min-height: 700px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 0;
+  margin-top: -50px;
 }
 
 .hero-content {
@@ -483,7 +483,6 @@ section {
   justify-content: center;
   text-align: left;
 }
-
 
 .contact-icon {
   width: 50px;
