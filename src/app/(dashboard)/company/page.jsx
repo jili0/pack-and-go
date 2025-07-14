@@ -226,13 +226,6 @@ export default function CompanyDashboard() {
             }
           }
         }
-  
-        console.log("🔍 Debug Info:");
-        console.log("  - Order ID:", orderId);
-        console.log("  - Updates:", updates);
-        console.log("  - Affected Order:", affectedOrder);
-        console.log("  - Extracted User ID:", userId);
-  
         // ✅ Emit socket notification for confirmed
         if (updates.status === "confirmed" && userId) {
           try {
