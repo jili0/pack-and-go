@@ -35,6 +35,8 @@ const AdminLoginPage = () => {
       secondaryButtonHref="/"
       onSubmit={handleAdminLogin}
       adminMode={true}
+      defaultEmail="admin@pack-and-go.com"
+      defaultPassword=""
     />
   );
 };
