@@ -45,11 +45,9 @@ export function SocketProvider({ children }) {
           }));
           
           setNotifications(notificationsWithReadStatus);
-          console.log(`📱 Loaded ${notificationsWithReadStatus.length} persisted notifications from localStorage`);
           
           // Log read status for debugging
           const unreadCount = notificationsWithReadStatus.filter(n => !n.read).length;
-          console.log(`📊 ${unreadCount} unread, ${notificationsWithReadStatus.length - unreadCount} read notifications loaded`);
         } catch (error) {
           console.error('❌ Error loading notifications from localStorage:', error);
           localStorage.removeItem('pack-and-go-notifications'); // Clear corrupted data
@@ -66,11 +64,9 @@ export function SocketProvider({ children }) {
           // Keep only the latest 50 notifications to prevent storage bloat
           const notificationsToSave = notifications.slice(-50);
           localStorage.setItem('pack-and-go-notifications', JSON.stringify(notificationsToSave));
-          console.log(`💾 Saved ${notificationsToSave.length} notifications to localStorage`);
         } else {
           // If no notifications, remove from localStorage
           localStorage.removeItem('pack-and-go-notifications');
-          console.log('🗑️ Removed empty notifications from localStorage');
         }
       } catch (error) {
         console.error('❌ Error saving notifications to localStorage:', error);
@@ -102,7 +98,6 @@ export function SocketProvider({ children }) {
         });
         
         if (cleaned.length !== prev.length) {
-          console.log(`🧹 Cleaned up ${prev.length - cleaned.length} old notifications`);
         }
         
         return cleaned;
@@ -120,7 +115,6 @@ export function SocketProvider({ children }) {
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof Notification !== "undefined" && Notification.permission !== 'granted') {
       Notification.requestPermission().then(permission => {
-        console.log("🔔 Browser notification permission:", permission);
       });
     }
   }, []);
@@ -132,8 +126,6 @@ export function SocketProvider({ children }) {
 
     // ✅ KORREKTE Konfiguration für Next.js + Socket.IO Server
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || '';
-    console.log("🔌 Connecting to Next.js Socket server:", socketUrl);
-
     const socketIO = io(socketUrl, {
       path: '/api/socket', // ✅ WICHTIG: Der Pfad wie in deinem Server definiert
       autoConnect: true,
@@ -145,12 +137,10 @@ export function SocketProvider({ children }) {
     });
 
     socketIO.on('connect', () => {
-      console.log('✅ Connected to Next.js Socket.IO server:', socketIO.id);
       setIsConnected(true);
     });
 
     socketIO.on('disconnect', (reason) => {
-      console.log('❌ Disconnected from Socket.IO server:', reason);
       setIsConnected(false);
     });
 
@@ -160,7 +150,6 @@ export function SocketProvider({ children }) {
     });
 
     socketIO.on('reconnect', (attemptNumber) => {
-      console.log(`🔄 Socket reconnected after ${attemptNumber} attempts`);
     });
 
     socketIO.on('reconnect_failed', () => {
@@ -169,7 +158,7 @@ export function SocketProvider({ children }) {
 
     // ✅ UNIFIED notification handler - NO FILTERING HERE
     socketIO.on('notification', (notification) => {
-      console.log('📬 Received unified notification:', notification);
+
       
       // ✅ Add ALL notifications to state - filtering happens in UI
       setNotifications(prev => {
@@ -181,11 +170,8 @@ export function SocketProvider({ children }) {
         );
         
         if (exists) {
-          console.log('🚫 Duplicate notification prevented');
           return prev;
         }
-        
-        console.log('✅ Adding notification to state');
         return [...prev, { ...notification, read: false }]; // ✅ New notifications are unread by default
       });
 
@@ -203,7 +189,6 @@ export function SocketProvider({ children }) {
     setSocket(socketIO);
 
     return () => {
-      console.log("🔌 Cleaning up socket connection");
       socketIO.disconnect();
     };
   }, []);
@@ -218,15 +203,12 @@ export function SocketProvider({ children }) {
       console.error("❌ registerUser called without valid accountId or role");
       return;
     }
-  
-    console.log(`🧠 registerUser CALLED: ${accountId}, role: ${role}`);
     setCurrentAccount({ accountId, role });
     
     // ✅ Don't clear notifications on registration - keep persisted ones
     // setNotifications([]); // ❌ REMOVED - This was clearing persisted notifications
   
     if (socket && socket.connected) {
-      console.log("📨 Emitting register-user");
       socket.emit('register-user', { accountId, role });
     } else {
       console.warn("⚠️ Socket not ready, delaying registration...");
@@ -234,7 +216,6 @@ export function SocketProvider({ children }) {
       // ➕ Automatisch registrieren, sobald verbunden
       const tryRegister = () => {
         if (socket && socket.connected) {
-          console.log("✅ Late registration after connect:", accountId, role);
           socket.emit('register-user', { accountId, role });
           socket.off('connect', tryRegister); // Cleanup
         }
@@ -246,28 +227,24 @@ export function SocketProvider({ children }) {
 
   const emitOrderCreated = (orderId, companyId) => {
     if (socket && isConnected) {
-      console.log(`📦 Emitting order created: ${orderId} for company: ${companyId}`);
       socket.emit('order-created', { orderId, companyId });
     }
   };
 
   const emitOrderConfirmed = (orderId, accountId) => {
     if (socket && isConnected) {
-      console.log(`✅ Emitting order confirmed: ${orderId} for account: ${accountId}`);
       socket.emit('order-confirmed', { orderId, accountId });
     }
   };
 
   const emitOrderCancelled = (orderId, accountId) => {
     if (socket && isConnected) {
-      console.log(`❌ Emitting order cancelled: ${orderId} for account: ${accountId}`);
       socket.emit('order-cancelled', { orderId, accountId });
     }
   };
 
   const emitOrderUserCancelled = (orderId, accountId, companyId) => {
     if (socket && isConnected) {
-      console.log(`🚫 Emitting user cancelled order: ${orderId} by user: ${accountId} for company: ${companyId}`);
       socket.emit('order-user-cancelled', { orderId, accountId, companyId });
     } else {
       console.error('❌ Socket not connected - cannot emit user cancellation');
@@ -276,7 +253,6 @@ export function SocketProvider({ children }) {
 
   const emitReviewSubmitted = (companyId, rating, orderId) => {
     if (socket && isConnected) {
-      console.log(`⭐ Emitting review submitted for company: ${companyId} - ${rating}★`);
       socket.emit('review-submitted', { companyId, rating, orderId });
     }
   };
@@ -286,7 +262,6 @@ export function SocketProvider({ children }) {
     // ✅ Also clear from localStorage
     if (typeof window !== 'undefined') {
       localStorage.removeItem('pack-and-go-notifications');
-      console.log('🗑️ Cleared all notifications from memory and localStorage');
     }
   };
   
@@ -298,7 +273,6 @@ export function SocketProvider({ children }) {
       if (typeof window !== 'undefined') {
         try {
           localStorage.setItem('pack-and-go-notifications', JSON.stringify(updated));
-          console.log(`🗑️ Removed notification at index ${index} from localStorage`);
         } catch (error) {
           console.error('❌ Error removing notification from localStorage:', error);
         }
@@ -330,8 +304,6 @@ export function SocketProvider({ children }) {
       const updated = prev.filter(notification => 
         !(notification.orderId === orderId && notification.type === type)
       );
-      
-      console.log(`🗑️ Removed notification for order ${orderId} type ${type}`);
       return updated;
     });
   }, []);
