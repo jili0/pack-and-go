@@ -115,14 +115,14 @@ export default function CompanyProfileEdit() {
     };
 
     const submissionData = { ...formData };
+    submissionData.companyName = account.name;
     Object.keys(defaultValues).forEach((key) => {
       if (!submissionData[key] || submissionData[key].trim() === "") {
         submissionData[key] = defaultValues[key];
       }
     });
 
-    // Remove companyName from submission data since it's not editable
-    // companyName is now in separate state and not part of formData
+    // companyName is now included in submissionData
 
     // Apply default values for service areas
     submissionData.serviceAreas = submissionData.serviceAreas.map((area) => ({
