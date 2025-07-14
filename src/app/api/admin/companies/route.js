@@ -91,3 +91,4 @@ export async function GET(request, { params }) {
     );
   }
 }
+export const dynamic = 'force-dynamic';

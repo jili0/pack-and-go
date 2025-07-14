@@ -119,3 +119,4 @@ export async function PUT(request) {
     );
   }
 }
+export const dynamic = 'force-dynamic';
