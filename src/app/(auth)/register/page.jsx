@@ -45,12 +45,36 @@ const RegisterPage = () => {
     if (errors[name]) setErrors({ ...errors, [name]: null });
   };
 
+  // ✅ KORRIGIERTE VALIDIERUNG
   const validateForm = () => {
-    return true; // No validation needed since we have defaults
+    const newErrors = {};
+
+    // ✅ Terms & Conditions Validierung
+    if (!formData.terms) {
+      newErrors.terms = "Sie müssen die Nutzungsbedingungen akzeptieren";
+    }
+
+    // ✅ Password Validierung
+    if (!formData.password || formData.password.trim() === "") {
+      newErrors.password = "Passwort ist erforderlich";
+    }
+
+    // ✅ Password Confirmation Validierung
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwörter stimmen nicht überein";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ✅ VALIDIERUNG VOR ALLEM ANDEREN
+    if (!validateForm()) {
+      return; // Stoppe wenn Validierung fehlschlägt
+    }
 
     // Apply default values for empty fields before submitting
     const submissionData = { ...formData };
@@ -69,11 +93,10 @@ const RegisterPage = () => {
       submissionData.phone = "+49 30 12345678";
     }
 
-    if (!validateForm()) return;
-
     setIsSubmitting(true);
     setRegisterError(null);
 
+    // ✅ Terms werden validiert, aber trotzdem aus den Daten entfernt
     const { confirmPassword, terms, ...registrationData } = submissionData;
 
     try {
@@ -214,7 +237,16 @@ const RegisterPage = () => {
           {errors.terms && <p className="error">{errors.terms}</p>}
         </div>
 
-        <button type="submit" disabled={isSubmitting} className="btn-primary">
+        {/* ✅ BUTTON IST JETZT DISABLED WENN TERMS NICHT AKZEPTIERT */}
+        <button 
+          type="submit" 
+          disabled={isSubmitting || !formData.terms} 
+          className="btn-primary"
+          style={{
+            opacity: (!formData.terms && !isSubmitting) ? 0.5 : 1,
+            cursor: (!formData.terms && !isSubmitting) ? 'not-allowed' : 'pointer'
+          }}
+        >
           {isSubmitting ? "Creating Account..." : "Create Account"}
         </button>
       </form>
