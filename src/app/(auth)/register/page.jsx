@@ -10,11 +10,11 @@ const RegisterPage = () => {
   const { register } = useAuth();
 
   const [formData, setFormData] = useState({
-    name: "test-user",
-    email: "test-user@test.com",
+    name: "Maria Schmidt",
+    email: "maria.schmidt@email.com",
     phone: "+49 30 12345678",
-    password: "123456",
-    confirmPassword: "123456",
+    password: "",
+    confirmPassword: "",
     role: "user",
     terms: false,
   });
@@ -27,14 +27,14 @@ const RegisterPage = () => {
     if (formData.role === "user") {
       setFormData((prev) => ({
         ...prev,
-        name: "test-user",
-        email: "test-user@test.com",
+        name: "Maria Schmidt",
+        email: "maria.schmidt@email.com",
       }));
     } else if (formData.role === "company") {
       setFormData((prev) => ({
         ...prev,
-        name: "test-company",
-        email: "test-company@test.com",
+        name: "Swift Relocations",
+        email: "swift.relocations@email.com",
       }));
     }
   }, [formData.role]);
@@ -57,23 +57,16 @@ const RegisterPage = () => {
 
     if (!submissionData.name || submissionData.name.trim() === "") {
       submissionData.name =
-        formData.role === "user" ? "test-user" : "test-company";
+        formData.role === "user" ? "Maria Schmidt" : "Swift Relocations";
     }
     if (!submissionData.email || submissionData.email.trim() === "") {
       submissionData.email =
-        formData.role === "user" ? "test-user@test.com" : "test-company@test.com";
+        formData.role === "user"
+          ? "maria.schmidt@email.com"
+          : "swift.relocations@email.com";
     }
     if (!submissionData.phone || submissionData.phone.trim() === "") {
       submissionData.phone = "+49 30 12345678";
-    }
-    if (!submissionData.password || submissionData.password.trim() === "") {
-      submissionData.password = "123456";
-    }
-    if (
-      !submissionData.confirmPassword ||
-      submissionData.confirmPassword.trim() === ""
-    ) {
-      submissionData.confirmPassword = "123456";
     }
 
     if (!validateForm()) return;
@@ -180,7 +173,7 @@ const RegisterPage = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="123456"
+              placeholder="Your password"
               disabled={isSubmitting}
             />
           </label>
@@ -196,7 +189,7 @@ const RegisterPage = () => {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              placeholder="123456"
+              placeholder="Confirm your password"
               disabled={isSubmitting}
             />
           </label>
