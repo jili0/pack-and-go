@@ -13,7 +13,6 @@ export default function SocketManager() {
   // User Registration on Connection (OPTIMIERT)
   useEffect(() => {
     if (isConnected && account?.id && account?.role && !hasRegistered) {
-      console.log("🧠 Registering user:", account.id, "as", account.role);
       registerUser(account.id, account.role);
       setHasRegistered(true);
     }
@@ -23,15 +22,6 @@ export default function SocketManager() {
   useEffect(() => {
     setHasRegistered(false);
   }, [account?.id]);
-
-  // Debug Log (optional, zur Überwachung der Socket-Verbindung)
-  console.log("🔍 Debug SocketManager:", {
-    isConnected,
-    accountRole: account?.role,
-    accountId: account?.id,
-    hasRegistered,
-  });
-
  
   return null; 
 }
