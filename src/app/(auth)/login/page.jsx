@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -18,6 +18,8 @@ export const AuthForm = ({
   adminMode = false,
   defaultEmail = "",
   defaultPassword = "",
+  thirdButtonText = "",
+  onThirdButtonClick = null,
 }) => {
   const [formData, setFormData] = useState({ 
     email: defaultEmail, 
@@ -26,6 +28,14 @@ export const AuthForm = ({
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState(null);
+
+  // Update formData when defaultEmail prop changes
+  useEffect(() => {
+    setFormData(prev => ({ 
+      ...prev, 
+      email: defaultEmail 
+    }));
+  }, [defaultEmail]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -98,6 +108,16 @@ export const AuthForm = ({
         <Link href={secondaryButtonHref}>
           <button className="btn-primary">{secondaryButtonText}</button>
         </Link>
+
+        {thirdButtonText && onThirdButtonClick && (
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={onThirdButtonClick}
+          >
+            {thirdButtonText}
+          </button>
+        )}
       </form>
     </div>
   );
@@ -106,6 +126,7 @@ export const AuthForm = ({
 const LoginPage = () => {
   const router = useRouter();
   const { login } = useAuth();
+  const [currentEmail, setCurrentEmail] = useState("maria.schmidt@email.com");
 
   const handleLogin = async (formData, setAuthError, setIsSubmitting) => {
     const result = await login(formData.email, formData.password);
@@ -117,19 +138,35 @@ const LoginPage = () => {
     }
   };
 
+  const handleToggleUserType = () => {
+    if (currentEmail === "maria.schmidt@email.com") {
+      setCurrentEmail("swift.relocations@email.com");
+    } else {
+      setCurrentEmail("maria.schmidt@email.com");
+    }
+  };
+
+  const getToggleButtonText = () => {
+    return currentEmail === "maria.schmidt@email.com" 
+      ? "Sign In As Company" 
+      : "Sign In As Customer";
+  };
+
   return (
     <AuthForm
       title="Welcome Back"
       subtitle="Sign in to plan or manage your move."
-      emailPlaceholder="test-user@test.com"
-      passwordPlaceholder="123456"
+      emailPlaceholder={currentEmail}
+      passwordPlaceholder="Your password"
       submitText="Sign in"
       submitLoadingText="Signing in..."
       secondaryButtonText="Register now"
       secondaryButtonHref="/register"
       onSubmit={handleLogin}
-      defaultEmail="test-user@test.com"
-      defaultPassword="123456"
+      defaultEmail={currentEmail}
+      defaultPassword=""
+      thirdButtonText={getToggleButtonText()}
+      onThirdButtonClick={handleToggleUserType}
     />
   );
 };

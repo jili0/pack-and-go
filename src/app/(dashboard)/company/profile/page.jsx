@@ -12,8 +12,8 @@ export default function CompanyProfileEdit() {
   const profileLoading = useLoading("api", "companyProfile");
   const submitLoading = useLoading("api", "submitProfile");
 
+  const [companyName, setCompanyName] = useState("");
   const [formData, setFormData] = useState({
-    companyName: "Berlin Moving Services GmbH",
     taxId: "123456789",
     street: "Friedrichstrasse 123",
     city: "Berlin",
@@ -41,6 +41,13 @@ export default function CompanyProfileEdit() {
       return;
     }
 
+    // Set company name and email from account (always available)
+    setCompanyName(account.name);
+    setFormData((prev) => ({
+      ...prev,
+      email: account.email,
+    }));
+
     fetchCompanyProfile();
   }, [initialCheckDone, account, router]);
 
@@ -57,22 +64,22 @@ export default function CompanyProfileEdit() {
       const result = await response.json();
       if (result.success && result.company) {
         const company = result.company;
-        setFormData({
-          companyName: company.companyName || "Berlin Moving Services GmbH",
-          taxId: company.taxId || "123456789",
-          street: company.address?.street || "Friedrichstrasse 123",
-          city: company.address?.city || "Berlin",
-          postalCode: company.address?.postalCode || "10117",
-          country: company.address?.country || "Germany",
-          phone: company.phone || "+49 30 12345678",
-          email: company.email || "info@berlinmoving.de",
+        // Update formData with real data, keeping defaults for empty fields
+        setFormData((prev) => ({
+          taxId: company.taxId || prev.taxId,
+          street: company.address?.street || prev.street,
+          city: company.address?.city || prev.city,
+          postalCode: company.address?.postalCode || prev.postalCode,
+          country: company.address?.country || prev.country,
+          phone: company.phone || prev.phone,
+          email: company.email || prev.email,
           isKisteKlarCertified: company.isKisteKlarCertified || false,
           serviceAreas:
             company.serviceAreas?.length > 0
               ? company.serviceAreas
-              : [{ from: "Berlin", to: "Hamburg" }],
+              : prev.serviceAreas,
           kisteKlarCertificate: null,
-        });
+        }));
       }
     } catch (error) {
       console.error("Error loading company profile:", error);
@@ -98,7 +105,6 @@ export default function CompanyProfileEdit() {
 
     // Apply default values for empty fields before submitting
     const defaultValues = {
-      companyName: "Berlin Moving Services GmbH",
       taxId: "123456789",
       street: "Friedrichstrasse 123",
       city: "Berlin",
@@ -109,11 +115,14 @@ export default function CompanyProfileEdit() {
     };
 
     const submissionData = { ...formData };
+    submissionData.companyName = account.name;
     Object.keys(defaultValues).forEach((key) => {
       if (!submissionData[key] || submissionData[key].trim() === "") {
         submissionData[key] = defaultValues[key];
       }
     });
+
+    // companyName is now included in submissionData
 
     // Apply default values for service areas
     submissionData.serviceAreas = submissionData.serviceAreas.map((area) => ({
@@ -188,14 +197,11 @@ export default function CompanyProfileEdit() {
       <form onSubmit={handleSubmit}>
         <div className="form-field">
           <label>
-            Company Name*
-            <input
-              value={formData.companyName}
-              onChange={(e) => handleChange("companyName", e.target.value)}
-              placeholder="Berlin Moving Services GmbH"
-            />
-            {errors.companyName && (
-              <div className="error">{errors.companyName}</div>
+            Company Name
+            {companyName ? (
+              <input value={companyName} disabled={true} />
+            ) : (
+              <div className="error">Company name cannot be displayed</div>
             )}
           </label>
         </div>

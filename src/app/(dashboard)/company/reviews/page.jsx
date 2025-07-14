@@ -64,7 +64,7 @@ export default function CompanyReviewsPage() {
   if (error) {
     return (
       <div className="container">
-        <h2>Error</h2>
+        <h1>Error</h1>
         <p>{error}</p>
       </div>
     );
@@ -73,7 +73,7 @@ export default function CompanyReviewsPage() {
   if (reviews.length === 0) {
     return (
       <div className="container">
-        <h2>No reviews yet</h2>
+        <h1>No reviews yet</h1>
         <p>Customers have not submitted any reviews for your company yet.</p>
         <button className="btn-primary" onClick={() => router.back()}>
           Back to Dashboard
@@ -87,20 +87,21 @@ export default function CompanyReviewsPage() {
       <h1>Your Reviews</h1>
       {reviews.map((review) => (
         <div key={review._id} className="review-card">
-          <p>
-            <strong>Rating:</strong> {review.rating} / 5
-          </p>
-          <p>
-            <strong>Comment:</strong> {review.comment}
-          </p>
-          <p>
-            <strong>Customer:</strong> {review.accountId?.name || "Anonymous"}
-          </p>
-          <p>
-            <strong>Date:</strong>
-            {new Date(review.createdAt).toLocaleDateString()}
-          </p>
-          <hr />
+          <div className="review-header">
+            <span>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span
+                  key={star}
+                  className={star <= review.rating ? "star-active" : "star-inactive"}
+                >
+                  ★
+                </span>
+              ))}
+            </span>
+            <span>{review.accountId?.name || "Anonymous"}</span>
+            <span>{new Date(review.createdAt).toLocaleDateString()}</span>
+          </div>
+          <div className="review-comment">{review.comment}</div>
         </div>
       ))}
       <button className="btn-primary" onClick={() => router.back()}>

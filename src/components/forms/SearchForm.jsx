@@ -102,7 +102,9 @@ export default function SearchForm() {
       <form onSubmit={handleSubmit}>
         <div className="search-inputs">
           <div className="input-field">
-            <label htmlFor="fromLocation">Moving from</label>
+            <label htmlFor="fromLocation" className="no-wrap">
+              Moving from
+            </label>
             <input
               type="text"
               id="fromLocation"
@@ -114,25 +116,10 @@ export default function SearchForm() {
             />
           </div>
 
-          <div className="arrow-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
-          </div>
-
           <div className="input-field">
-            <label htmlFor="toLocation">Moving to</label>
+            <label htmlFor="toLocation" className="no-wrap">
+              Moving to
+            </label>
             <input
               type="text"
               id="toLocation"
@@ -146,35 +133,13 @@ export default function SearchForm() {
         </div>
 
         {!isAuthenticated && (
-          <div
-            className="auth-notice"
-            style={{
-              padding: "10px",
-              marginBottom: "15px",
-              backgroundColor: "#fff3cd",
-              border: "1px solid #ffeaa7",
-              borderRadius: "4px",
-              color: "#856404",
-            }}
-          >
-            Please log in to search for moving companies
-          </div>
+          <p className="error">Please log in to search for moving companies</p>
         )}
 
         {isAuthenticated && isCompany && (
-          <div
-            className="auth-notice"
-            style={{
-              padding: "10px",
-              marginBottom: "15px",
-              backgroundColor: "#f8d7da",
-              border: "1px solid #f5c6cb",
-              borderRadius: "4px",
-              color: "#721c24",
-            }}
-          >
+          <p className="error">
             Only customers can search for moving companies
-          </div>
+          </p>
         )}
 
         <button

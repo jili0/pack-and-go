@@ -39,18 +39,14 @@ app.prepare().then(() => {
 
   // Enhanced connection handling
   io.on("connection", (socket) => {
-    console.log("📡 Client connected:", socket.id, "Transport:", socket.conn.transport.name);
-    
     // Log transport upgrades
     socket.conn.on("upgrade", () => {
-      console.log("🔄 Transport upgraded to:", socket.conn.transport.name);
     });
 
     // ✅ User Registration
     socket.on("register-user", ({ accountId, role }) => {
-      console.log(`🧠 Registering user: ${accountId} as ${role}`);
-    
-      let roomName;
+      
+    let roomName;
       if (role === "company") {
         roomName = `company-${accountId}`;
       } else if (role === "admin") {
@@ -59,26 +55,17 @@ app.prepare().then(() => {
         roomName = `user-${accountId}`;
       }
     
-      socket.join(roomName);
-      console.log(`✅ User ${accountId} joined room(s) as ${role} in room: ${roomName}`);
-    
+      socket.join(roomName);  
       const currentSocketsInRoom = io.sockets.adapter.rooms.get(roomName);
       if (currentSocketsInRoom) {
-        console.log(`SERVER DEBUG: AFTER JOIN, Sockets in ${roomName} room:`, Array.from(currentSocketsInRoom));
       } else {
-        console.log(`SERVER DEBUG: AFTER JOIN, Room ${roomName} is empty or not yet created.`);
       }
     });
 
     // ✅ Order Created (Kunde stellt Anfrage) → COMPANY bekommt Benachrichtigung
     socket.on("order-created", async ({ orderId, companyId }) => {
-      console.log(`📦 Order created: ${orderId} for company: ${companyId}`);
-      console.log(`SERVER DEBUG: Received order-created event from socket ${socket.id}`);
-      console.log(`SERVER DEBUG: Target company for order-created notification: ${companyId}`);
-    
       const roomName = `company-${companyId}`;
       const companyRoomSockets = io.sockets.adapter.rooms.get(roomName);
-      console.log(`SERVER DEBUG: Sockets in ${roomName} room:`, companyRoomSockets ? Array.from(companyRoomSockets) : 'None'); 
       let notificationSentViaSocket = false;
 
       if (companyRoomSockets && companyRoomSockets.size > 0) {
@@ -89,7 +76,6 @@ app.prepare().then(() => {
           target: "company",
           timestamp: new Date().toISOString(),
         });
-        console.log(`SERVER: ✅ 'order-created' notification emitted to company room: ${companyId}`);
         notificationSentViaSocket = true;
       } else {
         console.warn(`SERVER WARNING: No sockets found in company room ${roomName}. Notification not sent via Socket.IO.`);
@@ -111,7 +97,6 @@ app.prepare().then(() => {
           });
           const data = await response.json();
           if (data.success) {
-            console.log("SERVER: ✅ Fallback notification (via API) sent successfully.");
           } else {
             console.error("SERVER: ❌ Fallback notification (via API) failed:", data.message);
           }
@@ -132,12 +117,7 @@ app.prepare().then(() => {
 
     // ✅ Order Confirmed
     socket.on("order-confirmed", ({ orderId, accountId }) => {
-      console.log(`✅ Order confirmed: ${orderId} for user: ${accountId}`);
-      console.log(`SERVER: Received order-confirmed from socket ${socket.id}`);
-      console.log(`SERVER: Target user for notification: ${accountId}`);
       const userRoomSockets = io.sockets.adapter.rooms.get(`user-${accountId}`);
-      console.log(`SERVER: Sockets in user-${accountId} room:`, userRoomSockets ? Array.from(userRoomSockets) : 'None');
-
       if (userRoomSockets && userRoomSockets.has(socket.id)) {
           console.warn(`SERVER WARNING: Sending socket ${socket.id} (Company) is unexpectedly in User room ${accountId}!`);
       }
@@ -161,8 +141,6 @@ app.prepare().then(() => {
 
     // ✅ Order Cancelled
     socket.on("order-cancelled", ({ orderId, accountId }) => {
-      console.log(`❌ Order cancelled: ${orderId} for user: ${accountId}`);
-
       io.to(`user-${accountId}`).emit("notification", {
         type: "order-cancelled",
         message: `Your booking was declined. (ID: ${orderId})`,
@@ -181,12 +159,8 @@ app.prepare().then(() => {
     });
     // ✅ Order User-Cancelled (Kunde bricht selbst ab)
 socket.on("order-user-cancelled", async ({ orderId, accountId, companyId }) => {
-  console.log(`🚫 User cancelled order: ${orderId} by user: ${accountId} for company: ${companyId}`);
-  
   const roomName = `company-${companyId}`;
   const companyRoomSockets = io.sockets.adapter.rooms.get(roomName);
-  console.log(`SERVER DEBUG: Notifying company ${companyId} about user cancellation`);
-  
   let notificationSentViaSocket = false;
 
   // Benachrichtigung an die Firma
@@ -199,7 +173,6 @@ socket.on("order-user-cancelled", async ({ orderId, accountId, companyId }) => {
       target: "company",
       timestamp: new Date().toISOString(),
     });
-    console.log(`SERVER: ✅ 'order-user-cancelled' notification sent to company: ${companyId}`);
     notificationSentViaSocket = true;
   } else {
     console.warn(`SERVER WARNING: No sockets found in company room ${roomName}`);
@@ -222,7 +195,6 @@ socket.on("order-user-cancelled", async ({ orderId, accountId, companyId }) => {
       });
       const data = await response.json();
       if (data.success) {
-        console.log("SERVER: ✅ Fallback notification sent successfully.");
       } else {
         console.error("SERVER: ❌ Fallback notification failed:", data.message);
       }
@@ -245,8 +217,6 @@ socket.on("order-user-cancelled", async ({ orderId, accountId, companyId }) => {
 
     // ✅ Review Submitted
     socket.on("review-submitted", ({ companyId, rating, orderId }) => {
-      console.log(`⭐ Review submitted for company: ${companyId} - ${rating}★`);
-
       io.to(`company-${companyId}`).emit("notification", {
         type: "review-submitted",
         message: `New review received (${rating}★)!`,
@@ -268,7 +238,6 @@ socket.on("order-user-cancelled", async ({ orderId, accountId, companyId }) => {
 
     // Enhanced disconnect handling
     socket.on("disconnect", (reason) => {
-      console.log("❌ Client disconnected:", socket.id, "Reason:", reason);
     });
 
     // Error handling
@@ -280,9 +249,6 @@ socket.on("order-user-cancelled", async ({ orderId, accountId, companyId }) => {
   // Enhanced server startup
   httpServer.listen(port, (err) => {
     if (err) throw err;
-    console.log(`🚀 Server ready on http://${hostname}:${port}`);
-    console.log(`📡 Socket.IO server running on path: /api/socket`);
-    console.log(`🔧 Allowed origins:`, allowedOrigins);
   });
 
   // Handle server errors
