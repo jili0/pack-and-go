@@ -23,16 +23,14 @@ export const createToken = (accountId, role) => {
 
 // Token in Cookie speichern
 export const setTokenCookie = (token) => {
-  const isProduction = process.env.NODE_ENV === "production";
-  
   cookies().set({
     name: "token",
     value: token,
     httpOnly: true,
     path: "/",
-    secure: isProduction,
+    secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 24 * 7, // 7 Tage
-    sameSite: isProduction ? "lax" : "strict", // ✅ Railway-kompatibel
+    sameSite: "strict",
   });
 };
 
