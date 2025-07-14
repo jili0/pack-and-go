@@ -162,6 +162,10 @@ form {
   display: none;
 }
 
+.no-wrap {
+  white-space: nowrap;
+}
+
 .form-container {
   background: #f8f9fa;
   padding: 2rem 10px;
@@ -359,7 +363,10 @@ section {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-end;
+  padding: 0 1rem 2rem 1rem;
+}
+
+.companies-img-animated:hover {
   animation: swingImg 2.2s cubic-bezier(0.4, 2, 0.6, 1) infinite alternate;
 }
 
@@ -370,7 +377,7 @@ section {
   object-fit: cover;
   border-radius: 1.5rem;
   box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.1);
-  transition: transform 0.4s cubic-bezier(0.4, 2, 0.6, 1);
+  transition: all 0.4s cubic-bezier(0.4, 2, 0.6, 1);
 }
 
 @keyframes swingImg {
@@ -445,8 +452,9 @@ section {
 /* Search Form */
 .search-inputs {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 1rem;
+  align-items: center;
   margin-bottom: 2rem;
 }
 
@@ -459,11 +467,6 @@ section {
   font-weight: 600;
   margin-bottom: 0.5rem;
   text-align: left;
-}
-
-.arrow-icon {
-  color: #666;
-  margin-top: 1.5rem;
 }
 
 .contact-info {
