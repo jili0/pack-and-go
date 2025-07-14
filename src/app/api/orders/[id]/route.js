@@ -1,157 +1,294 @@
-// app/api/orders/[id]/route.js - Vercel-Fix
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/db"; // ✅ Verwende die build-sichere DB-Connection
+import connectDB from "@/lib/db";
 import Order from "@/models/Order";
+import Company from "@/models/Company";
+import Account from "@/models/Account";
+import { getSession } from "@/lib/auth";
+import { sendOrderStatusUpdateEmail } from "@/lib/email";
 
-export async function GET(request, { params }) {
+// ---------------------- GET ----------------------
+export async function GET(request, context) {
   try {
-    // ✅ Sichere DB-Verbindung
-    const db = await connectDB();
-    if (!db) {
+    const { id } = await context.params;
+
+    const session = await getSession();
+
+    if (!session) {
       return NextResponse.json(
-        { success: false, message: "Database nicht verfügbar" },
-        { status: 503 }
+        { success: false, message: "Nicht autorisiert" },
+        { status: 401 }
       );
     }
 
-    // Await params in Next.js 15+
-    const { id } = await params;
+    await connectDB();
 
-    const order = await Order.findById(id)
-      .populate("accountId", "name email")
-      .populate("companyId", "name email");
+    const order = await Order.findById(id);
 
     if (!order) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Order not found",
-        },
+        { success: false, message: "Bestellung nicht gefunden" },
         { status: 404 }
       );
     }
 
-    // Add customer name for display
-    const orderData = {
-      ...order.toObject(),
-      customerName: order.accountId?.name || "Unknown Customer",
-    };
+    // ✅ Zugriffskontrolle
+    if (
+      (session.role === "user" && order.accountId.toString() !== session.id) ||
+      (session.role === "company" &&
+        order.companyAccountId?.toString() !== session.id)
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Keine Berechtigung" },
+        { status: 403 }
+      );
+    }
 
-    return NextResponse.json({
-      success: true,
-      order: orderData,
-    });
+    const company = await Company.findById(order.companyId).select(
+      "companyName email phone isKisteKlarCertified averageRating reviewsCount"
+    );
+    const account = await Account.findById(order.accountId).select(
+      "name email phone"
+    );
+
+    return NextResponse.json(
+      {
+        success: true,
+        order: {
+          ...order.toObject(),
+          companyName: company.companyName,
+          customerName: account.name,
+          customerEmail: account.email,
+          customerPhone: account.phone,
+        },
+        company,
+      },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error("Error fetching order:", error);
+    console.error("Fehler beim Abrufen der Bestelldetails:", error);
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to fetch order",
-        error: error.message
+        message: "Serverfehler beim Abrufen der Bestelldetails",
       },
       { status: 500 }
     );
   }
 }
 
-export async function PATCH(request, { params }) {
+// ---------------------- PUT ----------------------
+export async function PUT(request, { params }) {
   try {
-    // ✅ Sichere DB-Verbindung
-    const db = await connectDB();
-    if (!db) {
+    const { id } = params;
+    const session = await getSession();
+
+    if (!session) {
       return NextResponse.json(
-        { success: false, message: "Database nicht verfügbar" },
-        { status: 503 }
+        { success: false, message: "Nicht autorisiert" },
+        { status: 401 }
       );
     }
 
-    // Await params in Next.js 15+
-    const { id } = await params;
-    const body = await request.json();
+    await connectDB();
 
-    const order = await Order.findByIdAndUpdate(
-      id,
-      { ...body, updatedAt: new Date() },
-      { new: true }
-    )
-      .populate("accountId", "name email")
-      .populate("companyId", "name email");
+    const { status, confirmedDate, notes } = await request.json();
+    const order = await Order.findById(id);
 
     if (!order) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Order not found",
-        },
+        { success: false, message: "Bestellung nicht gefunden" },
         { status: 404 }
       );
     }
 
-    // Add customer name for display
-    const orderData = {
-      ...order.toObject(),
-      customerName: order.accountId?.name || "Unknown Customer",
-    };
+    // ✅ Zugriff prüfen
+    if (
+      (session.role === "user" && order.accountId.toString() !== session.id) ||
+      (session.role === "company" &&
+        order.companyAccountId?.toString() !== session.id)
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Keine Berechtigung" },
+        { status: 403 }
+      );
+    }
 
-    return NextResponse.json({
-      success: true,
-      order: orderData,
+    const updateData = {};
+    if (status) updateData.status = status;
+    if (status === "confirmed" && confirmedDate)
+      updateData.confirmedDate = confirmedDate;
+    if (notes) updateData.notes = notes;
+
+    const updatedOrder = await Order.findByIdAndUpdate(id, updateData, {
+      new: true,
     });
+
+    // ✅ E-Mail bei Statusänderung
+    if (status && status !== order.status) {
+      const account = await Account.findById(order.accountId);
+      const company = await Company.findById(order.companyId);
+
+      await sendOrderStatusUpdateEmail({
+        email: account.email,
+        name: account.name,
+        orderId: order._id,
+        oldStatus: order.status,
+        newStatus: status,
+        companyName: company.companyName,
+        fromCity: order.fromAddress.city,
+        toCity: order.toAddress.city,
+        confirmedDate: updatedOrder.confirmedDate,
+      });
+
+      // ✅ Direktes Socket.IO Event - KORRIGIERT
+      const io = globalThis.io;
+
+      if (io) {
+        const payload = {
+          orderId: order._id.toString(),
+          timestamp: new Date().toISOString(),
+        };
+
+        if (status === "confirmed") {
+          io.to(`user-${order.accountId}`).emit("notification", {
+            ...payload,
+            target: "user",
+            type: "order-confirmed",
+            message: `Your booking has been confirmed! (ID: ${order._id})`,
+          });
+
+          io.to("admin").emit("notification", {
+            ...payload,
+            target: "admin",
+            type: "order-confirmed",
+            message: `Booking confirmed: ${order._id} for user: ${order.accountId}`,
+          });
+
+          console.log("✅ Socket: Sent 'order-confirmed'");
+        }
+
+        if (status === "cancelled") {
+          // ✅ KORRIGIERT: Unterscheide zwischen Company-Cancellation und User-Cancellation
+          if (session.role === "company") {
+            // Company storniert → User benachrichtigen
+            io.to(`user-${order.accountId}`).emit("notification", {
+              ...payload,
+              target: "user",
+              type: "order-cancelled",
+              message: `Your booking was declined. (ID: ${order._id})`,
+            });
+            console.log("✅ Socket: Sent 'order-cancelled' (company declined)");
+          } else if (session.role === "user") {
+            // User storniert → Company benachrichtigen
+            io.to(`company-${order.companyAccountId}`).emit("notification", {
+              ...payload,
+              target: "company",
+              type: "order-user-cancelled",
+              message: `Customer cancelled their booking (ID: ${order._id})`,
+              accountId: order.accountId,
+            });
+            console.log("✅ Socket: Sent 'order-user-cancelled' (user cancelled)");
+          }
+          
+          // Admin bekommt immer eine Benachrichtigung
+          io.to("admin").emit("notification", {
+            ...payload,
+            target: "admin",
+            type: session.role === "company" ? "order-cancelled" : "order-user-cancelled",
+            message: `Booking cancelled: ${order._id} by ${session.role}`,
+            accountId: order.accountId,
+            companyId: order.companyId,
+          });
+        }
+      } else {
+        console.warn("⚠️ globalThis.io is not defined – no socket event sent.");
+      }
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Bestellung erfolgreich aktualisiert",
+        order: updatedOrder,
+      },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error("Error updating order:", error);
+    console.error("Fehler beim Aktualisieren der Bestellung:", error);
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to update order",
-        error: error.message
+        message: "Serverfehler beim Aktualisieren der Bestellung",
       },
       { status: 500 }
     );
   }
 }
-
-export async function DELETE(request, { params }) {
+// ---------------------- DELETE ----------------------
+export async function DELETE(request, context) {
   try {
-    // ✅ Sichere DB-Verbindung
-    const db = await connectDB();
-    if (!db) {
+    const { id } = await context.params;
+    const session = await getSession();
+
+    if (!session) {
       return NextResponse.json(
-        { success: false, message: "Database nicht verfügbar" },
-        { status: 503 }
+        { success: false, message: "Nicht autorisiert" },
+        { status: 401 }
       );
     }
 
-    // Await params in Next.js 15+
-    const { id } = await params;
+    await connectDB();
 
-    const order = await Order.findByIdAndDelete(id);
-
+    const order = await Order.findById(id);
     if (!order) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Order not found",
-        },
+        { success: false, message: "Bestellung nicht gefunden" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "Order deleted successfully",
-    });
+    // ✅ Zugriffskontrolle
+    let hasPermission = false;
+
+    if (session.role === "admin") {
+      hasPermission = true;
+    } else if (
+      session.role === "user" &&
+      order.accountId.toString() === session.id
+    ) {
+      hasPermission = true;
+    } else if (session.role === "company") {
+      const company = await Company.findOne({ accountId: session.id });
+      if (company && order.companyId.toString() === company._id.toString()) {
+        hasPermission = true;
+      }
+    }
+
+    if (!hasPermission) {
+      return NextResponse.json(
+        { success: false, message: "Keine Berechtigung" },
+        { status: 403 }
+      );
+    }
+
+    // ✅ Order löschen
+    await Order.findByIdAndDelete(id);
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Bestellung erfolgreich gelöscht",
+      },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error("Error deleting order:", error);
+    console.error("Fehler beim Löschen der Bestellung:", error);
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to delete order",
-        error: error.message
+        message: "Serverfehler beim Löschen der Bestellung",
       },
       { status: 500 }
     );
   }
 }
-
-// ✅ KRITISCH: Verhindert Pre-rendering beim Build
-export const dynamic = 'force-dynamic';

@@ -1,12 +1,19 @@
-// src/lib/db.js - Build-sicherer Mongoose Connection
+// src/lib/db.js
 import mongoose from 'mongoose';
 
-// ✅ Build-sichere Überprüfung - NUR warnen, nicht crashen
 const MONGODB_URI = process.env.MONGODB_URI;
 
+// Bessere Fehlerbehandlung für fehlende Umgebungsvariablen
 if (!MONGODB_URI) {
-  // ✅ Nur warnen, nicht den Build stoppen
-  console.warn('⚠️ MONGODB_URI nicht gefunden - Database wird zur Runtime initialisiert');
+  // Im Entwicklungsmodus nur warnen, nicht abstürzen
+  if (process.env.NODE_ENV === 'development') {
+    console.error('WARNUNG: Keine MONGODB_URI in der .env.local-Datei gefunden. Stelle sicher, dass die Datei existiert und die Variable korrekt ist.');
+    console.error('Für lokale Entwicklung, erstelle eine .env.local Datei mit:');
+    console.error('MONGODB_URI=mongodb://localhost:27017/pack-and-go');
+  } else {
+    // In Produktion ist es kritischer
+    throw new Error('MONGODB_URI Umgebungsvariable nicht gefunden. Bitte definieren Sie die MONGODB_URI-Umgebungsvariable in Ihrer .env.local-Datei');
+  }
 }
 
 /**
@@ -19,42 +26,34 @@ if (!cached) {
 }
 
 /**
- * Build-sichere Verbindung zur MongoDB-Datenbank
- * @returns {Promise<Mongoose>} - Eine Mongoose-Instanz oder null
+ * Stellt eine Verbindung zur MongoDB-Datenbank her
+ * @returns {Promise<Mongoose>} - Eine Mongoose-Instanz
  */
 async function connectDB() {
-  // ✅ Runtime-Check: Falls MONGODB_URI fehlt
-  if (!MONGODB_URI) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('Entwicklungsmodus: MONGODB_URI nicht gefunden, simuliere Datenbankverbindung.');
-      return { connection: { readyState: 1 } };
-    } else {
-      // ✅ Graceful handling in Produktion
-      console.error('❌ MONGODB_URI fehlt in Produktion');
-      return null;
-    }
+  // Wenn keine MONGODB_URI vorhanden ist und wir im Entwicklungsmodus sind,
+  // simulieren wir eine Verbindung für Tests
+  if (!MONGODB_URI && process.env.NODE_ENV === 'development') {
+    console.warn('Entwicklungsmodus: MONGODB_URI nicht gefunden, simuliere Datenbankverbindung.');
+    return { connection: { readyState: 1 } };
   }
 
-  // ✅ Bereits verbunden
   if (cached.conn) {
     return cached.conn;
   }
 
-  // ✅ Verbindung aufbauen
   if (!cached.promise) {
     const opts = {
-      // ✅ Deprecated Options entfernt
-      bufferCommands: false,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts)
       .then((mongoose) => {
-        console.log('✅ MongoDB-Verbindung hergestellt');
+        console.log('MongoDB-Verbindung hergestellt');
         return mongoose;
       })
       .catch((error) => {
-        console.error('❌ Fehler bei der MongoDB-Verbindung:', error);
-        cached.promise = null; // Reset bei Fehler
+        console.error('Fehler bei der MongoDB-Verbindung:', error);
         throw error;
       });
   }
@@ -63,15 +62,12 @@ async function connectDB() {
     cached.conn = await cached.promise;
     return cached.conn;
   } catch (error) {
-    // ✅ Graceful error handling
+    // Bei Verbindungsfehlern in der Entwicklung eine Warnung ausgeben
     if (process.env.NODE_ENV === 'development') {
-      console.error('❌ MongoDB-Verbindung fehlgeschlagen. Simuliere Verbindung für Entwicklung.');
+      console.error('Fehler bei der MongoDB-Verbindung. Simuliere Verbindung für Entwicklungszwecke.');
       return { connection: { readyState: 1 } };
     }
-    
-    // ✅ In Produktion null zurückgeben statt crashen
-    console.error('❌ MongoDB-Verbindung fehlgeschlagen:', error.message);
-    return null;
+    throw error;
   }
 }
 
