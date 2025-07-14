@@ -15,12 +15,14 @@ export default function Home() {
             </a>
           </div>
           <div className="hero-image">
+            <img src="/images/moving-planning.jpg" alt="Moving Planning" />
           </div>
         </div>
       </section>
 
       {/* Price Calculator */}
       <section id="pricing" className="container">
+        <h2>Calculate your moving price</h2>
         <MovingCalculator />
       </section>
 
