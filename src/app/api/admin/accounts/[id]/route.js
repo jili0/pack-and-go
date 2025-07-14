@@ -278,3 +278,4 @@ export async function DELETE(request, { params }) {
     );
   }
 }
+export const dynamic = 'force-dynamic';

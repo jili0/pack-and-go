@@ -46,3 +46,4 @@ export async function POST(request) {
     }, { status: 500 });
   }
 }
+export const dynamic = 'force-dynamic';
