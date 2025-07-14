@@ -1,22 +1,14 @@
-// src/app/api/auth/register/route.js - Build-sicher
+// src/app/api/auth/register/route.js
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Account from "@/models/Account";
 import { createToken, setTokenCookie } from "@/lib/auth";
-// ✅ Email Import komplett entfernt
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(request) {
   try {
     console.log("=== REGISTER REQUEST START ===");
-    
-    // ✅ Sichere DB-Verbindung
-    const db = await connectDB();
-    if (!db) {
-      return NextResponse.json(
-        { success: false, message: "Database nicht verfügbar" },
-        { status: 503 }
-      );
-    }
+    await connectDB();
     console.log("✓ Database connected");
 
     let requestData;
@@ -91,7 +83,7 @@ export async function POST(request) {
       }
     } catch (error) {
       console.error("Fehler bei der Benutzerüberprüfung:", error);
-      // ✅ Bei DB-Fehler trotzdem weitermachen (für Demo-Zwecke)
+      // Fehler bei der Benutzerüberprüfung ignorieren, da möglicherweise keine DB-Verbindung besteht
     }
 
     // Zulässige Rollen beschränken
@@ -140,8 +132,13 @@ export async function POST(request) {
       );
     }
 
-    // ✅ Email-Code komplett entfernt - stattdessen nur Log
-    console.log(`📧 Welcome email würde gesendet an: ${email} (${name})`);
+    // Willkommens-E-Mail senden (optional - könnte fehlschlagen)
+    try {
+      await sendWelcomeEmail(email, name);
+    } catch (emailError) {
+      console.error("Fehler beim Senden der Willkommens-E-Mail:", emailError);
+      // Wir wollen nicht die Registrierung abbrechen, wenn die E-Mail nicht gesendet werden kann
+    }
 
     // JWT-Token erstellen
     const token = createToken(newAccount._id, newAccount.role);
@@ -182,6 +179,3 @@ export async function POST(request) {
     );
   }
 }
-
-// ✅ WICHTIG: Verhindert Pre-rendering beim Build
-export const dynamic = 'force-dynamic';
