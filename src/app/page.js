@@ -22,7 +22,7 @@ export default function Home() {
 
       {/* Price Calculator */}
       <section id="pricing" className="container">
-        <h2>Calculate your moving price</h2>
+      
         <MovingCalculator />
       </section>
 
