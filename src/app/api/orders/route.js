@@ -4,10 +4,11 @@ import Order from "@/models/Order";
 import Company from "@/models/Company";
 import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
-import {
-  sendOrderConfirmationEmail,
-  sendNewOrderNotificationEmail,
-} from "@/lib/email";
+// ✅ Email Imports optional machen
+// import {
+//   sendOrderConfirmationEmail,
+//   sendNewOrderNotificationEmail,
+// } from "@/lib/email";
 
 // 📥 GET: Alle Bestellungen basierend auf Rolle
 export async function GET(request) {
@@ -21,7 +22,14 @@ export async function GET(request) {
       );
     }
 
-    await connectDB();
+    // ✅ Sichere DB-Verbindung
+    const db = await connectDB();
+    if (!db) {
+      return NextResponse.json(
+        { success: false, message: "Database nicht verfügbar" },
+        { status: 503 }
+      );
+    }
 
     let query = {};
 
@@ -46,7 +54,7 @@ export async function GET(request) {
   } catch (error) {
     console.error("Fehler beim Abrufen der Bestellungen:", error);
     return NextResponse.json(
-      { success: false, message: "Serverfehler beim Abrufen der Bestellungen" },
+      { success: false, message: "Serverfehler beim Abrufen der Bestellungen", error: error.message },
       { status: 500 }
     );
   }
@@ -60,7 +68,14 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: "Nicht autorisiert" }, { status: 401 });
     }
 
-    await connectDB();
+    // ✅ Sichere DB-Verbindung
+    const db = await connectDB();
+    if (!db) {
+      return NextResponse.json(
+        { success: false, message: "Database nicht verfügbar" },
+        { status: 503 }
+      );
+    }
 
     const {
       companyId,
@@ -114,40 +129,46 @@ export async function POST(request) {
 
     const account = await Account.findById(session.id);
 
-    // E-Mails
-    await sendOrderConfirmationEmail({
-      email: account.email,
-      name: account.name,
-      orderId: newOrder._id,
-      companyName: company.companyName,
-      fromCity: fromAddress.city,
-      toCity: toAddress.city,
-      preferredDate: preferredDates[0],
-      totalPrice,
-    });
+    // ✅ E-Mails optional (für Vercel Demo)
+    try {
+      // await sendOrderConfirmationEmail({
+      //   email: account.email,
+      //   name: account.name,
+      //   orderId: newOrder._id,
+      //   companyName: company.companyName,
+      //   fromCity: fromAddress.city,
+      //   toCity: toAddress.city,
+      //   preferredDate: preferredDates[0],
+      //   totalPrice,
+      // });
 
-    await sendNewOrderNotificationEmail({
-      email: company.email,
-      companyName: company.companyName,
-      orderDetails: {
-        id: newOrder._id,
-        customerName: account.name,
-        customerEmail: account.email,
-        customerPhone: account.phone,
-        fromAddress,
-        toAddress,
-        preferredDates,
-        helpersCount,
-        estimatedHours,
-        totalPrice,
-        notes,
-      },
-    });
+      // await sendNewOrderNotificationEmail({
+      //   email: company.email,
+      //   companyName: company.companyName,
+      //   orderDetails: {
+      //     id: newOrder._id,
+      //     customerName: account.name,
+      //     customerEmail: account.email,
+      //     customerPhone: account.phone,
+      //     fromAddress,
+      //     toAddress,
+      //     preferredDates,
+      //     helpersCount,
+      //     estimatedHours,
+      //     totalPrice,
+      //     notes,
+      //   },
+      // });
 
-    // Socket
+      console.log(`📧 Demo: Emails würden gesendet an ${account.email} und ${company.email}`);
+    } catch (emailError) {
+      console.warn('⚠️ Email sending failed (demo mode):', emailError);
+    }
+
+    // ✅ Socket optional (für Vercel Demo)
     try {
       const socketResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/api/socket/emit`,
+        `${process.env.NEXT_PUBLIC_URL || 'https://pack-and-go-liard.vercel.app'}/api/socket/emit`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -167,7 +188,7 @@ export async function POST(request) {
         console.warn('⚠️ Failed to emit socket event order-created');
       }
     } catch (socketError) {
-      console.error('❌ Error emitting socket event:', socketError);
+      console.warn('⚠️ Socket event failed (demo mode):', socketError);
     }
 
     return NextResponse.json(
@@ -177,8 +198,11 @@ export async function POST(request) {
   } catch (error) {
     console.error("Fehler beim Erstellen der Bestellung:", error);
     return NextResponse.json(
-      { success: false, message: "Serverfehler beim Erstellen der Bestellung" },
+      { success: false, message: "Serverfehler beim Erstellen der Bestellung", error: error.message },
       { status: 500 }
     );
   }
 }
+
+// ✅ KRITISCH: Verhindert Pre-rendering beim Build
+export const dynamic = 'force-dynamic';
