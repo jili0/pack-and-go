@@ -374,20 +374,6 @@ const OrderDetails = () => {
           </div>
         </div>
       )}
-
-      {/* Debug Info (Development Only) */}
-      {process.env.NODE_ENV === 'development' && (
-        <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
-          <h4>Debug Info:</h4>
-          <div style={{ fontSize: '12px', color: '#666' }}>
-            <p>User Account ID: {order?.accountId || 'Not found'}</p>
-            <p>Company Account ID: {company?.accountId || 'Not found'}</p>
-            <p>Order ID: {orderId}</p>
-            <p>Order Status: {order?.status}</p>
-            <p>Refresh Trigger: {refreshTrigger}</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
