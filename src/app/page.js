@@ -15,7 +15,6 @@ export default function Home() {
             </a>
           </div>
           <div className="hero-image">
-            <img src="/images/moving-planning.jpg" alt="Moving Planning" />
           </div>
         </div>
       </section>

@@ -11,13 +11,13 @@ const Footer = () => {
         <div className="footer-description">
           <Link href="/" className="footer-logo">
             <Image
-              src="/images/logo-transparent.png"
+              src="/images/logo.png"
               alt="Pack & Go Logo"
               fill
               className="object-contain"
             />
           </Link>
-          <p>
+          <p className="blue">
             Pack & Go offers a simple and transparent solution for moving
             services with clear pricing and verified quality.
           </p>
@@ -110,7 +110,7 @@ const Footer = () => {
 
       {/* Copyright */}
       <div className="footer-copyright">
-        <p>&copy; {currentYear} Pack & Go. All Rights Reserved.</p>
+        <p className="blue">&copy; {currentYear} Pack & Go. All Rights Reserved.</p>
       </div>
     </footer>
   );
