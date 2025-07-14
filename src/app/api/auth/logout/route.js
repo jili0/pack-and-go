@@ -19,4 +19,3 @@ export async function POST() {
   
   return response;
 }
-export const dynamic = 'force-dynamic';

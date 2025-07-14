@@ -182,4 +182,3 @@ export async function POST(request) {
     );
   }
 }
-export const dynamic = 'force-dynamic';

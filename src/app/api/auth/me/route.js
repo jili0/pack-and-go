@@ -64,4 +64,3 @@ export async function HEAD() {
 
   return new Response(null, { status: 200 });
 }
-export const dynamic = 'force-dynamic';
