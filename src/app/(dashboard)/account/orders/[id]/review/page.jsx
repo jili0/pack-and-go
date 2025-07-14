@@ -9,9 +9,9 @@ import Loader from "@/components/ui/Loader";
 export default function ReviewPage() {
   const router = useRouter();
   const params = useParams();
-  const { account, initialCheckDone } = useAuth(); 
-  const orderLoading = useLoading('api', 'reviewOrder');
-  const submitLoading = useLoading('api', 'submitReview');
+  const { account, initialCheckDone } = useAuth();
+  const orderLoading = useLoading("api", "reviewOrder");
+  const submitLoading = useLoading("api", "submitReview");
   const orderId = params.id;
 
   const [order, setOrder] = useState(null);
@@ -20,7 +20,7 @@ export default function ReviewPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!initialCheckDone) return; 
+    if (!initialCheckDone) return;
     if (!account) {
       router.push("/login");
       return;
@@ -90,7 +90,7 @@ export default function ReviewPage() {
     }
   };
 
-  if (!initialCheckDone || orderLoading.isLoading) { 
+  if (!initialCheckDone || orderLoading.isLoading) {
     return (
       <div className="container">
         <Loader text="Loading..." />
@@ -159,19 +159,19 @@ export default function ReviewPage() {
 
       <div className="form-actions">
         <button
+          type="button"
+          onClick={() => router.push("/account")}
+          className="btn-primary"
+        >
+          Cancel
+        </button>
+        <button
           type="submit"
           disabled={submitLoading.isLoading || rating === 0}
           className="btn-primary"
           onClick={handleSubmit}
         >
           {submitLoading.isLoading ? "Submitting..." : "Submit Review"}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.push("/account")}
-          className="btn-primary"
-        >
-          Cancel
         </button>
       </div>
     </form>
