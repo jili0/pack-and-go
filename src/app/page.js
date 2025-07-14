@@ -22,13 +22,12 @@ export default function Home() {
 
       {/* Price Calculator */}
       <section id="pricing" className="container">
-      
         <MovingCalculator />
       </section>
 
       {/* Search Section */}
-      <section id="companies" className="container companies-section-with-img">
-        <div className="companies-content">
+      <section id="companies" className="container search-section-container">
+        <div className="search-section">
           <h2>Find moving companies</h2>
           <p>
             Enter your moving route to discover the best moving companies in
@@ -36,7 +35,7 @@ export default function Home() {
           </p>
           <SearchForm />
         </div>
-        <div className="companies-img-animated">
+        <div className="search-section-img">
           <img src="/images/img1.png" alt="Moving" />
         </div>
       </section>
@@ -46,7 +45,8 @@ export default function Home() {
         <div className="container">
           <h2>Contact Information</h2>
           <p>
-            Get in touch with us through any of these channels. We&apos;re always ready to help!
+            Get in touch with us through any of these channels. We&apos;re
+            always ready to help!
           </p>
 
           <div className="contact-info">

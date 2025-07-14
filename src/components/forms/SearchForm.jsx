@@ -133,35 +133,13 @@ export default function SearchForm() {
         </div>
 
         {!isAuthenticated && (
-          <div
-            className="auth-notice"
-            style={{
-              padding: "10px",
-              marginBottom: "15px",
-              backgroundColor: "#fff3cd",
-              border: "1px solid #ffeaa7",
-              borderRadius: "4px",
-              color: "#856404",
-            }}
-          >
-            Please log in to search for moving companies
-          </div>
+          <p className="error">Please log in to search for moving companies</p>
         )}
 
         {isAuthenticated && isCompany && (
-          <div
-            className="auth-notice"
-            style={{
-              padding: "10px",
-              marginBottom: "15px",
-              backgroundColor: "#f8d7da",
-              border: "1px solid #f5c6cb",
-              borderRadius: "4px",
-              color: "#721c24",
-            }}
-          >
+          <p className="error">
             Only customers can search for moving companies
-          </div>
+          </p>
         )}
 
         <button

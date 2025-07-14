@@ -337,78 +337,6 @@ section {
   display: none;
 }
 
-.companies-section-with-img {
-  display: flex;
-  align-items: stretch;
-  justify-content: space-between;
-  gap: 2rem;
-  padding: 3.5rem 2rem;
-  min-height: 500px;
-}
-
-.companies-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-.companies-content h2,
-.companies-content p {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.companies-img-animated {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 1rem 2rem 1rem;
-}
-
-.companies-img-animated:hover {
-  animation: swingImg 2.2s cubic-bezier(0.4, 2, 0.6, 1) infinite alternate;
-}
-
-.companies-img-animated img {
-  width: 100%;
-  max-width: 400px;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.1);
-  transition: all 0.4s cubic-bezier(0.4, 2, 0.6, 1);
-}
-
-@keyframes swingImg {
-  0% {
-    transform: rotate(-2deg) scale(1);
-  }
-  50% {
-    transform: rotate(2deg) scale(1.03);
-  }
-  100% {
-    transform: rotate(-2deg) scale(1);
-  }
-}
-
-@media (max-width: 900px) {
-  .companies-section-with-img {
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 2rem 0.5rem;
-    min-height: unset;
-  }
-  .companies-img-animated {
-    justify-content: center;
-    align-items: center;
-  }
-  .companies-content {
-    align-items: center;
-    text-align: center;
-  }
-}
-
 /* Price Calculator */
 .row {
   display: flex;
@@ -449,7 +377,7 @@ section {
   color: #007bff;
 }
 
-/* Search Form */
+/* SearchForm */
 .search-inputs {
   display: flex;
   flex-direction: column;
@@ -459,7 +387,7 @@ section {
 }
 
 .input-field {
-  flex: 1;
+  width: 100%;
 }
 
 .input-field label {
@@ -532,6 +460,51 @@ section {
 
 .social-icons a:hover {
   background: #0056b3;
+}
+
+.search-section-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.search-section {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.search-section-img {
+  padding: 1rem 0 2.5rem;
+}
+
+.search-section-img:hover {
+  animation: swingImg 2.2s cubic-bezier(0.4, 2, 0.6, 1) infinite alternate;
+}
+
+.search-section-img img {
+  width: 100%;
+  max-width: 400px;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 2, 0.6, 1);
+}
+
+@keyframes swingImg {
+  0% {
+    transform: rotate(-2deg) scale(1);
+  }
+  50% {
+    transform: rotate(2deg) scale(1.03);
+  }
+  100% {
+    transform: rotate(-2deg) scale(1);
+  }
 }
 
 /* SearchResults */
@@ -1082,6 +1055,10 @@ footer a:hover {
 @media (min-width: 640px) {
   .mobile-hide {
     display: inline-block;
+  }
+
+  .search-section-container {
+    flex-direction: row;
   }
 
   footer > .container {
