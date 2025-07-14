@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
 /* Reset */
 * {
   margin: 0;
@@ -10,7 +12,7 @@ html {
 }
 
 body {
-  font-family: system-ui, sans-serif;
+  font-family: 'Noto Sans', 'Lora', system-ui, sans-serif;
   line-height: 1.6;
   color: #333;
   text-align: center;
@@ -29,6 +31,7 @@ h1,
 h2,
 h3 {
   margin-bottom: clamp(12px, 2vw, 18px);
+  color:  rgb(2, 2, 43);
 }
 
 h1 {
@@ -215,7 +218,7 @@ form {
 
 /* Header Styles */
 header {
-  background: #fff;
+  background: #fcfafa;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 0;
@@ -296,8 +299,8 @@ section {
 }
 
 .hero {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, #21318ca3 0%, #6655788b 100%);
+  color: rgb(2, 2, 43);
   padding-bottom: clamp(20px, 15vw, 100px);
 }
 
@@ -314,6 +317,18 @@ section {
 }
 
 /* Price Calculator */
+
+.calculator {
+  background: rgba(255, 255, 255, 0.251);
+  padding: 2rem;
+  border-radius: 8px;
+  
+}
+.form-container {
+  background:rgba(255, 255, 255, 0.7);
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 .row {
   display: flex;
   justify-content: space-between;
@@ -974,5 +989,67 @@ footer a:hover {
   .footer-description {
     order: 0;
     grid-column: auto;
+  }
+}
+
+#contact.container {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.07);
+  padding: 2rem 1.5rem;
+}
+
+/* Companies Section with Image */
+.companies-section-with-img {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.companies-content, .companies-img-animated {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.companies-content {
+  text-align: left;
+  justify-content: center;
+}
+
+.companies-img-animated {
+  align-items: center;
+  justify-content: center;
+  animation: swingImg 2.2s cubic-bezier(.4,2,.6,1) infinite alternate;
+}
+
+.companies-img-animated img {
+  width: 100%;
+  max-width: 400px;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.10);
+  transition: transform 0.4s cubic-bezier(.4,2,.6,1);
+}
+
+@keyframes swingImg {
+  0% { transform: rotate(-2deg) scale(1); }
+  50% { transform: rotate(2deg) scale(1.03); }
+  100% { transform: rotate(-2deg) scale(1); }
+}
+
+@media (max-width: 900px) {
+  .companies-section-with-img {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .companies-img-animated {
+    justify-content: center;
+  }
+  .companies-content {
+    text-align: center;
   }
 }

@@ -8,6 +8,7 @@ import SocketManager from "@/components/SocketManager";
 import Widget from "@/components/ui/Widget";
 
 import "@/app/styles/styles.css";
+import "@/app/styles/main-bg.css"; // Import the new background CSS for the main background image
 
 export const metadata = {
   title: "Pack & Go - Move easily with transparent pricing",
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
               <NotificationProvider>
                 <SocketManager />
                 <Header />
+                <div className="main-bg" />
                 <main>{children}</main>
                 <Widget />
                 <Footer />
