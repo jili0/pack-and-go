@@ -11,7 +11,7 @@ const Footer = () => {
         <div className="footer-description">
           <Link href="/" className="footer-logo">
             <Image
-              src="/images/logo.png"
+              src="/images/logo-transparent.png"
               alt="Pack & Go Logo"
               fill
               className="object-contain"
