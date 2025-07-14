@@ -605,6 +605,31 @@ section {
   margin: 1rem 0;
 }
 
+/* CompanyReviewsPage */
+
+.review-card {
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background: white;
+  text-align: left;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  gap: 1rem;
+}
+
+.review-comment {
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
 /* Footer */
 footer {
   background: #333;
