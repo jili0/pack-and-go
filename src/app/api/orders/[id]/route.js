@@ -4,7 +4,8 @@ import Order from "@/models/Order";
 import Company from "@/models/Company";
 import Account from "@/models/Account";
 import { getSession } from "@/lib/auth";
-import { sendOrderStatusUpdateEmail } from "@/lib/email";
+// ✅ Email Import optional machen
+// import { sendOrderStatusUpdateEmail } from "@/lib/email";
 
 // ---------------------- GET ----------------------
 export async function GET(request, context) {
@@ -20,7 +21,14 @@ export async function GET(request, context) {
       );
     }
 
-    await connectDB();
+    // ✅ Sichere DB-Verbindung
+    const db = await connectDB();
+    if (!db) {
+      return NextResponse.json(
+        { success: false, message: "Database nicht verfügbar" },
+        { status: 503 }
+      );
+    }
 
     const order = await Order.findById(id);
 
@@ -70,6 +78,7 @@ export async function GET(request, context) {
       {
         success: false,
         message: "Serverfehler beim Abrufen der Bestelldetails",
+        error: error.message
       },
       { status: 500 }
     );
@@ -89,7 +98,14 @@ export async function PUT(request, { params }) {
       );
     }
 
-    await connectDB();
+    // ✅ Sichere DB-Verbindung
+    const db = await connectDB();
+    if (!db) {
+      return NextResponse.json(
+        { success: false, message: "Database nicht verfügbar" },
+        { status: 503 }
+      );
+    }
 
     const { status, confirmedDate, notes } = await request.json();
     const order = await Order.findById(id);
@@ -123,85 +139,55 @@ export async function PUT(request, { params }) {
       new: true,
     });
 
-    // ✅ E-Mail bei Statusänderung
+    // ✅ E-Mail bei Statusänderung (optional für Demo)
     if (status && status !== order.status) {
-      const account = await Account.findById(order.accountId);
-      const company = await Company.findById(order.companyId);
+      try {
+        const account = await Account.findById(order.accountId);
+        const company = await Company.findById(order.companyId);
 
-      await sendOrderStatusUpdateEmail({
-        email: account.email,
-        name: account.name,
-        orderId: order._id,
-        oldStatus: order.status,
-        newStatus: status,
-        companyName: company.companyName,
-        fromCity: order.fromAddress.city,
-        toCity: order.toAddress.city,
-        confirmedDate: updatedOrder.confirmedDate,
-      });
+        // await sendOrderStatusUpdateEmail({
+        //   email: account.email,
+        //   name: account.name,
+        //   orderId: order._id,
+        //   oldStatus: order.status,
+        //   newStatus: status,
+        //   companyName: company.companyName,
+        //   fromCity: order.fromAddress.city,
+        //   toCity: order.toAddress.city,
+        //   confirmedDate: updatedOrder.confirmedDate,
+        // });
 
-      // ✅ Direktes Socket.IO Event - KORRIGIERT
-      const io = globalThis.io;
+        console.log(`📧 Demo: Status update email würde gesendet an ${account.email}`);
+      } catch (emailError) {
+        console.warn('⚠️ Email sending failed (demo mode):', emailError);
+      }
 
-      if (io) {
-        const payload = {
-          orderId: order._id.toString(),
-          timestamp: new Date().toISOString(),
-        };
-
-        if (status === "confirmed") {
-          io.to(`user-${order.accountId}`).emit("notification", {
-            ...payload,
-            target: "user",
-            type: "order-confirmed",
-            message: `Your booking has been confirmed! (ID: ${order._id})`,
-          });
-
-          io.to("admin").emit("notification", {
-            ...payload,
-            target: "admin",
-            type: "order-confirmed",
-            message: `Booking confirmed: ${order._id} for user: ${order.accountId}`,
-          });
-
-          console.log("✅ Socket: Sent 'order-confirmed'");
-        }
-
-        if (status === "cancelled") {
-          // ✅ KORRIGIERT: Unterscheide zwischen Company-Cancellation und User-Cancellation
-          if (session.role === "company") {
-            // Company storniert → User benachrichtigen
-            io.to(`user-${order.accountId}`).emit("notification", {
-              ...payload,
-              target: "user",
-              type: "order-cancelled",
-              message: `Your booking was declined. (ID: ${order._id})`,
-            });
-            console.log("✅ Socket: Sent 'order-cancelled' (company declined)");
-          } else if (session.role === "user") {
-            // User storniert → Company benachrichtigen
-            io.to(`company-${order.companyAccountId}`).emit("notification", {
-              ...payload,
-              target: "company",
-              type: "order-user-cancelled",
-              message: `Customer cancelled their booking (ID: ${order._id})`,
-              accountId: order.accountId,
-            });
-            console.log("✅ Socket: Sent 'order-user-cancelled' (user cancelled)");
+      // ✅ Socket.IO Event (optional für Vercel)
+      try {
+        const socketResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_URL || 'https://pack-and-go-liard.vercel.app'}/api/socket/emit`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              event: status === "confirmed" ? 'order-confirmed' : 
+                     status === "cancelled" ? 'order-cancelled' : 'order-updated',
+              data: {
+                orderId: order._id.toString(),
+                accountId: order.accountId.toString(),
+                companyId: order.companyId.toString(),
+              },
+            }),
           }
-          
-          // Admin bekommt immer eine Benachrichtigung
-          io.to("admin").emit("notification", {
-            ...payload,
-            target: "admin",
-            type: session.role === "company" ? "order-cancelled" : "order-user-cancelled",
-            message: `Booking cancelled: ${order._id} by ${session.role}`,
-            accountId: order.accountId,
-            companyId: order.companyId,
-          });
+        );
+
+        if (socketResponse.ok) {
+          console.log(`✅ Socket event ${status} emitted successfully`);
+        } else {
+          console.warn(`⚠️ Failed to emit socket event ${status}`);
         }
-      } else {
-        console.warn("⚠️ globalThis.io is not defined – no socket event sent.");
+      } catch (socketError) {
+        console.warn('⚠️ Socket event failed (demo mode):', socketError);
       }
     }
 
@@ -219,11 +205,13 @@ export async function PUT(request, { params }) {
       {
         success: false,
         message: "Serverfehler beim Aktualisieren der Bestellung",
+        error: error.message
       },
       { status: 500 }
     );
   }
 }
+
 // ---------------------- DELETE ----------------------
 export async function DELETE(request, context) {
   try {
@@ -237,7 +225,14 @@ export async function DELETE(request, context) {
       );
     }
 
-    await connectDB();
+    // ✅ Sichere DB-Verbindung
+    const db = await connectDB();
+    if (!db) {
+      return NextResponse.json(
+        { success: false, message: "Database nicht verfügbar" },
+        { status: 503 }
+      );
+    }
 
     const order = await Order.findById(id);
     if (!order) {
@@ -287,8 +282,12 @@ export async function DELETE(request, context) {
       {
         success: false,
         message: "Serverfehler beim Löschen der Bestellung",
+        error: error.message
       },
       { status: 500 }
     );
   }
 }
+
+// ✅ KRITISCH: Verhindert Pre-rendering beim Build
+export const dynamic = 'force-dynamic';
