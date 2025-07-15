@@ -1,5 +1,4 @@
-// components/NotificationButton.jsx (FINAL & CORRECTED with Read Status + Clickable)
-'use client'
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -9,369 +8,197 @@ export default function NotificationButton({ account }) {
   const router = useRouter();
   const { notifications, clearNotifications, removeNotification } = useSocket();
   const [isOpen, setIsOpen] = useState(false);
-  const [testNotifications, setTestNotifications] = useState([]);
-  const [localNotifications, setLocalNotifications] = useState([]);
+  const [readIds, setReadIds] = useState(new Set());
 
-  // Kombiniere alle Benachrichtigungen
-  const allNotifications = [...notifications, ...testNotifications];
+  const filteredNotifications = notifications.filter((notification) => {
+    const { type, target } = notification;
 
-  // Synchronisiere mit lokalen Benachrichtigungen (für Read-Status)  
-  useEffect(() => {
-    // Verwende JSON.stringify für tiefe Vergleiche
-    const currentIds = allNotifications.map(n => `${n.type}-${n.orderId}-${n.timestamp}`);
-    const localIds = localNotifications.map(n => `${n.type}-${n.orderId}-${n.timestamp}`);
-    
-    const hasNewNotifications = currentIds.some(id => !localIds.includes(id));
-    
-    if (hasNewNotifications) {
-      setLocalNotifications(prev => {
-        const newNotifications = allNotifications.filter(notification => 
-          !prev.some(local => 
-            local.type === notification.type && 
-            local.orderId === notification.orderId &&
-            local.timestamp === notification.timestamp
-          )
-        );
-        
-        return [
-          ...prev,
-          ...newNotifications.map(n => ({ ...n, read: false }))
-        ];
-      });
-    }
-  }, [allNotifications.length, notifications.length]); // ✅ Stable dependencies
-
-  // Wenn Dropdown geöffnet wird, markiere alle als gelesen
-  const handleDropdownOpen = () => {
-    setIsOpen(!isOpen);
-    
-    if (!isOpen) {
-      // Markiere alle als gelesen nach kurzer Verzögerung
-      setTimeout(() => {
-        setLocalNotifications(prev => 
-          prev.map(notification => ({ ...notification, read: true }))
-        );
-      }, 1000); // 1 Sekunde Verzögerung
-    }
-  };
-
-  // ✅ UPDATED filtering logic
-  const getFilteredNotifications = () => {
-    if (!account?.role) {
-      console.log('🚫 No account role, showing no notifications');
-      return [];
-    }
-
-    const filtered = localNotifications.filter((notification) => {
-      const { type, target } = notification;
-
-      if (target) {
-        switch (account.role) {
-          case 'user':
-            return target === 'user' || target === 'all';
-          case 'company':
-            return target === 'company' || target === 'all';
-          case 'admin':
-            return true;
-          default:
-            return false;
-        }
-      }
-
-      switch (account.role) {
-        case 'user':
-          return ['order-confirmed', 'order-cancelled'].includes(type);
-        case 'company':
-          return ['order-created', 'order-user-cancelled', 'review-submitted'].includes(type);
-        case 'admin':
+    if (target) {
+      switch (account?.role) {
+        case "user":
+          return target === "user" || target === "all";
+        case "company":
+          return target === "company" || target === "all";
+        case "admin":
           return true;
         default:
           return false;
       }
-    });
-
-    console.log(`🔍 Filtered notifications: ${filtered.length}/${localNotifications.length} for role: ${account.role}`);
-    return filtered;
-  };
-
-  const filteredNotifications = getFilteredNotifications();
-
-  // Badge nur für ungelesene Benachrichtigungen anzeigen
-  const unreadCount = filteredNotifications.filter(n => !n.read).length;
-
-  console.log("🧪 [TEST] Incoming notifications:", allNotifications);
-  console.log("🧪 [TEST] Filtered notifications:", filteredNotifications);
-  console.log("🧪 [TEST] Unread count:", unreadCount);
-
-  const deleteNotification = (indexToDelete) => {
-    const notificationToDelete = filteredNotifications[indexToDelete];
-    
-    // Entferne aus lokalen Benachrichtigungen
-    setLocalNotifications(prev => prev.filter(n =>
-      !(n.type === notificationToDelete.type &&
-        n.orderId === notificationToDelete.orderId &&
-        n.timestamp === notificationToDelete.timestamp)
-    ));
-
-    // Entferne aus globalen Benachrichtigungen
-    const actualIndex = notifications.findIndex(n =>
-      n.type === notificationToDelete.type &&
-      n.orderId === notificationToDelete.orderId &&
-      n.timestamp === notificationToDelete.timestamp
-    );
-
-    if (actualIndex !== -1) {
-      removeNotification(actualIndex);
     }
-  };
 
-  const clearAllNotifications = () => {
-    setLocalNotifications([]);
-    clearNotifications();
-    setIsOpen(false);
-  };
-
-  // ✅ Handle notification click for navigation
-  const handleNotificationClick = (notification, index) => {
-    const { type, orderId, companyId } = notification;
-    
-    console.log('🔗 Notification clicked:', { type, orderId, companyId, role: account?.role });
-    
-    // Navigate based on notification type and user role
-    switch (type) {
-      case 'order-created':
-      case 'newBookingRequest':
-        // Company: Zur Company Dashboard mit direkter Order-Navigation
-        if (account?.role === 'company') {
-          router.push(`/company#order-${orderId}`);
-        }
-        break;
-        
-      case 'order-confirmed':
-      case 'bookingConfirmed':
-        // User: Zur Order-Details  
-        if (account?.role === 'user') {
-          router.push(`/account/orders/${orderId}`);
-        }
-        break;
-        
-      case 'order-cancelled':
-      case 'bookingCancelled':
-        // User: Zur Order-Details
-        if (account?.role === 'user') {
-          router.push(`/account/orders/${orderId}`);
-        }
-        break;
-        
-      case 'order-user-cancelled':
-        // Company: Zur Company Dashboard mit direkter Order-Navigation
-        if (account?.role === 'company') {
-          router.push(`/company#order-${orderId}`);
-        }
-        break;
-        
-      case 'review-submitted':
-        // Company: Zu Reviews
-        if (account?.role === 'company') {
-          router.push(`/company/reviews`);
-        }
-        break;
-        
+    switch (account?.role) {
+      case "user":
+        return ["order-confirmed", "order-cancelled"].includes(type);
+      case "company":
+        return [
+          "order-created",
+          "order-user-cancelled",
+          "review-submitted",
+        ].includes(type);
+      case "admin":
+        return true;
       default:
-        console.log('No navigation defined for notification type:', type);
-        return; // Don't close dropdown if no navigation
+        return false;
     }
-    
-    // Mark as read and close dropdown
-    deleteNotification(index);
-    setIsOpen(false);
+  });
+
+  const unreadCount = filteredNotifications.filter(
+    (n) => !readIds.has(`${n.type}-${n.orderId}-${n.timestamp}`)
+  ).length;
+
+  const handleDropdownOpen = () => {
+    setIsOpen(!isOpen);
+    if (!isOpen) {
+      setTimeout(() => {
+        setReadIds(
+          new Set(
+            filteredNotifications.map(
+              (n) => `${n.type}-${n.orderId}-${n.timestamp}`
+            )
+          )
+        );
+      }, 1000);
+    }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isOpen && !event.target.closest('.notification-wrapper')) {
-        setIsOpen(false);
-      }
+  const handleNotificationClick = (notification, index) => {
+    const { type, orderId } = notification;
+    const routes = {
+      "order-created": () =>
+        account?.role === "company" && `/company#order-${orderId}`,
+      newBookingRequest: () =>
+        account?.role === "company" && `/company#order-${orderId}`,
+      "order-confirmed": () =>
+        account?.role === "user" && `/account/orders/${orderId}`,
+      bookingConfirmed: () =>
+        account?.role === "user" && `/account/orders/${orderId}`,
+      "order-cancelled": () =>
+        account?.role === "user" && `/account/orders/${orderId}`,
+      bookingCancelled: () =>
+        account?.role === "user" && `/account/orders/${orderId}`,
+      "order-user-cancelled": () =>
+        account?.role === "company" && `/company#order-${orderId}`,
+      "review-submitted": () =>
+        account?.role === "company" && `/company/reviews`,
     };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    const route = routes[type]?.();
+    if (route) {
+      router.push(route);
+      removeNotification(index);
+      setIsOpen(false);
+    }
+  };
+
+  const getIcon = (type) =>
+    ({
+      "order-created": "📦",
+      newBookingRequest: "📦",
+      "order-confirmed": "✅",
+      bookingConfirmed: "✅",
+      "order-cancelled": "❌",
+      bookingCancelled: "❌",
+      "order-user-cancelled": "🚫",
+      "review-submitted": "⭐",
+    })[type] || "📬";
+
+  const getTitle = (type) =>
+    ({
+      "order-created": "New Request",
+      newBookingRequest: "New Request",
+      "order-confirmed": "Confirmed",
+      bookingConfirmed: "Confirmed",
+      "order-cancelled": "Cancelled",
+      bookingCancelled: "Cancelled",
+      "order-user-cancelled": "User Cancelled",
+      "review-submitted": "New Review",
+    })[type] || "Notification";
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isOpen && !e.target.closest(".notification-wrapper"))
+        setIsOpen(false);
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, [isOpen]);
 
   return (
-    <div className="notification-wrapper">
-      <button
-        onClick={handleDropdownOpen}
-        className="notification-icon"
-        style={{
-          position: 'relative',
-          background: 'none',
-          border: 'none',
-          fontSize: '24px',
-          cursor: 'pointer',
-          padding: '8px',
-          borderRadius: '8px',
-          transition: 'background-color 0.2s',
-        }}
-        onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-      >
-        🔔
+    <div className="notification-wrapper user-dropdown">
+      <button onClick={handleDropdownOpen} className="notification-btn">
+        <svg
+          viewBox="0 0 24 24"
+          width={36}
+          height={36}
+          fill="none"
+          stroke="#007bff"
+          strokeWidth="3"
+        >
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
         {unreadCount > 0 && (
-          <span
-            className="notification-badge"
-            style={{
-              position: 'absolute',
-              top: '0px',
-              right: '0px',
-              backgroundColor: '#ff4444',
-              color: 'white',
-              borderRadius: '50%',
-              width: '20px',
-              height: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '12px',
-              fontWeight: 'bold',
-              minWidth: '20px',
-              animation: unreadCount > 0 ? 'pulse 2s infinite' : 'none',
-            }}
-          >
-            {unreadCount}
-          </span>
+          <span className="notification-badge">{unreadCount}</span>
         )}
       </button>
 
       {isOpen && (
-        <div
-          className="notification-dropdown"
-          style={{
-            position: 'absolute',
-            top: '100%',
-            right: '0px',
-            background: 'white',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            minWidth: '300px',
-            maxWidth: '400px',
-            zIndex: 1000,
-            marginTop: '8px',
-          }}
-        >
+        <div className="dropdown-menu notification-dropdown">
           {filteredNotifications.length === 0 ? (
-            <p
-              className="notification-empty"
-              style={{
-                padding: '16px',
-                textAlign: 'center',
-                color: '#666',
-                margin: 0,
-              }}
-            >
-              No new notifications
-            </p>
+            <p className="notification-empty">No new notifications</p>
           ) : (
             <>
-              <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                {filteredNotifications.slice(-5).map((notification, idx) => (
-                  <div
-                    key={`${notification.type}-${notification.orderId}-${notification.timestamp}`}
-                    className="notification-item"
-                    onClick={() => handleNotificationClick(notification, idx)}
-                    style={{
-                      padding: '12px 16px',
-                      borderBottom: idx < filteredNotifications.length - 1 ? '1px solid #eee' : 'none',
-                      position: 'relative',
-                      backgroundColor: notification.read ? 'transparent' : '#f8f9ff',
-                      borderLeft: notification.read ? 'none' : '3px solid #4285f4',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!notification.read) {
-                        e.currentTarget.style.backgroundColor = '#f0f7ff';
-                      } else {
-                        e.currentTarget.style.backgroundColor = '#f5f5f5';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!notification.read) {
-                        e.currentTarget.style.backgroundColor = '#f8f9ff';
-                      } else {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
-                      <strong style={{ 
-                        color: notification.read ? '#666' : '#333', 
-                        fontSize: '14px',
-                        fontWeight: notification.read ? 'normal' : 'bold'
-                      }}>
-                        {getNotificationIcon(notification.type)} {formatNotificationType(notification.type)}
-                        {!notification.read && <span style={{ color: '#4285f4', marginLeft: '4px' }}>•</span>}
-                      </strong>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '11px', color: '#666' }}>
-                          {new Date(notification.timestamp).toLocaleTimeString()}
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent notification click
-                            deleteNotification(idx);
-                          }}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: '#999',
-                            fontSize: '12px',
-                            padding: '2px',
-                            borderRadius: '2px',
-                            transition: 'color 0.2s',
-                          }}
-                          onMouseEnter={(e) => e.target.style.color = '#ff4444'}
-                          onMouseLeave={(e) => e.target.style.color = '#999'}
-                          title="Delete notification"
-                        >
-                          ✕
-                        </button>
+              <div className="notification-list">
+                {filteredNotifications.slice(-5).map((notification, idx) => {
+                  const id = `${notification.type}-${notification.orderId}-${notification.timestamp}`;
+                  const isRead = readIds.has(id);
+                  return (
+                    <div
+                      key={id}
+                      className={`notification-item ${!isRead ? "unread" : ""}`}
+                      onClick={() => handleNotificationClick(notification, idx)}
+                    >
+                      <div className="notification-header">
+                        <strong>
+                          {getIcon(notification.type)}{" "}
+                          {getTitle(notification.type)}
+                          {!isRead && <span className="unread-dot">•</span>}
+                        </strong>
+                        <div className="notification-actions">
+                          <span className="notification-time">
+                            {new Date(
+                              notification.timestamp
+                            ).toLocaleTimeString()}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeNotification(idx);
+                            }}
+                            className="notification-delete btn-secondary"
+                          >
+                            ✕
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <p style={{ 
-                      margin: 0, 
-                      fontSize: '13px', 
-                      color: notification.read ? '#777' : '#555', 
-                      lineHeight: '1.4' 
-                    }}>
-                      {notification.message}
-                    </p>
-                    {notification.orderId && (
-                      <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#888', fontStyle: 'italic' }}>
-                        Order: {notification.orderId} • Click to view
+                      <p className="notification-message">
+                        {notification.message}
                       </p>
-                    )}
-                  </div>
-                ))}
+                      {notification.orderId && (
+                        <p className="notification-footer">
+                          Order: {notification.orderId} • Click to view
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               <button
-                onClick={clearAllNotifications}
-                className="notification-clear-btn"
-                style={{
-                  width: '100%',
-                  padding: '10px 16px',
-                  background: '#f8f9fa',
-                  border: 'none',
-                  borderTop: '1px solid #eee',
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  color: '#666',
-                  transition: 'background-color 0.2s',
+                onClick={() => {
+                  clearNotifications();
+                  setIsOpen(false);
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#e9ecef'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#f8f9fa'}
+                className="notification-clear"
               >
                 🗑️ Clear all
               </button>
@@ -379,65 +206,6 @@ export default function NotificationButton({ account }) {
           )}
         </div>
       )}
-      <style jsx>{`
-        .notification-wrapper {
-          position: relative;
-          display: inline-block;
-        }
-        
-        @keyframes pulse {
-          0% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.1);
-          }
-          100% {
-            transform: scale(1);
-          }
-        }
-      `}</style>
     </div>
   );
-}
-
-// ✅ Helper Functions
-function getNotificationIcon(type) {
-  switch (type) {
-    case 'order-created':
-    case 'newBookingRequest':
-      return '📦';
-    case 'order-confirmed':
-    case 'bookingConfirmed':
-      return '✅';
-    case 'order-cancelled':
-    case 'bookingCancelled':
-      return '❌';
-    case 'order-user-cancelled': 
-      return '🚫';
-    case 'review-submitted':
-      return '⭐';
-    default:
-      return '📬';
-  }
-}
-
-function formatNotificationType(type) {
-  switch (type) {
-    case 'order-created':
-    case 'newBookingRequest':
-      return 'New Request';
-    case 'order-confirmed':
-    case 'bookingConfirmed':
-      return 'Confirmed';
-    case 'order-cancelled':
-    case 'bookingCancelled':
-      return 'Cancelled';
-    case 'order-user-cancelled': 
-      return 'User Cancelled';
-    case 'review-submitted':
-      return 'New Review';
-    default:
-      return 'Notification';
-  }
 }
