@@ -18,7 +18,6 @@ export default function AccountDashboard() {
 
   const ordersLoading = useLoading("api", "orders");
   const [orders, setOrders] = useState([]);
-  const [upcomingOrders, setUpcomingOrders] = useState([]);
   const [error, setError] = useState(null);
 
   const formatDate = (dateString) => {
@@ -85,13 +84,11 @@ export default function AccountDashboard() {
       const data = await response.json();
 
       if (data.success) {
-        setOrders(data.orders);
-        const now = new Date();
-        const upcoming = data.orders.filter((order) => {
-          const orderDate = getOrderDate(order);
-          return orderDate && new Date(orderDate) >= now;
-        });
-        setUpcomingOrders(upcoming);
+        // Sort orders by creation date (newest first)
+        const sortedOrders = data.orders.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setOrders(sortedOrders);
       } else {
         setError(data.message || "Orders could not be loaded.");
       }
@@ -186,13 +183,13 @@ export default function AccountDashboard() {
       {error && <p className="error">{error}</p>}
 
       <section>
-        <h2>View Orders</h2>
+        <h2>All Orders</h2>
 
         {ordersLoading.isLoading ? (
           <Loader text="Loading orders..." />
-        ) : upcomingOrders.length > 0 ? (
+        ) : orders.length > 0 ? (
           <div>
-            {upcomingOrders.map((order) => (
+            {orders.map((order) => (
               <Link
                 href={`/account/orders/${order._id}`}
                 key={order._id}
@@ -218,7 +215,8 @@ export default function AccountDashboard() {
                 </div>
                 <div>
                   <p>
-                    <strong>Moving Company:</strong> {order.companyId?.companyName || order.companyName}
+                    <strong>Moving Company:</strong>{" "}
+                    {order.companyId?.companyName || order.companyName}
                   </p>
                   <p>
                     <strong>Helpers / Hours:</strong> {order.helpersCount}&nbsp;
@@ -232,7 +230,7 @@ export default function AccountDashboard() {
             ))}
           </div>
         ) : (
-          <p>You currently have no planned moves.</p>
+          <p>You currently have no orders.</p>
         )}
       </section>
     </div>
