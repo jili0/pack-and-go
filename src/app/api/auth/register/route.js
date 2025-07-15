@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Account from "@/models/Account";
 import { createToken, setTokenCookie } from "@/lib/auth";
-// import { sendWelcomeEmail } from "@/lib/email";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(request) {
   try {

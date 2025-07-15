@@ -1,4 +1,4 @@
-// /src/app/api/socket/emit/route.js
+/// /src/app/api/socket/emit/route.js
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
