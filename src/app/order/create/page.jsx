@@ -4,9 +4,57 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/context/LoadingContext";
-import Loader from "@/components/ui/Loader";
 import Link from "next/link";
 import { useSocket } from "@/context/useSocket";
+
+const AddressInputs = ({ type, address, onChange }) => (
+  <>
+    <p className="section-header">{type === "from" ? "From:" : "To:"}</p>
+    <div className="form-field">
+      <label>
+        Address
+        <input
+          type="text"
+          value={address.street || ""}
+          onChange={(e) => onChange({ ...address, street: e.target.value })}
+          placeholder={
+            type === "from" ? "Friedrichstrasse 123" : "Hauptstrasse 456"
+          }
+        />
+      </label>
+    </div>
+    <div className="form-field">
+      <label>
+        Postal Code
+        <input
+          type="text"
+          value={address.postalCode || ""}
+          onChange={(e) => onChange({ ...address, postalCode: e.target.value })}
+          placeholder={type === "from" ? "10117" : "20095"}
+        />
+      </label>
+      <label>
+        City
+        <input
+          type="text"
+          value={address.city || ""}
+          onChange={(e) => onChange({ ...address, city: e.target.value })}
+          placeholder={type === "from" ? "Berlin" : "Hamburg"}
+        />
+      </label>
+    </div>
+  </>
+);
+
+const getDefaultDates = () => {
+  const dates = [];
+  for (let i = 1; i <= 3; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() + i);
+    dates.push(date.toISOString().split("T")[0]);
+  }
+  return dates;
+};
 
 export default function CreateOrder() {
   const router = useRouter();
@@ -16,18 +64,6 @@ export default function CreateOrder() {
   const submitLoading = useLoading("api", "createOrder");
 
   const [selectedCompany, setSelectedCompany] = useState(null);
-
-  // Helper function to get default dates (1, 2, 3 days from today)
-  const getDefaultDates = () => {
-    const dates = [];
-    for (let i = 1; i <= 3; i++) {
-      const date = new Date();
-      date.setDate(date.getDate() + i);
-      dates.push(date.toISOString().split("T")[0]);
-    }
-    return dates;
-  };
-
   const [formData, setFormData] = useState({
     fromAddress: {
       street: "Friedrichstrasse 123",
@@ -99,7 +135,7 @@ export default function CreateOrder() {
     };
 
     loadSessionData();
-  }, [initialCheckDone, account?.id || null]);
+  }, [initialCheckDone, account?.id]);
 
   useEffect(() => {
     if (isConnected) {
@@ -108,51 +144,6 @@ export default function CreateOrder() {
       console.warn("⚠️ Socket is not connected - notifications may not work");
     }
   }, [isConnected]);
-
-  const AddressInputs = ({ type, address, onChange }) => (
-    <>
-      <p className="section-header">{type === "from" ? "From:" : "To:"}</p>
-      <div className="form-field">
-        <label>
-          Address
-          <input
-            type="text"
-            value={address.street || ""}
-            onChange={(e) => onChange({ ...address, street: e.target.value })}
-            placeholder={
-              type === "from" ? "Friedrichstrasse 123" : "Hauptstrasse 456"
-            }
-          />
-        </label>
-      </div>
-      <div className="form-field">
-        <label>
-          Postal Code
-          <input
-            type="text"
-            value={address.postalCode || ""}
-            onChange={(e) =>
-              onChange({ ...address, postalCode: e.target.value })
-            }
-            placeholder={type === "from" ? "10117" : "20095"}
-          />
-        </label>
-        <label>
-          City
-          <input
-            type="text"
-            value={address.city || ""}
-            onChange={(e) => onChange({ ...address, city: e.target.value })}
-            placeholder={type === "from" ? "Berlin" : "Hamburg"}
-          />
-        </label>
-      </div>
-    </>
-  );
-
-  const validateForm = () => {
-    return true; // No validation needed since we have defaults
-  };
 
   const totalPrice =
     selectedCompany && formData.helpersCount && formData.estimatedHours
@@ -164,49 +155,28 @@ export default function CreateOrder() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Apply default values for empty fields before submitting
     const submissionData = { ...formData };
 
-    // Default addresses
-    if (
-      !submissionData.fromAddress.street ||
-      submissionData.fromAddress.street.trim() === ""
-    ) {
+    if (!submissionData.fromAddress.street?.trim()) {
       submissionData.fromAddress.street = "Friedrichstrasse 123";
     }
-    if (
-      !submissionData.fromAddress.city ||
-      submissionData.fromAddress.city.trim() === ""
-    ) {
+    if (!submissionData.fromAddress.city?.trim()) {
       submissionData.fromAddress.city = "Berlin";
     }
-    if (
-      !submissionData.fromAddress.postalCode ||
-      submissionData.fromAddress.postalCode.trim() === ""
-    ) {
+    if (!submissionData.fromAddress.postalCode?.trim()) {
       submissionData.fromAddress.postalCode = "10117";
     }
 
-    if (
-      !submissionData.toAddress.street ||
-      submissionData.toAddress.street.trim() === ""
-    ) {
+    if (!submissionData.toAddress.street?.trim()) {
       submissionData.toAddress.street = "Hauptstrasse 456";
     }
-    if (
-      !submissionData.toAddress.city ||
-      submissionData.toAddress.city.trim() === ""
-    ) {
+    if (!submissionData.toAddress.city?.trim()) {
       submissionData.toAddress.city = "Hamburg";
     }
-    if (
-      !submissionData.toAddress.postalCode ||
-      submissionData.toAddress.postalCode.trim() === ""
-    ) {
+    if (!submissionData.toAddress.postalCode?.trim()) {
       submissionData.toAddress.postalCode = "20095";
     }
 
-    // Default dates
     if (
       !submissionData.preferredDates ||
       submissionData.preferredDates.filter((date) => date).length === 0
@@ -214,12 +184,9 @@ export default function CreateOrder() {
       submissionData.preferredDates = getDefaultDates();
     }
 
-    // Default notes
-    if (!submissionData.notes || submissionData.notes.trim() === "") {
+    if (!submissionData.notes?.trim()) {
       submissionData.notes = "Please handle fragile items with extra care.";
     }
-
-    if (!validateForm()) return;
 
     submitLoading.startLoading();
     setError(null);
