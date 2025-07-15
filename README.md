@@ -1,35 +1,97 @@
 # Pack & Go - Moving Platform
 
-Pack & Go is a modern web platform for mediating moving services with a transparent pricing model and quality certification.
+Pack & Go is a modern web platform that connects customers with certified moving companies, featuring transparent pricing, quality certification, and streamlined booking processes.
 
-List of test account daten:
-User accounts:
-Maria Schmidt - maria.schmidt@email.com (default user)
-Thomas Müller - thomas.mueller@email.com
-Anna Weber - anna.weber@email.com
-Kevin Bauer - kevin.bauer@email.com
-Sarah Johnson - sarah.johnson@email.com
-Michael Wagner - michael.wagner@email.com
-Lisa Chen - lisa.chen@email.com
-Robert Klein - robert.klein@email.com
+## Features
 
-Company accounts:
-**Swift Relocations** - swift.relocations@email.com - from Berlin to Cologne, from Berlin to Dusseldorf, from Berlin to Essen, from Berlin to Dortmund etc.(default company)
+- **Transparent Pricing**: Clear, upfront pricing with no hidden fees
+- **Quality Certification**: Verified moving companies with quality ratings
+- **Easy Booking**: Streamlined order process from quote to completion
+- **Review System**: Customer feedback and rating system
+- **Admin Dashboard**: Comprehensive management tools for platform administration
+- **Company Dashboard**: Tools for moving companies to manage their services
+- **User Accounts**: Personal dashboards for customers to track their moves
 
-**MoveMax Berlin** - movemax.berlin@email.com - from Berlin to Munich, from Berlin to Frankfurt, from Berlin to Stuttgart
+## Test Accounts
 
-**Capital Movers** - capital.movers@email.com - from Berlin to Hamburg, from Berlin to Bremen
+### User Accounts
+- **Maria Schmidt** - maria.schmidt@email.com (default user)
+- **Thomas Müller** - thomas.mueller@email.com
+- **Anna Weber** - anna.weber@email.com
+- **Kevin Bauer** - kevin.bauer@email.com
+- **Sarah Johnson** - sarah.johnson@email.com
+- **Michael Wagner** - michael.wagner@email.com
+- **Lisa Chen** - lisa.chen@email.com
+- **Robert Klein** - robert.klein@email.com
 
-**Berlin Express Moving** - berlin.express@email.com - from Berlin to Dresden, from Berlin to Leipzig, from Berlin to Chemnitz, from Berlin to Rostock, from Berlin to Magdeburg
+### Company Accounts
 
-**Prime Movers Germany** - prime.movers@email.com - from Berlin to Nuremberg, from Berlin to Augsburg, from Berlin to Regensburg
+#### Swift Relocations (Default Company)
+- **Email**: swift.relocations@email.com
+- **Service Areas**: Berlin to Cologne, Dusseldorf, Essen, Dortmund
+- **Note**: All test reviews are available for this company
 
-**Metro Moving Solutions** - metro.moving@email.com - from Berlin to Hannover
+#### MoveMax Berlin
+- **Email**: movemax.berlin@email.com
+- **Service Areas**: Berlin to Munich, Frankfurt, Stuttgart
 
-Start City: Berlin
+#### Capital Movers
+- **Email**: capital.movers@email.com
+- **Service Areas**: Berlin to Hamburg, Bremen
 
-Destination Cities:
-Munich, Frankfurt, Stuttgart, Hamburg, Bremen, Cologne, Dusseldorf, Essen, Dortmund, Dresden, Leipzig, Chemnitz, Rostock, Magdeburg, Nuremberg, Augsburg, Regensburg, Hannover
+#### Berlin Express Moving
+- **Email**: berlin.express@email.com
+- **Service Areas**: Berlin to Dresden, Leipzig, Chemnitz, Rostock, Magdeburg
 
-Reviews:
-All test reviews are available for **Swift Relocations** - swift.relocations@email.com 
+#### Prime Movers Germany
+- **Email**: prime.movers@email.com
+- **Service Areas**: Berlin to Nuremberg, Augsburg, Regensburg
+
+#### Metro Moving Solutions
+- **Email**: metro.moving@email.com
+- **Service Areas**: Berlin to Hannover
+
+## Service Coverage
+
+### Start City
+- **Berlin** (primary departure location)
+
+### Destination Cities
+- Munich
+- Frankfurt
+- Stuttgart
+- Hamburg
+- Bremen
+- Cologne
+- Dusseldorf
+- Essen
+- Dortmund
+- Dresden
+- Leipzig
+- Chemnitz
+- Rostock
+- Magdeburg
+- Nuremberg
+- Augsburg
+- Regensburg
+- Hannover
+
+## Team
+
+This project was developed by:
+
+### Jing Li
+- **LinkedIn**: https://www.linkedin.com/in/jili0/
+- **GitHub**: https://github.com/jili0
+
+### Dursel Türkan
+- **LinkedIn**: https://www.linkedin.com/in/dursel-tuerkan/
+- **GitHub**: https://github.com/durseltuerkan
+
+### Angelique
+- **LinkedIn**: https://www.linkedin.com/in/jili0/
+- **GitHub**: https://github.com/jili0
+
+### Jian Lu
+- **LinkedIn**: https://www.linkedin.com/in/jian-lu-705184330/
+- **GitHub**: https://github.com/LuJian2024
