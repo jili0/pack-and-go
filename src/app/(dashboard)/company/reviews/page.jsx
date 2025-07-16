@@ -84,7 +84,7 @@ export default function CompanyReviewsPage() {
 
   return (
     <div className="container">
-      <h1>Your Reviews</h1>
+      <h1>Company Reviews</h1>
       {reviews.map((review) => (
         <div key={review._id} className="review-card">
           <div className="review-header">
@@ -92,7 +92,9 @@ export default function CompanyReviewsPage() {
               {[1, 2, 3, 4, 5].map((star) => (
                 <span
                   key={star}
-                  className={star <= review.rating ? "star-active" : "star-inactive"}
+                  className={
+                    star <= review.rating ? "star-active" : "star-inactive"
+                  }
                 >
                   ★
                 </span>
