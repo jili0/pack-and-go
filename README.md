@@ -2,6 +2,35 @@
 
 Pack & Go is a modern web platform that connects customers with certified moving companies, featuring transparent pricing, quality certification, and streamlined booking processes.
 
+## 📷 App Preview
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="public/app-preview/preview1.png" alt="App Preview" width="400"/>
+        <p><em>Homepage</em></p>
+      </td>
+      <td align="center">
+        <img src="public/app-preview/preview2.png" alt="App Preview" width="400"/>
+        <p><em>Company Reviews</em></p>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="public/app-preview/preview3.png" alt="App Preview" width="400"/>
+        <p><em>CompanyDashboard</em></p>
+      </td>
+      <td align="center">
+        <img src="public/app-preview/preview4.png" alt="App Preview" width="400"/>
+        <p><em>User Dashboard</em></p>
+      </td>
+    </tr>
+  </table>
+</div>
+<br><br>
+
+
 ## Features
 
 - **Transparent Pricing**: Clear, upfront pricing with no hidden fees
