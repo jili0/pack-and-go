@@ -525,6 +525,7 @@ export default function EditPage() {
                     <button
                       type="button"
                       onClick={() => removeServiceArea(area._id)}
+                      className="btn-primary"
                     >
                       Remove
                     </button>
@@ -553,7 +554,7 @@ export default function EditPage() {
                       }))
                     }
                   />
-                  <button type="button" onClick={addServiceArea}>
+                  <button type="button" onClick={addServiceArea} className="btn-primary">
                     Add
                   </button>
                 </div>

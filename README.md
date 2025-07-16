@@ -80,7 +80,11 @@ Pack & Go is a modern web platform that connects customers with certified moving
 
 This project was developed by:
 
-### Jing Li
+### Jian Lu
+- **LinkedIn**: https://www.linkedin.com/in/jian-lu-705184330/
+- **GitHub**: https://github.com/LuJian2024
+
+### Angelique
 - **LinkedIn**: https://www.linkedin.com/in/jili0/
 - **GitHub**: https://github.com/jili0
 
@@ -88,10 +92,6 @@ This project was developed by:
 - **LinkedIn**: https://www.linkedin.com/in/dursel-tuerkan/
 - **GitHub**: https://github.com/durseltuerkan
 
-### Angelique
+### Jing Li
 - **LinkedIn**: https://www.linkedin.com/in/jili0/
 - **GitHub**: https://github.com/jili0
-
-### Jian Lu
-- **LinkedIn**: https://www.linkedin.com/in/jian-lu-705184330/
-- **GitHub**: https://github.com/LuJian2024
