@@ -85,8 +85,8 @@ This project was developed by:
 - **GitHub**: https://github.com/LuJian2024
 
 ### Angelique
-- **LinkedIn**: https://www.linkedin.com/in/jili0/
-- **GitHub**: https://github.com/jili0
+- **LinkedIn**: https://www.linkedin.com/in/angelique-guisse-049541317/
+- **GitHub**: https://github.com/Angelique-guisse
 
 ### Dursel Türkan
 - **LinkedIn**: https://www.linkedin.com/in/dursel-tuerkan/
