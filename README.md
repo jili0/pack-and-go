@@ -2,7 +2,7 @@
 
 Pack & Go is a modern web platform that connects customers with certified moving companies, featuring transparent pricing, quality certification, and streamlined booking processes.
 
-## 📷 App Preview
+## App Preview
 
 <div align="center">
   <table>
@@ -19,7 +19,7 @@ Pack & Go is a modern web platform that connects customers with certified moving
     <tr>
       <td align="center">
         <img src="public/app-preview/preview3.png" alt="App Preview" width="400"/>
-        <p><em>CompanyDashboard</em></p>
+        <p><em>Company Dashboard</em></p>
       </td>
       <td align="center">
         <img src="public/app-preview/preview4.png" alt="App Preview" width="400"/>
