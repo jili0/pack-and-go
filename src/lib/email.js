@@ -1,13 +1,32 @@
 // src/lib/email.js
 import { Resend } from "resend";
 
-// Konfiguriere Resend mit dem API-Schlüssel aus den Umgebungsvariablen
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 // E-Mail-Absender-Adresse
 const fromEmail = process.env.FROM_EMAIL || "no-reply@pack-and-go.de";
 const supportEmail = process.env.SUPPORT_EMAIL || "support@pack-and-go.de";
 const adminEmail = process.env.ADMIN_EMAIL || "admin@pack-and-go.de";
+
+// Lazy initialization of Resend client to avoid build-time errors
+let resend = null;
+function getResendClient() {
+  if (!resend) {
+    const apiKey = process.env.RESEND_API_KEY;
+    // During build time, create a mock client if API key is missing
+    if (!apiKey && (process.env.NEXT_PHASE === 'phase-production-build' || process.env.NODE_ENV === 'development')) {
+      // Return a mock client that logs instead of sending
+      return {
+        emails: {
+          send: async () => {
+            console.warn('Resend API key not configured. Email would be sent in production.');
+            return { id: 'mock-email-id' };
+          }
+        }
+      };
+    }
+    resend = new Resend(apiKey);
+  }
+  return resend;
+}
 
 /**
  * Sendet eine Willkommens-E-Mail an einen neuen Benutzer
@@ -17,7 +36,8 @@ const adminEmail = process.env.ADMIN_EMAIL || "admin@pack-and-go.de";
  */
 export const sendWelcomeEmail = async (email, name) => {
   try {
-    const response = await resend.emails.send({
+    const resendClient = getResendClient();
+    const response = await resendClient.emails.send({
       from: fromEmail,
       to: email,
       subject: "Willkommen bei Pack & Go",
@@ -73,7 +93,8 @@ export const sendOrderConfirmationEmail = async ({
       day: "numeric",
     });
 
-    const response = await resend.emails.send({
+    const resendClient = getResendClient();
+    const response = await resendClient.emails.send({
       from: fromEmail,
       to: email,
       subject: "Ihre Umzugsanfrage bei Pack & Go",
@@ -131,7 +152,8 @@ export const sendNewOrderNotificationEmail = async ({
       )
       .join(", ");
 
-    const response = await resend.emails.send({
+    const resendClient = getResendClient();
+    const response = await resendClient.emails.send({
       from: fromEmail,
       to: email,
       subject: "Neue Umzugsanfrage auf Pack & Go",
@@ -247,7 +269,8 @@ export const sendOrderStatusUpdateEmail = async ({
       `;
     }
 
-    const response = await resend.emails.send({
+    const resendClient = getResendClient();
+    const response = await resendClient.emails.send({
       from: fromEmail,
       to: email,
       subject,
@@ -293,7 +316,8 @@ export const sendCompanyVerificationRequestEmail = async ({
   documentsUrl,
 }) => {
   try {
-    const response = await resend.emails.send({
+    const resendClient = getResendClient();
+    const response = await resendClient.emails.send({
       from: fromEmail,
       to: adminEmail,
       subject: "Neue Anfrage zur Firmenverifizierung",
@@ -378,7 +402,8 @@ export const sendBookingConfirmationEmail = async ({
       `
       : '';
 
-    const response = await resend.emails.send({
+    const resendClient = getResendClient();
+    const response = await resendClient.emails.send({
       from: fromEmail,
       to: email,
       subject: `Buchungsbestätigung - ${serviceName}`,
