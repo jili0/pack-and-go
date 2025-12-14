@@ -43,7 +43,7 @@ const roleBasedPaths = {
   "/api/admin": ["admin"],
 };
 
-export async function middleware(request) {
+export default async function proxy(request) {
   const { pathname } = request.nextUrl;
 
   // For Protected Paths check authentication
@@ -51,7 +51,7 @@ export async function middleware(request) {
     // Get token from cookies
     const token = request.cookies.get("token")?.value;
 
-    console.log("=== Middleware Debug ===");
+    console.log("=== Proxy Debug ===");
     console.log("Path:", pathname);
     console.log("Token exists:", !!token);
 
